@@ -14,4 +14,8 @@ cd "${PROJECT_ROOT}/docker" && \
 # https://jtreminio.com/blog/running-docker-containers-as-current-host-user/
 docker run \
    -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
+   -v "${PROJECT_ROOT}/docker/.emacs":"/home/emacdona/.emacs" \
+   -v "${PROJECT_ROOT}/docker/.exrc":"/home/emacdona/.exrc" \
+   -v "${PROJECT_ROOT}/docker/.screenrc":"/home/emacdona/.screenrc" \
+   -v "${PROJECT_ROOT}/docker/.zshrc":"/home/emacdona/.zshrc" \
    -it emacdona/onlisp $@

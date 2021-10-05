@@ -14,6 +14,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y unzip
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y zip
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sudo
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y clisp
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y texinfo
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
 
 
 # Create a user corresponding to the host user
@@ -31,6 +33,9 @@ RUN useradd \
    -G sudo \
    -u $UID "${USERNAME}"
 
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
+/etc/sudoers
+
 USER "${USERNAME}"
 WORKDIR "/home/${USERNAME}/onlisp"
 
@@ -41,15 +46,37 @@ RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/inst
 # SDK Man
 # https://sdkman.io/install
 RUN curl -s "https://get.sdkman.io" | bash
-RUN sudo -i -u "${USERNAME}" bash -c 'source /home/${USER}/.sdkman/bin/sdkman-init.sh &&  sdk install java 11.0.11.hs-adpt'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install java 11.0.11.hs-adpt'
+
+# Commented out for now and mounted as volumes -- because if I change them, I want to see the changes take
+# effect! However, if you run a command that you know will change one of these, consider how to handle that.
+# If you run that command as part of this file (ie as part of the docker build process), you should uncomment
+# these so they are copied in before the command that changes them. Then copy them BACK to the host and vc
+# them. If they change as a result of something you run inside the container, then just copy them back to the
+# host and vc them
+# Copy in some dotfiles
+# COPY --chown="${USERNAME}:${USERGROUP}" .exrc .exrc
+# COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
+# COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
+#COPY --chown="${USERNAME}:${USERGROUP}" .emacs "/home/${USERNAME}/.emacs"
+
+# Why do they make this so hard?? Modified from: 
+# https://github.com/dimitri/el-get
+#RUN sudo -i -u "${USERNAME}" bash -c 'curl -s "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el" > /tmp/el-get-install.el'
+#RUN sudo -i -u "${USERNAME}" bash -c 'emacs -batch -l /tmp/el-get-install.el'
+
+#RUN sudo -i -u "${USERNAME}" bash -c 'emacs -batch -l /home/${USER}/.emacs'
 
 # pathogen
 RUN sudo -i -u "${USERNAME}" bash -c '\
    mkdir -p ~/.vim/autoload ~/.vim/bundle && \
    curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim'
 
-# Copy in some dotfiles
-COPY --chown="${USERNAME}:${USERGROUP}" .exrc .exrc
-COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
+# Fugitive
+RUN sudo -i -u "${USERNAME}" bash -c '\
+   mkdir -p ~/.vim/pack/tpope/start && \
+   cd ~/.vim/pack/tpope/start && \
+   git clone https://tpope.io/vim/fugitive.git && \
+   vim -u NONE -c "helptags fugitive/doc" -c q'
 
 CMD zsh
