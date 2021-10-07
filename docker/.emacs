@@ -1,18 +1,23 @@
-(add-to-list 'load-path "~/.emacs.d/el-get/el-get")
+;; Set up package.el to work with MELPA
+(require 'package)
+(add-to-list 'package-archives
+   '("melpa" . "https://melpa.org/packages/"))
 
-(unless (require 'el-get nil 'noerror)
-  (with-current-buffer
-      (url-retrieve-synchronously
-       "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
-    (goto-char (point-max))
-    (eval-print-last-sexp)))
+(package-initialize)
+(package-refresh-contents)
 
-(add-to-list 'el-get-recipe-path "~/.emacs.d/el-get-user/recipes")
+;; Download Evil
+(unless (package-installed-p 'evil)
+    (package-install 'evil))
 
-(el-get-bundle slime)
+;; Download Slime
+(unless (package-installed-p 'slime)
+    (package-install 'slime))
 
-(el-get 'sync)
+;; Enable Evil
+(require 'evil)
+(evil-mode 1)
 
+;; Enable slime
+(require 'slime)
 (setq inferior-lisp-program "sbcl")
-
-

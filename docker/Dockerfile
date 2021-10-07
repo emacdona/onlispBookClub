@@ -16,6 +16,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sudo
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y clisp
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y texinfo
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-sphinx
 
 
 # Create a user corresponding to the host user
@@ -39,6 +40,12 @@ RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
 USER "${USERNAME}"
 WORKDIR "/home/${USERNAME}/onlisp"
 
+ARG GIT_USER_EMAIL
+ARG GIT_USER_NAME
+
+RUN sudo -i -u "${USERNAME}" bash -c "git config --global user.email ${GIT_USER_EMAIL}"
+RUN sudo -i -u "${USERNAME}" bash -c "git config --global user.name ${GIT_USER_NAME}"
+
 # Oh My Zsh
 # https://ohmyz.sh/#install
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -58,7 +65,10 @@ RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sd
 # COPY --chown="${USERNAME}:${USERGROUP}" .exrc .exrc
 # COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
 # COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
-#COPY --chown="${USERNAME}:${USERGROUP}" .emacs "/home/${USERNAME}/.emacs"
+COPY --chown="${USERNAME}:${USERGROUP}" .emacs "/home/${USERNAME}/.emacs"
+
+# Run emacs in batch mode to install all packages
+RUN sudo -i -u "${USERNAME}" bash -c 'emacs --batch -l ~/.emacs'
 
 # Why do they make this so hard?? Modified from: 
 # https://github.com/dimitri/el-get
