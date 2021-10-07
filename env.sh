@@ -23,7 +23,7 @@ docker run \
    -v "${PROJECT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
    -v "${PROJECT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
    -v "${PROJECT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
+   -v "${PROJECT_ROOT}/docker/.emacs":"/home/emacdona/.emacs" \
    -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
    -it emacdona/onlisp $@
 
-#   -v "${PROJECT_ROOT}/docker/.emacs":"/home/emacdona/.emacs" \

@@ -55,16 +55,14 @@ RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/inst
 RUN curl -s "https://get.sdkman.io" | bash
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install java 11.0.11.hs-adpt'
 
-# Commented out for now and mounted as volumes -- because if I change them, I want to see the changes take
-# effect! However, if you run a command that you know will change one of these, consider how to handle that.
-# If you run that command as part of this file (ie as part of the docker build process), you should uncomment
-# these so they are copied in before the command that changes them. Then copy them BACK to the host and vc
-# them. If they change as a result of something you run inside the container, then just copy them back to the
-# host and vc them
-# Copy in some dotfiles
-# COPY --chown="${USERNAME}:${USERGROUP}" .exrc .exrc
-# COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
-# COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
+# Copy in some dotfiles.
+# Hell, mount them as volumes too when we start the container. That way, if you change them on the host and it doesn't cause this layer to
+# rebuild, you'll still see your changes! (I'm not sure how to force this layer to rebuild if one of these files changes on the host).
+# Note that the .emacs file HAS to be copied in because we count on it being there when we run emacs in batch mode while building the
+# container -- which results in emacs plugins being installed ON A LAYER IN THE CONTAINER.
+COPY --chown="${USERNAME}:${USERGROUP}" .exrc .exrc
+COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
+COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
 COPY --chown="${USERNAME}:${USERGROUP}" .emacs "/home/${USERNAME}/.emacs"
 
 # Run emacs in batch mode to install all packages
