@@ -100,8 +100,17 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# Tell screen to use unicode.
 alias screen="screen -U"
+
+# My favorite git history viewing command
+alias gg="git log --oneline --graph --all"
+
+# DON'T PAGE IF IT'S LESS THAN A PAGE!!!
+export LESS="-F -X $LESS"
+
 set -o vi
+
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
