@@ -68,13 +68,6 @@ COPY --chown="${USERNAME}:${USERGROUP}" .emacs "/home/${USERNAME}/.emacs"
 # Run emacs in batch mode to install all packages
 RUN sudo -i -u "${USERNAME}" bash -c 'emacs --batch -l ~/.emacs'
 
-# Why do they make this so hard?? Modified from: 
-# https://github.com/dimitri/el-get
-#RUN sudo -i -u "${USERNAME}" bash -c 'curl -s "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el" > /tmp/el-get-install.el'
-#RUN sudo -i -u "${USERNAME}" bash -c 'emacs -batch -l /tmp/el-get-install.el'
-
-#RUN sudo -i -u "${USERNAME}" bash -c 'emacs -batch -l /home/${USER}/.emacs'
-
 # pathogen
 RUN sudo -i -u "${USERNAME}" bash -c '\
    mkdir -p ~/.vim/autoload ~/.vim/bundle && \
