@@ -1,7 +1,9 @@
 
+shell "/usr/bin/zsh"
+term screen-256color
+
 bind j focus down
 bind k focus up
 bind h focus left
 bind l focus right
 
-shell "/usr/bin/zsh"

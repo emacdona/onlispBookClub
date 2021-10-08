@@ -21,3 +21,9 @@
 ;; Enable slime
 (require 'slime)
 (setq inferior-lisp-program "sbcl")
+
+;; Make 'delete' on my iPad keyboard behave like 'backspace'
+;; or something like that, I was certain that this would break
+;; it for my workstation keyboard -- but it still works. Go
+;; figure.
+(keyboard-translate ?\C-h ?\C-?)
