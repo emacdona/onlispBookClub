@@ -19,6 +19,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-sphinx
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales
 
+# https://docs.docker.com/engine/install/ubuntu/ (but we're not installing the engine, just the cli)
+RUN apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt-get update
+RUN apt-get install -y docker-ce-cli
+
+
 # https://unix.stackexchange.com/questions/90772/first-characters-of-the-command-repeated-in-the-display-when-completing
 # https://askubuntu.com/questions/581458/how-to-configure-locales-to-unicode-in-a-docker-ubuntu-14-04-container
 # Set the locale
@@ -33,14 +41,16 @@ ARG UID
 ARG USERNAME
 ARG USERGROUP
 ARG GID
+ARG DOCKER_GID
 
 RUN groupadd -g "${GID}" "${USERGROUP}"
+RUN groupadd -g "${DOCKER_GID}" "docker"
 
 RUN useradd \
    -d "/home/${USERNAME}" \
    -ms /bin/zsh \
    -g "${USERGROUP}" \
-   -G sudo \
+   -G sudo,docker \
    -u $UID "${USERNAME}"
 
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
