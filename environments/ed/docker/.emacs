@@ -22,6 +22,14 @@
 (require 'slime)
 (setq inferior-lisp-program "sbcl")
 
+;what a fucking pain
+;https://github.com/sellout/emacs-color-theme-solarized
+;https://www.philipdaniels.com/blog/2017/spacemacs-solarized/
+(add-to-list 'custom-theme-load-path "~/.emacs.d/emacs-color-theme-solarized")
+(set-terminal-parameter nil 'background-mode 'dark)
+(set-frame-parameter nil 'background-mode 'dark)
+(load-theme 'solarized t)
+
 ;; Make 'delete' on my iPad keyboard behave like 'backspace'
 ;; or something like that, I was certain that this would break
 ;; it for my workstation keyboard -- but it still works. Go

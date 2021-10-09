@@ -26,5 +26,6 @@ docker run \
    -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
    -v "${ENVIRONMENT_ROOT}/docker/.emacs":"/home/emacdona/.emacs" \
    -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
+   -e "TERM=xterm-256color" \
    -it emacdona/onlisp $@
 
