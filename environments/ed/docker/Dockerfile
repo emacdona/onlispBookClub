@@ -111,10 +111,13 @@ RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sd
 # Note: keep an eye on the download link here: https://abcl.org/
 # (Not sure how long outdated links will continue to work)
 WORKDIR "/home/${USERNAME}/usr/src"
+COPY --chown="${USERNAME}:${USERGROUP}" abcl-completions.lisp abcl-completions.lisp
 RUN curl -O https://abcl.org/releases/1.8.0/abcl-src-1.8.0.tar.gz && \
     tar xvfz abcl-src-1.8.0.tar.gz && \
     cd abcl-src-1.8.0 && \
-    bash -c 'source ~/.sdkman/bin/sdkman-init.sh && ant -f build.xml'
+    bash -c 'source ~/.sdkman/bin/sdkman-init.sh && ant -f build.xml' && \
+    bash -c 'source ~/.sdkman/bin/sdkman-init.sh && java -jar dist/abcl.jar --load ../abcl-completions.lisp'
+
 
 WORKDIR "/home/${USERNAME}"
 
@@ -134,6 +137,7 @@ RUN git clone https://github.com/sellout/emacs-color-theme-solarized.git ~/.emac
 # Run emacs in batch mode to install all packages
 RUN sudo -i -u "${USERNAME}" bash -c 'emacs --batch -l ~/.emacs'
 
+# For when I inevitably give up on emacs, set up vim in a way that I like ;-)
 # pathogen
 RUN sudo -i -u "${USERNAME}" bash -c '\
    mkdir -p ~/.vim/autoload ~/.vim/bundle && \
@@ -146,6 +150,9 @@ RUN sudo -i -u "${USERNAME}" bash -c '\
    git clone https://tpope.io/vim/fugitive.git && \
    vim -u NONE -c "helptags fugitive/doc" -c q'
 
+COPY --chown="${USERNAME}:${USERGROUP}" scripts scripts
+
 WORKDIR "/home/${USERNAME}/onlisp"
+env USER ${USERNAME}
 
 CMD zsh

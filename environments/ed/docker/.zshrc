@@ -100,6 +100,8 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+export PATH="/home/${USER}/scripts:${PATH}"
+
 # Tell screen to use unicode.
 alias screen="screen -U"
 
@@ -112,6 +114,13 @@ export LESS="-F -X $LESS"
 # Given I can never remember to type "rlwrap ...", maybe I have a better chance
 # at remembering to type "repl"
 alias repl="rlwrap sbcl"
+
+# repls for individual lisps. May be better to write scripts like the one I yanked from the ABCL
+# documentation for sbcl and clisp (it's smart: it lets you just type "abcl" and gives you a repl
+# if there are no arguments)
+alias sbclr="rlwrap sbcl"
+alias clispr="rlwrap clisp"
+alias abclr="abcl"
 
 set -o vi
 

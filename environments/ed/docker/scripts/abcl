@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+ABCL_JAR="/home/${USER}/usr/src/abcl-src-1.8.0/dist/abcl.jar"
+JAVA=$(which java)
+ABCL="$JAVA -server -Xrs -cp $ABCL_JAR org.armedbear.lisp.Main"
+
+if [ $# -eq 0 ]; then
+   exec rlwrap -b "[]()'\" " --remember -c -f ~/.abcl_completions -H ~/.abcl_history -s 1000000 $ABCL
+else
+   exec $ABCL "$@"
+fi
+
+
