@@ -106,6 +106,18 @@ RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sd
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install kotlin 1.5.31'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install leiningen 2.9.7'
 
+# ABCL
+# https://abcl.org/doc/abcl-user.html
+# Note: keep an eye on the download link here: https://abcl.org/
+# (Not sure how long outdated links will continue to work)
+WORKDIR "/home/${USERNAME}/usr/src"
+RUN curl -O https://abcl.org/releases/1.8.0/abcl-src-1.8.0.tar.gz && \
+    tar xvfz abcl-src-1.8.0.tar.gz && \
+    cd abcl-src-1.8.0 && \
+    bash -c 'source ~/.sdkman/bin/sdkman-init.sh && ant -f build.xml'
+
+WORKDIR "/home/${USERNAME}"
+
 # Copy in some dotfiles.
 # Hell, mount them as volumes too when we start the container. That way, if you change them on the host and it doesn't cause this layer to
 # rebuild, you'll still see your changes! (I'm not sure how to force this layer to rebuild if one of these files changes on the host).
