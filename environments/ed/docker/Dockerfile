@@ -18,6 +18,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y texinfo
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-sphinx
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y rlwrap
 
 # https://docs.docker.com/engine/install/ubuntu/ (but we're not installing the engine, just the cli)
 RUN apt-get install -y apt-transport-https ca-certificates gnupg lsb-release

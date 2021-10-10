@@ -109,6 +109,10 @@ alias gg="git log --oneline --graph --all"
 # DON'T PAGE IF IT'S LESS THAN A PAGE!!!
 export LESS="-F -X $LESS"
 
+# Given I can never remember to type "rlwrap ...", maybe I have a better chance
+# at remembering to type "repl"
+alias repl="rlwrap sbcl"
+
 set -o vi
 
 
