@@ -57,13 +57,39 @@ RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
 /etc/sudoers
 
 USER "${USERNAME}"
-WORKDIR "/home/${USERNAME}/onlisp"
 
 ARG GIT_USER_EMAIL
 ARG GIT_USER_NAME
 
 RUN sudo -i -u "${USERNAME}" bash -c "git config --global user.email ${GIT_USER_EMAIL}"
 RUN sudo -i -u "${USERNAME}" bash -c "git config --global user.name ${GIT_USER_NAME}"
+
+# Quicklsip
+RUN mkdir -p "/home/${USERNAME}/usr/src/quicklisp"
+WORKDIR "/home/${USERNAME}/usr/src/quicklisp"
+RUN curl -O https://beta.quicklisp.org/quicklisp.lisp && \
+    curl -O https://beta.quicklisp.org/quicklisp.lisp.asc 
+#    gpg --verify quicklisp.lisp.asc quicklisp.lisp
+
+COPY --chown="${USERNAME}:${USERGROUP}" quicklisp-install-script.lisp quicklisp-install-script.lisp
+
+# 'echo |' to get past the "enter" prompt at end of install
+RUN echo | sbcl --load quicklisp.lisp --script quicklisp-install-script.lisp
+
+# clon (required by erudite) currently having problems installing via quicklisp b/c of missing package. See:
+# https://githubmemory.com/repo/didierverna/clon/issues/9
+# So, install manually: (git clone clon... lolz)
+WORKDIR "/home/${USERNAME}/quicklisp/local-projects"
+RUN git clone https://github.com/didierverna/clon.git
+
+# Erudite
+WORKDIR "/home/${USERNAME}/usr/src"
+RUN git clone https://github.com/mmontone/erudite.git
+
+WORKDIR "/home/${USERNAME}/usr/src/erudite"
+RUN make && sudo make install
+
+WORKDIR "/home/${USERNAME}"
 
 # Oh My Zsh
 # https://ohmyz.sh/#install
@@ -82,7 +108,7 @@ RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sd
 COPY --chown="${USERNAME}:${USERGROUP}" .exrc .exrc
 COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
 COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
-COPY --chown="${USERNAME}:${USERGROUP}" .emacs "/home/${USERNAME}/.emacs"
+COPY --chown="${USERNAME}:${USERGROUP}" .emacs .emacs
 
 # The only emacs solarized theme I could get working for terminal based emacs
 RUN git clone https://github.com/sellout/emacs-color-theme-solarized.git ~/.emacs.d/emacs-color-theme-solarized
@@ -101,5 +127,7 @@ RUN sudo -i -u "${USERNAME}" bash -c '\
    cd ~/.vim/pack/tpope/start && \
    git clone https://tpope.io/vim/fugitive.git && \
    vim -u NONE -c "helptags fugitive/doc" -c q'
+
+WORKDIR "/home/${USERNAME}/onlisp"
 
 CMD zsh
