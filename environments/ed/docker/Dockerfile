@@ -99,6 +99,10 @@ RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/inst
 # https://sdkman.io/install
 RUN curl -s "https://get.sdkman.io" | bash
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install java 11.0.11.hs-adpt'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install gradle 7.2'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install maven 3.8.3'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install kotlin 1.5.31'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install leiningen 2.9.7'
 
 # Copy in some dotfiles.
 # Hell, mount them as volumes too when we start the container. That way, if you change them on the host and it doesn't cause this layer to
