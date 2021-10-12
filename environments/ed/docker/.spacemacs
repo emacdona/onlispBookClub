@@ -409,7 +409,7 @@ It should only modify the values of Spacemacs settings."
    ;;   :size-limit-kb 1000)
    ;; When used in a plist, `visual' takes precedence over `relative'.
    ;; (default nil)
-   dotspacemacs-line-numbers nil
+   dotspacemacs-line-numbers t
 
    ;; Code folding method. Possible values are `evil', `origami' and `vimish'.
    ;; (default 'evil)
@@ -557,6 +557,8 @@ before packages are loaded."
 ;; it for my workstation keyboard -- but it still works. Go
 ;; figure.
    (keyboard-translate ?\C-h ?\C-?)
+   (menu-bar-mode 1)
+   (tool-bar-mode 1)
 )
 
 
