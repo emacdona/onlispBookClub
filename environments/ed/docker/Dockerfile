@@ -129,13 +129,20 @@ WORKDIR "/home/${USERNAME}"
 COPY --chown="${USERNAME}:${USERGROUP}" .exrc .exrc
 COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
 COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
-COPY --chown="${USERNAME}:${USERGROUP}" .emacs .emacs
+COPY --chown="${USERNAME}:${USERGROUP}" .spacemacs .spacemacs
+#COPY --chown="${USERNAME}:${USERGROUP}" .emacs .emacs
 
 # The only emacs solarized theme I could get working for terminal based emacs
-RUN git clone https://github.com/sellout/emacs-color-theme-solarized.git ~/.emacs.d/emacs-color-theme-solarized
+#RUN git clone https://github.com/sellout/emacs-color-theme-solarized.git ~/.emacs.d/emacs-color-theme-solarized
 
 # Run emacs in batch mode to install all packages
-RUN sudo -i -u "${USERNAME}" bash -c 'emacs --batch -l ~/.emacs'
+#RUN sudo -i -u "${USERNAME}" bash -c 'emacs --batch -l ~/.emacs'
+
+# Let's see what spacemacs is like...
+RUN git clone https://github.com/syl20bnr/spacemacs "/home/${USERNAME}/.emacs.d"
+
+# Run emacs in batch mode to install all packages
+RUN sudo -i -u "${USERNAME}" bash -c 'emacs -batch -l ~/.emacs.d/init.el'
 
 # For when I inevitably give up on emacs, set up vim in a way that I like ;-)
 # pathogen

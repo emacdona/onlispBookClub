@@ -26,9 +26,10 @@ docker run \
    -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
    -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
    -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
-   -v "${ENVIRONMENT_ROOT}/docker/.emacs":"/home/emacdona/.emacs" \
+   -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/emacdona/.spacemacs" \
    -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
    -v /var/run/docker.sock:/var/run/docker.sock \
    -e "TERM=xterm-256color" \
    -it emacdona/onlisp $@
 
+#   -v "${ENVIRONMENT_ROOT}/docker/.emacs":"/home/emacdona/.emacs" \
