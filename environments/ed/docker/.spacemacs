@@ -58,6 +58,9 @@ This function should only modify configuration layer settings."
      ;; https://develop.spacemacs.org/layers/+lang/common-lisp/README.html
      common-lisp
 
+     ;; https://develop.spacemacs.org/layers/+source-control/git/README.html
+     git
+
      ;; https://develop.spacemacs.org/layers/+themes/themes-megapack/README.html
      ;;themes-megapack
      )
@@ -559,6 +562,12 @@ before packages are loaded."
    (keyboard-translate ?\C-h ?\C-?)
    (menu-bar-mode 1)
    (tool-bar-mode 1)
+
+   ;; https://www.reddit.com/r/spacemacs/comments/hbl9yi/stupid_question_how_to_disable_truncate_lines/
+   (add-hook 'hack-local-variables-hook #'spacemacs/toggle-truncate-lines-on)
+
+   ;; https://www.spacemacs.org/layers/+source-control/git/README.html
+   (setq-default git-magit-status-fullscreen t)
 )
 
 
