@@ -4,26 +4,27 @@ set -eo pipefail
 # Note: Currently, this script requires the following be installed:
 # docker
 # git
-# perl
 #
 # It probably also will only run on Linux. Maybe with a little work, it could run on Mac. With a BIT more
-# work, it could run on Windows. The git and perl dependencies will be easy to remove... I just need to
-# get around to it.
+# work, it could run on Windows. The git dependency will be easy to remove... I just need to get around to it.
 
 
-# TODO: Don't fail if perl not installed. IE: Just make this an optimization -- connect to a container of this
-# image if one already exists. Maybe even accept a container name/id on the command line.
-CONTAINER_ID=$(docker ps | perl -ne 'my($id, $image) = (split(/\s+/, $_, 3))[0,1]; print $id if $image eq "emacdona/onlisp"')
+# Hacky, but since we already require docker, use it to run perl!
+CONTAINER_ID=$(\
+  docker ps | \
+    docker run -i perl:5.34.0 \
+    perl -ne 'my($id, $image) = (split(/\s+/, $_, 3))[0,1]; print $id if $image eq "emacdona/onlisp"'\
+)
 
 if [ -z "$CONTAINER_ID" ]
 then
    # TODO: use getopts to capture these -- use git values for default
    GIT_USER_EMAIL=$(git config --global user.email)
    GIT_USER_NAME=$(git config --global user.name)
-   
+
    ENVIRONMENT_ROOT="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
    PROJECT_ROOT="${ENVIRONMENT_ROOT}/../.."
-   
+
    cd "${ENVIRONMENT_ROOT}/docker" && \
       docker build \
          --build-arg USERNAME="${USER}" \
@@ -34,7 +35,7 @@ then
          --build-arg GIT_USER_EMAIL="${GIT_USER_EMAIL}" \
          --build-arg GIT_USER_NAME="${GIT_USER_NAME}" \
          -t emacdona/onlisp .
-   
+
    # https://jtreminio.com/blog/running-docker-containers-as-current-host-user/
    # https://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
    # Separating this into "run" then "exec" lets you leave the container running so you can exit
