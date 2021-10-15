@@ -21,7 +21,9 @@ cd "${ENVIRONMENT_ROOT}/docker" && \
 
 # https://jtreminio.com/blog/running-docker-containers-as-current-host-user/
 # https://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
-docker run \
+# Separating this into "run" then "exec" lets you leave the container running so you can exit
+# and then reconnect to it later
+CONTAINER_ID=$(docker run \
    -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
    -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
    -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
@@ -32,6 +34,14 @@ docker run \
    -v /var/run/docker.sock:/var/run/docker.sock \
    -e "TERM=xterm-256color" \
    -e "DISPLAY=${DISPLAY}" \
-   -it emacdona/onlisp $@
+   -td emacdona/onlisp zsh)
 
-#   -v "${ENVIRONMENT_ROOT}/docker/.emacs":"/home/emacdona/.emacs" \
+echo "Connecting to ContainerID: ${CONTAINER_ID}"
+
+if [ -z "$@" ]
+then
+   docker exec -it $CONTAINER_ID zsh
+else
+   docker exec -it $CONTAINER_ID $@
+fi;
+
