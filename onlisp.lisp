@@ -61,3 +61,14 @@
 
 (defun list-all()
   (funcall (caddr finders)))
+
+;; Trying to show how conses are built. a starts as a cons of 0 and nil (a one element list).
+;; b and c are two item lists, each conses of a value (1 and 2 respectively) and the list a.
+;; This example shows that mutating the car of a mutates the car of the cdr of both b and c.
+(defun cons-exmaple ()
+  (let ((a (cons 0 nil)))
+    (let ((b (cons 1 a))
+          (c (cons 2 a)))
+      (setf (car a) 10)
+      (list a b c))))
+
