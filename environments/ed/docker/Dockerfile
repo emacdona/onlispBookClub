@@ -160,6 +160,10 @@ RUN sudo -i -u "${USERNAME}" bash -c '\
 
 COPY --chown="${USERNAME}:${USERGROUP}" scripts scripts
 
+RUN   sudo -i -u "${USERNAME}" bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash \
+      && . /home/${USER}/.nvm/nvm.sh \
+      && nvm install node'
+
 WORKDIR "/home/${USERNAME}/onlisp"
 env USER ${USERNAME}
 
