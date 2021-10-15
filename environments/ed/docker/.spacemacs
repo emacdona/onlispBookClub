@@ -41,28 +41,22 @@ This function should only modify configuration layer settings."
      ;; auto-completion
      ;; better-defaults
      emacs-lisp
-     ;; git
+     git
      helm
-     ;; lsp
-     ;; markdown
+     lsp
+     markdown
      multiple-cursors
-     ;; org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
-     ;; spell-checking
-     ;; syntax-checking
-     ;; version-control
+     org
+     (shell :variables
+            shell-default-height 30
+            shell-default-position 'bottom)
+     spell-checking
+     syntax-checking
+     version-control
      treemacs
 
      ;; https://develop.spacemacs.org/layers/+lang/common-lisp/README.html
      common-lisp
-
-     ;; https://develop.spacemacs.org/layers/+source-control/git/README.html
-     git
-
-     ;; https://develop.spacemacs.org/layers/+themes/themes-megapack/README.html
-     ;;themes-megapack
      )
 
 
