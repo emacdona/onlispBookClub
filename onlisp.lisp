@@ -66,9 +66,32 @@
 ;; b and c are two item lists, each conses of a value (1 and 2 respectively) and the list a.
 ;; This example shows that mutating the car of a mutates the car of the cdr of both b and c.
 (defun cons-exmaple ()
-  (let ((a (cons 0 nil)))
-    (let ((b (cons 1 a))
-          (c (cons 2 a)))
+  (let ((a (cons 2 (cons 1 (cons 0 nil)))))
+    (let ((b (cons 100 a))
+          (c (cons 200 a)))
       (setf (car a) 10)
       (list a b c))))
+
+(defun my-reverse-list (lst)
+  (labels ((rl (lst acc)
+             (if (null lst)
+                 acc
+                 (rl (cdr lst)
+                     (cons (car lst) acc)))))
+    (rl lst '())))
+
+;; Unlike in the cons-example, the list returned from this function is built
+;; of entirely new conses, so messing with elements of one does not affect
+;; the other.
+;; I think what I'm also showing here is that primitive values (eg: numbers)
+;; are passed by value and not by reference.
+(defun list-example ()
+    (let ((a '(1 2 3 4 5 6 7 8 9 10)))
+      (let ((b (my-reverse-list a)))
+        (setf (car a) 100)
+        (setf (car (cdr a)) 200)
+        (list a b)
+        )))
+
+
 
