@@ -3,27 +3,62 @@ set -eo pipefail
 
 # Note: Currently, this script requires the following be installed:
 # docker
-# git
-#
 # It probably also will only run on Linux. Maybe with a little work, it could run on Mac. With a BIT more
-# work, it could run on Windows. The git dependency will be easy to remove... I just need to get around to it.
+# work, it could run on Windows. 
 
+usage() {
+    echo "Usage: $0 [-n <git name>] [-e <git email>]" 1>&2;
+    echo "   If arguments not specified, you need to have git installed because:" 1>&2;
+    echo "      git name defaults to: git config --global user.name" 1>&2;
+    echo "      git email defaults to: git config --global user.email" 1>&2;
+    exit 1;
+}
+
+USER_ENTERED_GIT_NAME=""
+USER_ENTERED_GIT_EMAIL=""
+
+while getopts ":n:e:" o; do
+    case "${o}" in
+        n)
+            USER_ENTERED_GIT_NAME=${OPTARG}
+            ;;
+        e)
+            USER_ENTERED_GIT_EMAIL=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
 
 # Hacky, but since we already require docker, use it to run perl!
 CONTAINER_ID=$(\
   docker ps | \
-    docker run -i perl:5.34.0 \
+    docker run --rm -i perl:5.34.0 \
     perl -ne 'my($id, $image) = (split(/\s+/, $_, 3))[0,1]; print $id if $image eq "emacdona/onlisp"'\
 )
 
 if [ -z "$CONTAINER_ID" ]
 then
-   # TODO: use getopts to capture these -- use git values for default
-   GIT_USER_EMAIL=$(git config --global user.email)
-   GIT_USER_NAME=$(git config --global user.name)
+   if [ -z "${USER_ENTERED_GIT_NAME}" ]
+   then
+       GIT_USER_EMAIL=$(git config --global user.email)
+    else
+       GIT_USER_EMAIL=${USER_ENTERED_GIT_NAME}
+   fi;
+   if [ -z "${USER_ENTERED_GIT_EMAIL}" ]
+   then
+       GIT_USER_NAME=$(git config --global user.name)
+    else
+       GIT_USER_NAME=${USER_ENTERED_GIT_EMAIL}
+   fi;
 
    ENVIRONMENT_ROOT="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
    PROJECT_ROOT="${ENVIRONMENT_ROOT}/../.."
+
+   echo "Git User: ${GIT_USER_NAME}"
+   echo "Git Email: ${GIT_USER_EMAIL}"
 
    cd "${ENVIRONMENT_ROOT}/docker" && \
       docker build \
