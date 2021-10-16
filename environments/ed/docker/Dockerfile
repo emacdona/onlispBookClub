@@ -20,6 +20,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-sphinx
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y rlwrap
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y firefox
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4-terminal
 
 # https://docs.docker.com/engine/install/ubuntu/ (but we're not installing the engine, just the cli)
 RUN apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
@@ -131,6 +132,7 @@ COPY --chown="${USERNAME}:${USERGROUP}" .exrc .exrc
 COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
 COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
 COPY --chown="${USERNAME}:${USERGROUP}" .spacemacs .spacemacs
+COPY --chown="${USERNAME}:${USERGROUP}" terminalrc .config/xfce4/terminal/terminalrc
 #COPY --chown="${USERNAME}:${USERGROUP}" .emacs .emacs
 
 # The only emacs solarized theme I could get working for terminal based emacs

@@ -7,7 +7,7 @@ set -eo pipefail
 # work, it could run on Windows. 
 
 usage() {
-    echo "Usage: $0 [-n <git name>] [-e <git email>]" 1>&2;
+   echo "Usage: $0 [-n <git name>] [-e <git email>] [-d (starts container in daemon mode)]" 1>&2;
     echo "   If arguments not specified, you need to have git installed because:" 1>&2;
     echo "      git name defaults to: git config --global user.name" 1>&2;
     echo "      git email defaults to: git config --global user.email" 1>&2;
@@ -16,14 +16,20 @@ usage() {
 
 USER_ENTERED_GIT_NAME=""
 USER_ENTERED_GIT_EMAIL=""
+DAEMON=""
 
-while getopts ":n:e:" o; do
+echo "Started with arguments: $@"
+
+while getopts ":n:e:d" o; do
     case "${o}" in
         n)
             USER_ENTERED_GIT_NAME=${OPTARG}
             ;;
         e)
             USER_ENTERED_GIT_EMAIL=${OPTARG}
+            ;;
+        d)
+            DAEMON="y"
             ;;
         *)
             usage
@@ -32,14 +38,17 @@ while getopts ":n:e:" o; do
 done
 shift $((OPTIND-1))
 
+echo "Ended with arguments: $@"
+
 # Hacky, but since we already require docker, use it to run perl!
 CONTAINER_ID=$(\
   docker ps | \
     docker run --rm -i perl:5.34.0 \
-    perl -ne 'my($id, $image) = (split(/\s+/, $_, 3))[0,1]; print $id if $image eq "emacdona/onlisp"'\
+    perl -ne 'my($id, $image) = (split(/\s+/, $_, 3))[0,1]; print $id if $image eq "emacdona/onlisp"' \
+  | head -n 1
 )
 
-if [ -z "$CONTAINER_ID" ]
+if [ -z "${CONTAINER_ID}" ] || [ ! -z "${DAEMON}" ]
 then
    if [ -z "${USER_ENTERED_GIT_NAME}" ]
    then
@@ -75,6 +84,8 @@ then
    # https://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
    # Separating this into "run" then "exec" lets you leave the container running so you can exit
    # and then reconnect to it later
+   if [ -z "${DAEMON}" ]
+   then
    CONTAINER_ID=$(docker run \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
@@ -87,14 +98,31 @@ then
       -e "TERM=xterm-256color" \
       -e "DISPLAY=${DISPLAY}" \
       -td emacdona/onlisp zsh)
+   else
+   docker run --rm -d \
+      -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
+      -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
+      -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
+      -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
+      -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/emacdona/.spacemacs" \
+      -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
+      -v "/tmp/.X11-unix:/tmp/.X11-unix" \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -e "TERM=xterm-256color" \
+      -e "DISPLAY=${DISPLAY}" \
+      -td emacdona/onlisp "$@"
+   fi;
 fi;
 
-echo "Connecting to ContainerID: ${CONTAINER_ID}"
-
-if [ -z "$@" ]
+if [ -z "${DAEMON}" ]
 then
-   docker exec -it $CONTAINER_ID zsh
-else
-   docker exec -it $CONTAINER_ID $@
+   echo "Connecting to ContainerID: ${CONTAINER_ID}"
+
+   if [ -z "$@" ]
+   then
+      docker exec -it $CONTAINER_ID zsh
+   else
+      docker exec -it $CONTAINER_ID $@
+   fi;
 fi;
 
