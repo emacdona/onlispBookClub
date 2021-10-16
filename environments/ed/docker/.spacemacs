@@ -55,6 +55,8 @@ This function should only modify configuration layer settings."
      syntax-checking
      version-control
      treemacs
+     (tabs :variables
+           tabs-auto-hide nil)
 
      ;; https://develop.spacemacs.org/layers/+lang/common-lisp/README.html
      common-lisp
