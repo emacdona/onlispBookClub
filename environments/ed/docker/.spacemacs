@@ -60,6 +60,9 @@ This function should only modify configuration layer settings."
 
      ;; https://develop.spacemacs.org/layers/+lang/common-lisp/README.html
      common-lisp
+
+     ;; https://develop.spacemacs.org/layers/+tools/docker/README.html
+     docker
      )
 
 

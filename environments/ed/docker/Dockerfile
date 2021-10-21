@@ -1,5 +1,8 @@
 FROM ubuntu:20.04
 
+# Re-enable man pages
+RUN yes | unminimize
+
 # Install packages via apt
 RUN apt-get update
 
@@ -21,6 +24,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y rlwrap
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y firefox
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4-terminal
+
+# From the blang/latex ubuntu dockerfile
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y texlive-full
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pygments
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gnuplot
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y make
 
 # https://docs.docker.com/engine/install/ubuntu/ (but we're not installing the engine, just the cli)
 RUN apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
@@ -119,6 +128,18 @@ RUN curl -O https://abcl.org/releases/1.8.0/abcl-src-1.8.0.tar.gz && \
     cd abcl-src-1.8.0 && \
     bash -c 'source ~/.sdkman/bin/sdkman-init.sh && ant -f build.xml' && \
     bash -c 'source ~/.sdkman/bin/sdkman-init.sh && java -jar dist/abcl.jar --load ../abcl-completions.lisp'
+
+# Haskell b/c wtf not? Nah, the emacs Dockerfile linter needs a program written in haskell.
+# https://docs.haskellstack.org/en/stable/README/
+RUN curl -sSL https://get.haskellstack.org/ | sh
+
+# Aforementioned Dockerfile linter
+# https://develop.spacemacs.org/layers/+tools/docker/README.html
+# https://github.com/hadolint/hadolint
+WORKDIR "/home/${USERNAME}/usr/src"
+RUN git clone https://github.com/hadolint/hadolint \
+   && cd hadolint \
+   && stack install
 
 
 WORKDIR "/home/${USERNAME}"
