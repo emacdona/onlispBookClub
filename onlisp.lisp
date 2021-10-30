@@ -17,6 +17,12 @@
 ;; C-c C-l <=> M-x slime-load-file
 ;; though you can one off with:
 ;; C-M-x <=> M-x slime-eval-defun
+;;
+;; Note: If you try to build erudite documentation, you'll at least need swank running. You can do that
+;; via:
+;; (ql:quickload :swank)
+;; (swank:create-server)
+;; at the sbcl repl
 (defun increment(x)
   (+ x 1))
 
