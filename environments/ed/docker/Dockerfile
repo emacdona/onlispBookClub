@@ -24,12 +24,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y rlwrap
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y firefox
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4-terminal
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor
 
-# From the blang/latex ubuntu dockerfile
+# Install a Latex environment.
+# (copied from the blang/latex ubuntu dockerfile)
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y texlive-full
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pygments
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gnuplot
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y make
+
+# Install scheme
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mit-scheme mit-scheme-dbg mit-scheme-doc
 
 # https://docs.docker.com/engine/install/ubuntu/ (but we're not installing the engine, just the cli)
 RUN apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
@@ -94,6 +99,10 @@ RUN echo | sbcl --load quicklisp.lisp --script quicklisp-install-script.lisp
 WORKDIR "/home/${USERNAME}/quicklisp/local-projects"
 RUN git clone https://github.com/didierverna/clon.git
 
+# on-lisp source code for modern lisps -- so we don't have to type in all of PGs function definitions,
+# which he builds upon as the book progresses
+RUN git clone https://github.com/DalekBaldwin/on-lisp.git
+
 # Erudite
 WORKDIR "/home/${USERNAME}/usr/src"
 RUN git clone https://github.com/mmontone/erudite.git
@@ -116,6 +125,7 @@ RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sd
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install ant 1.10.10'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install kotlin 1.5.31'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install leiningen 2.9.7'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install scala 3.1.0'
 
 # ABCL
 # https://abcl.org/doc/abcl-user.html
@@ -154,6 +164,7 @@ COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
 COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
 COPY --chown="${USERNAME}:${USERGROUP}" .spacemacs .spacemacs
 COPY --chown="${USERNAME}:${USERGROUP}" terminalrc .config/xfce4/terminal/terminalrc
+COPY --chown="${USERNAME}:${USERGROUP}" supervisord.conf supervisord.conf
 #COPY --chown="${USERNAME}:${USERGROUP}" .emacs .emacs
 
 # The only emacs solarized theme I could get working for terminal based emacs
@@ -190,4 +201,4 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'curl -o- https://raw.githubusercontent.c
 WORKDIR "/home/${USERNAME}/onlisp"
 env USER ${USERNAME}
 
-CMD zsh
+CMD ["zsh" , "-c", "supervisord -n -c ${HOME}/supervisord.conf"]

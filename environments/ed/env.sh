@@ -99,6 +99,8 @@ then
       -e "DISPLAY=${DISPLAY}" \
       -td emacdona/onlisp zsh)
    else
+   echo "Running in daemon mode"
+   set -x
    docker run --rm -d \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
@@ -111,6 +113,7 @@ then
       -e "TERM=xterm-256color" \
       -e "DISPLAY=${DISPLAY}" \
       -td emacdona/onlisp "$@"
+   set +x
    fi;
 fi;
 

@@ -94,4 +94,20 @@
         )))
 
 
+(defun nconc-test ()
+  (let ((a '(1 2 3))
+        (b '(4 5 6)))
+    (list (nconc a b)
+          a
+          b)))
+
+(defun mapcan-test ()
+  (let ((a '(a b c))
+        (b '(1 2 3)))
+    (mapcan #'list a b)))
+
+(defun mapcar-test ()
+  (let ((a '(a b c))
+        (b '(1 2 3)))
+    (mapcar #'list a b)))
 
