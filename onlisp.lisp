@@ -1,4 +1,5 @@
-
+(ql:quickload 'cxml)
+(ql:quickload 'on-lisp)
 ;; On Lisp
 
 
