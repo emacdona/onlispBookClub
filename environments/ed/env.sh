@@ -66,6 +66,22 @@ then
    ENVIRONMENT_ROOT="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
    PROJECT_ROOT="${ENVIRONMENT_ROOT}/../.."
 
+   JETBRAINS_PLUGINS=".local/share/JetBrains"
+   JETBRAINS_CONFIGURATION=".config/JetBrains/IntelliJIdea2021.1"
+   JETBRAINS_SYSTEM=".cache/JetBrains/IntelliJIdea2021.1"
+   JETBRAINS_LOGS=".cache/JetBrains/IntelliJIdea2021.1/log"
+
+   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PLUGINS}"
+   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_CONFIGURATION}"
+   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_SYSTEM}"
+   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_LOGS}"
+
+   JETBRAINS_PLUGINS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PLUGINS}:/home/${USER}/${JETBRAINS_PLUGINS}:rw"
+   JETBRAINS_CONFIGURATION_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_CONFIGURATION}:/home/${USER}/${JETBRAINS_CONFIGURATION}:rw"
+   JETBRAINS_SYSTEM_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_SYSTEM}:/home/${USER}/${JETBRAINS_SYSTEM}:rw"
+   JETBRAINS_LOGS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_LOGS}:/home/${USER}/${JETBRAINS_LOGS}:rw"
+
+
    echo "Git User: ${GIT_USER_NAME}"
    echo "Git Email: ${GIT_USER_EMAIL}"
 
@@ -91,7 +107,11 @@ then
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
-      -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/emacdona/.spacemacs" \
+      -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/${USER}/.spacemacs" \
+      -v "${JETBRAINS_PLUGINS_VOLUME}" \
+      -v "${JETBRAINS_CONFIGURATION_VOLUME}" \
+      -v "${JETBRAINS_SYSTEM_VOLUME}" \
+      -v "${JETBRAINS_LOGS_VOLUME}" \
       -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
       -v "/tmp/.X11-unix:/tmp/.X11-unix" \
       -v /var/run/docker.sock:/var/run/docker.sock \
@@ -106,7 +126,11 @@ then
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
-      -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/emacdona/.spacemacs" \
+      -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/${USER}/.spacemacs" \
+      -v "${JETBRAINS_PLUGINS_VOLUME}" \
+      -v "${JETBRAINS_CONFIGURATION_VOLUME}" \
+      -v "${JETBRAINS_SYSTEM_VOLUME}" \
+      -v "${JETBRAINS_LOGS_VOLUME}" \
       -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
       -v "/tmp/.X11-unix:/tmp/.X11-unix" \
       -v /var/run/docker.sock:/var/run/docker.sock \

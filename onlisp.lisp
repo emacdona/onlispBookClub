@@ -118,3 +118,5 @@
         (b '(1 2 3)))
     (mapcar #'list a b)))
 
+
+(defmacro my-first-macro (a b c) `(list ,a ,b ,c))

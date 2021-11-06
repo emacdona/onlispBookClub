@@ -126,6 +126,8 @@ RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sd
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install kotlin 1.5.31'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install leiningen 2.9.7'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install scala 3.1.0'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install scala 2.13.7'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install sbt 1.5.5'
 
 # ABCL
 # https://abcl.org/doc/abcl-user.html
@@ -150,6 +152,12 @@ WORKDIR "/home/${USERNAME}/usr/src"
 RUN git clone https://github.com/hadolint/hadolint \
    && cd hadolint \
    && stack install
+
+RUN sudo -i -u "${USERNAME}" bash -c '\
+      mkdir -p ~/usr/local && \
+      cd ~/usr/local && \
+      curl -sLO https://download.jetbrains.com/idea/ideaIU-2021.1.3.tar.gz && \
+      tar xvfz ideaIU-2021.1.3.tar.gz'
 
 
 WORKDIR "/home/${USERNAME}"
