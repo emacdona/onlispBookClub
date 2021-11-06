@@ -70,16 +70,19 @@ then
    JETBRAINS_CONFIGURATION=".config/JetBrains/IntelliJIdea2021.1"
    JETBRAINS_SYSTEM=".cache/JetBrains/IntelliJIdea2021.1"
    JETBRAINS_LOGS=".cache/JetBrains/IntelliJIdea2021.1/log"
+   JETBRAINS_PROJECTS="IdeaProjects"
 
    mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PLUGINS}"
    mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_CONFIGURATION}"
    mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_SYSTEM}"
    mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_LOGS}"
+   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PROJECTS}"
 
    JETBRAINS_PLUGINS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PLUGINS}:/home/${USER}/${JETBRAINS_PLUGINS}:rw"
    JETBRAINS_CONFIGURATION_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_CONFIGURATION}:/home/${USER}/${JETBRAINS_CONFIGURATION}:rw"
    JETBRAINS_SYSTEM_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_SYSTEM}:/home/${USER}/${JETBRAINS_SYSTEM}:rw"
    JETBRAINS_LOGS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_LOGS}:/home/${USER}/${JETBRAINS_LOGS}:rw"
+   JETBRAINS_PROJECTS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PROJECTS}:/home/${USER}/${JETBRAINS_PROJECTS}"
 
 
    echo "Git User: ${GIT_USER_NAME}"
@@ -112,6 +115,7 @@ then
       -v "${JETBRAINS_CONFIGURATION_VOLUME}" \
       -v "${JETBRAINS_SYSTEM_VOLUME}" \
       -v "${JETBRAINS_LOGS_VOLUME}" \
+      -v "${JETBRAINS_PROJECTS_VOLUME}" \
       -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
       -v "/tmp/.X11-unix:/tmp/.X11-unix" \
       -v /var/run/docker.sock:/var/run/docker.sock \
@@ -131,6 +135,7 @@ then
       -v "${JETBRAINS_CONFIGURATION_VOLUME}" \
       -v "${JETBRAINS_SYSTEM_VOLUME}" \
       -v "${JETBRAINS_LOGS_VOLUME}" \
+      -v "${JETBRAINS_PROJECTS_VOLUME}" \
       -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
       -v "/tmp/.X11-unix:/tmp/.X11-unix" \
       -v /var/run/docker.sock:/var/run/docker.sock \
