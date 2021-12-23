@@ -25,6 +25,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y rlwrap
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y firefox
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4-terminal
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y jq
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y iputils-ping
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dia
 
 # Install a Latex environment.
 # (copied from the blang/latex ubuntu dockerfile)
@@ -85,7 +89,7 @@ RUN sudo -i -u "${USERNAME}" bash -c "git config --global user.name ${GIT_USER_N
 RUN mkdir -p "/home/${USERNAME}/usr/src/quicklisp"
 WORKDIR "/home/${USERNAME}/usr/src/quicklisp"
 RUN curl -O https://beta.quicklisp.org/quicklisp.lisp && \
-    curl -O https://beta.quicklisp.org/quicklisp.lisp.asc 
+    curl -O https://beta.quicklisp.org/quicklisp.lisp.asc
 #    gpg --verify quicklisp.lisp.asc quicklisp.lisp
 
 COPY --chown="${USERNAME}:${USERGROUP}" quicklisp-install-script.lisp quicklisp-install-script.lisp
@@ -159,8 +163,21 @@ RUN sudo -i -u "${USERNAME}" bash -c '\
       curl -sLO https://download.jetbrains.com/idea/ideaIU-2021.1.3.tar.gz && \
       tar xvfz ideaIU-2021.1.3.tar.gz'
 
-
 WORKDIR "/home/${USERNAME}"
+
+# https://k3d.io/v5.1.0/
+RUN sudo -i -u "${USERNAME}" bash -c '\
+    curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.0.0 bash'
+
+# https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+RUN sudo -i -u "${USERNAME}" bash -c '\
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"'
+
+RUN sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+# https://helm.sh/docs/intro/install/
+RUN sudo -i -u "${USERNAME}" bash -c '\
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash'
 
 # Copy in some dotfiles.
 # Hell, mount them as volumes too when we start the container. That way, if you change them on the host and it doesn't cause this layer to
@@ -205,6 +222,12 @@ COPY --chown="${USERNAME}:${USERGROUP}" scripts scripts
 RUN   sudo -i -u "${USERNAME}" bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash \
       && . /home/${USER}/.nvm/nvm.sh \
       && nvm install node'
+
+# Set up shell completion for some utils
+RUN   sudo -i -u "${USERNAME}" bash -c 'mkdir ~/.oh-my-zsh/completions'
+RUN   sudo -i -u "${USERNAME}" bash -c 'kubectl completion zsh > ~/.oh-my-zsh/completions/_kubectl'
+RUN   sudo -i -u "${USERNAME}" bash -c 'helm completion zsh > ~/.oh-my-zsh/completions/_helm'
+RUN   sudo -i -u "${USERNAME}" bash -c 'k3d completion zsh > ~/.oh-my-zsh/completions/_k3d'
 
 WORKDIR "/home/${USERNAME}/onlisp"
 env USER ${USERNAME}

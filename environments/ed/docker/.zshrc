@@ -115,6 +115,9 @@ export LESS="-F -X $LESS"
 # at remembering to type "repl"
 alias repl="rlwrap sbcl"
 
+# So I don't forget to add the --api-port switch that will let me connect to the cluster from other containers
+alias k8scluster="k3d cluster create --api-port host.docker.internal:42042"
+
 # repls for individual lisps. May be better to write scripts like the one I yanked from the ABCL
 # documentation for sbcl and clisp (it's smart: it lets you just type "abcl" and gives you a repl
 # if there are no arguments)

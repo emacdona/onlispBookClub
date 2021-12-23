@@ -105,7 +105,9 @@ then
    # and then reconnect to it later
    if [ -z "${DAEMON}" ]
    then
+       # "host.docker.internal": https://github.com/moby/moby/pull/40007#issuecomment-578729356
    CONTAINER_ID=$(docker run \
+      --add-host host.docker.internal:host-gateway \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
@@ -126,6 +128,7 @@ then
    echo "Running in daemon mode"
    set -x
    docker run --rm -d \
+      --add-host host.docker.internal:host-gateway \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
