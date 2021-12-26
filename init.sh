@@ -56,7 +56,6 @@ helm repo update
 helm install my-release nginx-stable/nginx-ingress
 
 
-helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-helm install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard
+./dashboard.sh
 
 ./ingress.sh
