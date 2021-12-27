@@ -30,6 +30,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y iputils-ping
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dia
 
+# https://www.xach.com/lisp/buildapp/
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y buildapp
+
 # Install a Latex environment.
 # (copied from the blang/latex ubuntu dockerfile)
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y texlive-full

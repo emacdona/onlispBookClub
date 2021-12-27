@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-k3d cluster delete 
+k3d cluster delete
 
 # Not sure about this *required* node-filter "server:0". What if I had multiple nodes? I don't want traefik, though.
 k3d cluster create \
+   --registry-create registry \
    --api-port host.docker.internal:42042 \
    -p "8081:80@loadbalancer" \
    --k3s-arg '--no-deploy=traefik@server:0'

@@ -118,6 +118,8 @@ alias repl="rlwrap sbcl"
 # So I don't forget to add the --api-port switch that will let me connect to the cluster from other containers
 alias k8scluster="k3d cluster create --api-port host.docker.internal:42042"
 
+alias dockerRepoPort="docker ps -f name=registry --format \"{{json .}}\" | jq -r '.Ports' | perl -ne 'print((split(/:/, (split(/->/))[0]))[1], \"\n\")'"
+
 # repls for individual lisps. May be better to write scripts like the one I yanked from the ABCL
 # documentation for sbcl and clisp (it's smart: it lets you just type "abcl" and gives you a repl
 # if there are no arguments)
