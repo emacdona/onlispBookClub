@@ -54,7 +54,7 @@ helm install filebeat elastic/filebeat
 # I wanted to redirect to "/bar" on the service specified in the match rule. Could NOT get it to work.
 helm repo add nginx-stable https://helm.nginx.com/stable
 helm repo update
-helm install my-release nginx-stable/nginx-ingress
+helm install nginx-ingress nginx-stable/nginx-ingress
 
 
 ./dashboard.sh

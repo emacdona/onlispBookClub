@@ -5,7 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: registry:34355/net.edmacdonald/lisphelloworld
+  # Need to specify repository on the command line b/c the port changes
+  # and it doesn't seem to work without the port as promised here:
+  # https://k3d.io/v5.2.0/usage/registries/
+  repository: registry:12345/net.edmacdonald/lisphelloworld
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -37,20 +40,20 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: ClusterIP
-  port: 80
+  type: LoadBalancer
+  port: 8282
 
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.org/rewrites: serviceName=hw-helloworld rewrite=/
+    nginx.org/mergeable-ingress-type: "minion"
   hosts:
-    - host: chart-example.local
+    - host: host.docker.internal
       paths:
-        - path: /
-          pathType: ImplementationSpecific
+        - path: /helloworld/
+          pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
