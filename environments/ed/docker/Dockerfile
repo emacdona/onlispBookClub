@@ -8,7 +8,6 @@ RUN apt-get update
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y screen
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y emacs
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y vim
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sbcl
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y zsh
@@ -42,6 +41,21 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y make
 
 # Install scheme
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mit-scheme mit-scheme-dbg mit-scheme-doc
+
+# Emacs from source (because Ubuntul LTS emacs packages are too old for Spacemacs now)
+# https://ubuntuhandbook.org/index.php/2021/12/compile-gnu-emacs-source-ubuntu/
+# https://askubuntu.com/questions/158871/how-do-i-enable-the-source-code-repositories
+RUN sed -i '/deb-src/s/^# //' /etc/apt/sources.list
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get build-dep emacs -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get install autoconf -y
+RUN curl -sO https://ftp.gnu.org/gnu/emacs/emacs-27.2.tar.gz && \
+    tar xfz emacs-27.2.tar.gz && \
+    cd emacs-27.2 && \
+    ./autogen.sh && \
+    ./configure && \
+    make bootstrap -j4 && \
+    make install
 
 # https://docs.docker.com/engine/install/ubuntu/ (but we're not installing the engine, just the cli)
 RUN apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
@@ -206,6 +220,12 @@ RUN git clone https://github.com/syl20bnr/spacemacs "/home/${USERNAME}/.emacs.d"
 
 # Run emacs in batch mode to install all packages
 RUN sudo -i -u "${USERNAME}" bash -c 'emacs -batch -l ~/.emacs.d/init.el'
+
+# Install istoctl
+# https://istio.io/latest/docs/setup/getting-started/
+RUN sudo -i -u "${USERNAME}" bash -c "\
+    curl -L https://istio.io/downloadIstio | sh - && \
+    mv istio-* istio"
 
 # For when I inevitably give up on emacs, set up vim in a way that I like ;-)
 # pathogen

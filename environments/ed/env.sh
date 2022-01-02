@@ -4,7 +4,7 @@ set -eo pipefail
 # Note: Currently, this script requires the following be installed:
 # docker
 # It probably also will only run on Linux. Maybe with a little work, it could run on Mac. With a BIT more
-# work, it could run on Windows. 
+# work, it could run on Windows.
 
 usage() {
    echo "Usage: $0 [-n <git name>] [-e <git email>] [-d (starts container in daemon mode)]" 1>&2;
