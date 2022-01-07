@@ -561,14 +561,27 @@ before packages are loaded."
 ;; it for my workstation keyboard -- but it still works. Go
 ;; figure.
    (keyboard-translate ?\C-h ?\C-?)
-   (menu-bar-mode 1)
-   (tool-bar-mode 1)
+
+   ;; This no longer work at startup for some reason (post upgrade to emacs 27 and whatever version of Spacemacs necessitated the emacs upgrade)
+   ;; (menu-bar-mode 1)
+   ;; (tool-bar-mode 1)
+
+   ;; This doesn't work either
+   ;; (add-hook 'after-make-frame-functions 'spacemacs/toggle-menu-bar-on)
+   ;; (add-hook 'after-make-frame-functions 'spacemacs/toggle-tool-bar-on)
+
+   ;; This doesn't work either.
+   ;; (spacemacs/toggle-menu-bar-on)
+   ;; (spacemacs/toggle-tool-bar-on)
 
    ;; https://www.reddit.com/r/spacemacs/comments/hbl9yi/stupid_question_how_to_disable_truncate_lines/
    (add-hook 'hack-local-variables-hook #'spacemacs/toggle-truncate-lines-on)
 
    ;; https://www.spacemacs.org/layers/+source-control/git/README.html
    (setq-default git-magit-status-fullscreen t)
+
+   ;; https://github.com/syl20bnr/spacemacs/issues/8642#issuecomment-329199745
+   (evil-set-initial-state 'term-mode 'emacs)
 )
 
 
