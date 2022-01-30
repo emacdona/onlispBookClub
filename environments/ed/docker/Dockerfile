@@ -23,6 +23,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y rlwrap
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y firefox
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4-terminal
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y thunar
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y jq
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils

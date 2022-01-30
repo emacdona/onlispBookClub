@@ -56,6 +56,13 @@ helm repo add nginx-stable https://helm.nginx.com/stable
 helm repo update
 helm install nginx-ingress nginx-stable/nginx-ingress
 
+# Cassandra and MongoDB (two separate edges of the CAP theorem)
+# https://github.com/bitnami/charts/tree/master/bitnami/cassandra
+# https://github.com/bitnami/charts/tree/master/bitnami/mongodb
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install cassandra bitnami/cassandra
+helm install my-release bitnami/mongodb
+
 
 ./dashboard.sh
 
