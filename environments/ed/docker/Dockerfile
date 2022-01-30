@@ -30,6 +30,24 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y iputils-ping
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dia
 
+# pyenv pre-reqs (delta from existing installed packages)
+# https://github.com/pyenv/pyenv/wiki#suggested-build-environment
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+   libssl-dev \
+   zlib1g-dev\
+   libbz2-dev\
+   libreadline-dev\
+   libsqlite3-dev\
+   wget\
+   llvm\
+   libncursesw5-dev\
+   xz-utils\
+   tk-dev\
+   libxml2-dev\
+   libxmlsec1-dev\
+   libffi-dev\
+   liblzma-dev
+
 # https://www.xach.com/lisp/buildapp/
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y buildapp
 
@@ -151,6 +169,14 @@ RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sd
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install scala 2.13.7'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install sbt 1.5.5'
 
+# pyenv
+# https://github.com/pyenv/pyenv
+# Running the commands specified there to update shell configuration files was a bridge too far. Adding Dockerfile quoting syntax
+# on top of shell quoting syntax is a disaster. Here, I'll just clone the repo and run the make command.
+# I've hard coded the shell configuration in ~/.zshrc
+RUN sudo -i -u "${USERNAME}" bash -c "git clone https://github.com/pyenv/pyenv.git ~/.pyenv"
+RUN sudo -i -u "${USERNAME}" bash -c "cd ~/.pyenv && src/configure && make -C src"
+
 # ABCL
 # https://abcl.org/doc/abcl-user.html
 # Note: keep an eye on the download link here: https://abcl.org/
@@ -208,15 +234,22 @@ COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
 COPY --chown="${USERNAME}:${USERGROUP}" .spacemacs .spacemacs
 COPY --chown="${USERNAME}:${USERGROUP}" terminalrc .config/xfce4/terminal/terminalrc
 COPY --chown="${USERNAME}:${USERGROUP}" supervisord.conf supervisord.conf
-#COPY --chown="${USERNAME}:${USERGROUP}" .emacs .emacs
 
-# The only emacs solarized theme I could get working for terminal based emacs
-#RUN git clone https://github.com/sellout/emacs-color-theme-solarized.git ~/.emacs.d/emacs-color-theme-solarized
+# Since we currently only have pyenv installed for zsh, we need to wait until our zshrc (with manual changes for pyenv) is installed so we can install pythons. Consider installing it for bash too, and
+# running this earlier?
+# Also, don't understand why I HAVE to source ~/.zshrc. But that's a problem for another time
+RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && pyenv install 3.10.2 && pyenv global 3.10.2'
 
-# Run emacs in batch mode to install all packages
-#RUN sudo -i -u "${USERNAME}" bash -c 'emacs --batch -l ~/.emacs'
+# Installing ansible with a pyenv installed python doesn't seem to create an "ansible" shim... so you can't run it unless you know where it's at.
+# Turns out that best practice is to install a virtualenv anyway, and then put ansible there.
+# Probably a project specific venv is best, but for now, I'll create a "common" one for me to use
+# https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html
+RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && python -m pip install virtualenv'
+RUN sudo -i -u "${USERNAME}" zsh -c 'mkdir -p ~/venv'
+RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && cd ~/venv && python -m virtualenv ansible && . ansible/bin/activate && pip install ansible && deactivate'
 
-# Let's see what spacemacs is like...
+
+# spacemacs
 RUN git clone https://github.com/syl20bnr/spacemacs "/home/${USERNAME}/.emacs.d"
 
 # Run emacs in batch mode to install all packages

@@ -127,6 +127,9 @@ alias sbclr="rlwrap sbcl"
 alias clispr="rlwrap clisp"
 alias abclr="abcl"
 
+# my "global" ansible venv
+alias ansible-venv=". ~/venv/ansible/bin/activate"
+
 set -o vi
 
 # haskell "stack?" installs stuff here
@@ -143,3 +146,10 @@ export SDKMAN_DIR="$HOME/.sdkman"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Pyenv, hard coded by me. Tailoring these instructions to work inside a Dockerfile was just too much
+# (quoting issues). Also, why the f*ck do they insist on login shells. I'm putting _everything_ here.
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
