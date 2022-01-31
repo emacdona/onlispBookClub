@@ -280,6 +280,10 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'curl -o- https://raw.githubusercontent.c
       && . /home/${USER}/.nvm/nvm.sh \
       && nvm install node'
 
+# Bazelisk
+# https://github.com/bazelbuild/bazelisk/blob/master/README.md
+RUN   sudo -i -u "${USERNAME}" bash -c '. /home/${USER}/.nvm/nvm.sh && npm install -g @bazel/bazelisk'
+
 # Set up shell completion for some utils
 RUN   sudo -i -u "${USERNAME}" bash -c 'mkdir ~/.oh-my-zsh/completions'
 RUN   sudo -i -u "${USERNAME}" bash -c 'kubectl completion zsh > ~/.oh-my-zsh/completions/_kubectl'
