@@ -30,6 +30,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y iputils-ping
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dia
 
+# Some math tools
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y octave
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y maxima wxmaxima
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sagemath
+
 # pyenv pre-reqs (delta from existing installed packages)
 # https://github.com/pyenv/pyenv/wiki#suggested-build-environment
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -57,6 +62,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y texlive-full
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pygments
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y gnuplot
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y make
+
+# added later...
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y texstudio
 
 # Install scheme
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mit-scheme mit-scheme-dbg mit-scheme-doc
@@ -283,6 +291,20 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'curl -o- https://raw.githubusercontent.c
 # Bazelisk
 # https://github.com/bazelbuild/bazelisk/blob/master/README.md
 RUN   sudo -i -u "${USERNAME}" bash -c '. /home/${USER}/.nvm/nvm.sh && npm install -g @bazel/bazelisk'
+
+# mdp
+# https://github.com/visit1985/mdp
+RUN   sudo -i -u "${USERNAME}" bash -c 'cd ~/usr/src \
+    && git clone https://github.com/visit1985/mdp.git \
+    && cd mdp \
+    && make \
+    && sudo make install'
+
+# required by demo-magic
+# https://github.com/paxtonhare/demo-magic
+# TODO: Should move this up top, but don't want to pay the price of rebuilding all successive layers (yet)
+# Have to use "sudo" now b/c I'm not root at this point. But that begs the question... why do the commands after this one need sudo? (need to look into that)
+RUN DEBIAN_FRONTEND=noninteractive sudo apt-get install -y pv
 
 # Set up shell completion for some utils
 RUN   sudo -i -u "${USERNAME}" bash -c 'mkdir ~/.oh-my-zsh/completions'

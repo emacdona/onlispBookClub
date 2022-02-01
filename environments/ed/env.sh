@@ -109,8 +109,10 @@ then
    if [ -z "${DAEMON}" ]
    then
        # "host.docker.internal": https://github.com/moby/moby/pull/40007#issuecomment-578729356
+       # https://robcogenteam.bitbucket.io/bonus-download.html (re: --security-opt)
    CONTAINER_ID=$(docker run \
       --add-host host.docker.internal:host-gateway \
+      --security-opt seccomp=unconfined \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
@@ -133,6 +135,7 @@ then
    set -x
    docker run --rm -d \
       --add-host host.docker.internal:host-gateway \
+      --security-opt seccomp=unconfined \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
