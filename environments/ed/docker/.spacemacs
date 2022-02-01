@@ -64,6 +64,9 @@ This function should only modify configuration layer settings."
 
      ;; https://develop.spacemacs.org/layers/+tools/docker/README.html
      docker
+
+     ;; https://develop.spacemacs.org/layers/+lang/latex/README.html
+     latex
      )
 
 
