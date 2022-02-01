@@ -67,6 +67,9 @@ This function should only modify configuration layer settings."
 
      ;; https://develop.spacemacs.org/layers/+lang/latex/README.html
      latex
+
+     ;; https://github.com/venmos/w3m-layer
+     w3m
      )
 
 

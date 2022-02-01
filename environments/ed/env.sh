@@ -7,7 +7,7 @@ set -eo pipefail
 # work, it could run on Windows.
 
 usage() {
-   echo "Usage: $0 [-n <git name>] [-e <git email>] [-d (starts container in daemon mode)]" 1>&2;
+   echo "Usage: $0 [-n <git name>] [-e <git email>] [-d (starts container in daemon mode)] [-c (don't use cache for docker build)]" 1>&2;
     echo "   If arguments not specified, you need to have git installed because:" 1>&2;
     echo "      git name defaults to: git config --global user.name" 1>&2;
     echo "      git email defaults to: git config --global user.email" 1>&2;
@@ -17,10 +17,11 @@ usage() {
 USER_ENTERED_GIT_NAME=""
 USER_ENTERED_GIT_EMAIL=""
 DAEMON=""
+NO_CACHE_DOCKER_BUILD=""
 
 echo "Started with arguments: $@"
 
-while getopts ":n:e:d" o; do
+while getopts ":n:e:dc" o; do
     case "${o}" in
         n)
             USER_ENTERED_GIT_NAME=${OPTARG}
@@ -30,6 +31,9 @@ while getopts ":n:e:d" o; do
             ;;
         d)
             DAEMON="y"
+            ;;
+        c)
+            NO_CACHE_DOCKER_BUILD="--no-cache"
             ;;
         *)
             usage
@@ -93,6 +97,7 @@ then
 
    cd "${ENVIRONMENT_ROOT}/docker" && \
       docker build \
+         ${NO_CACHE_DOCKER_BUILD} \
          --build-arg USERNAME="${USER}" \
          --build-arg UID=$(id -u ${USER}) \
          --build-arg USERGROUP="${USER}" \

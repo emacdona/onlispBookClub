@@ -30,6 +30,13 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y iputils-ping
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dia
 
+# Required by spacemacs w3m layer
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y w3m
+
+# required by demo-magic
+# https://github.com/paxtonhare/demo-magic
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y pv
+
 # Some math tools
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y octave
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y maxima wxmaxima
@@ -260,6 +267,9 @@ RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && cd ~/venv && python -m v
 # spacemacs
 RUN git clone https://github.com/syl20bnr/spacemacs "/home/${USERNAME}/.emacs.d"
 
+# https://github.com/venmos/w3m-layer
+RUN git clone https://github.com/venmos/w3m-layer.git ~/.emacs.d/private/w3m
+
 # Run emacs in batch mode to install all packages
 RUN sudo -i -u "${USERNAME}" bash -c 'emacs -batch -l ~/.emacs.d/init.el'
 
@@ -299,12 +309,6 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'cd ~/usr/src \
     && cd mdp \
     && make \
     && sudo make install'
-
-# required by demo-magic
-# https://github.com/paxtonhare/demo-magic
-# TODO: Should move this up top, but don't want to pay the price of rebuilding all successive layers (yet)
-# Have to use "sudo" now b/c I'm not root at this point. But that begs the question... why do the commands after this one need sudo? (need to look into that)
-RUN DEBIAN_FRONTEND=noninteractive sudo apt-get install -y pv
 
 # Set up shell completion for some utils
 RUN   sudo -i -u "${USERNAME}" bash -c 'mkdir ~/.oh-my-zsh/completions'
