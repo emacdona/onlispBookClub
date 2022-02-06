@@ -130,6 +130,11 @@ alias abclr="abcl"
 # my "global" ansible venv
 alias ansible-venv=". ~/venv/ansible/bin/activate"
 
+# Just to save me some typing for now (until I think of a better way to do this; like automate setting up a user account in mongodb?)
+alias mongofwd='kubectl port-forward --namespace default svc/my-release-mongodb 27017:27017 &'
+alias mongopw='echo $(kubectl get secret --namespace default my-release-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)'
+alias mongosh='mongosh --host 127.0.0.1 --username root --password $(mongopw)'
+
 set -o vi
 
 # haskell "stack?" installs stuff here

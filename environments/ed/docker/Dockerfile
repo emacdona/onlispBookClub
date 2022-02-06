@@ -42,6 +42,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y octave
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y maxima wxmaxima
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sagemath
 
+# Sage seems to use straight up system python (boo!). Their site seems to indicate that maybe someday they'll have a well supported sage venv. Anyway, until
+# then... gotta install "sage" specific things before we switch pythons via pyenv
+# https://wiki.sagemath.org/ReleaseTours/sage-9.3#Alternative_installation_methods_using_pip
+RUN pip install jupyterlab
+
 # pyenv pre-reqs (delta from existing installed packages)
 # https://github.com/pyenv/pyenv/wiki#suggested-build-environment
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -309,6 +314,25 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'cd ~/usr/src \
     && cd mdp \
     && make \
     && sudo make install'
+
+# TODO: EFM: Move this up (just don't want to pay the rebuild price at the moment)
+# https://docs.mongodb.com/mongodb-shell/install/#std-label-mdb-shell-install
+RUN   sudo -i -u "${USERNAME}" bash -c '\
+    wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add - && \
+    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list && \
+    sudo apt-get update && \
+    sudo apt-get install -y mongodb-mongosh'
+
+# https://docs.mongodb.com/database-tools/installation/installation-linux/
+# Note: download link specific to this version of Ubuntu
+RUN   sudo -i -u "${USERNAME}" bash -c '\
+    curl -sO https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.5.2.deb && \
+    sudo apt install ./mongodb-database-tools-*-100.5.2.deb'
+
+# TODO: EFM: Move this up. Just didn't want to pay the rebuild price).
+# Reddit data is compressed using this command.
+RUN   sudo -i -u "${USERNAME}" bash -c 'sudo apt-get install -y zstd'
+
 
 # Set up shell completion for some utils
 RUN   sudo -i -u "${USERNAME}" bash -c 'mkdir ~/.oh-my-zsh/completions'
