@@ -1,6 +1,26 @@
 #!/usr/bin/env zsh
 set -eo pipefail
 
+MONGO_PW=""
+
+while getopts ":p:" o; do
+    case "${o}" in
+        p)
+            MONGO_PW=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${MONGO_PW}" ]
+then
+   echo "Must specify a password" 1>&2
+   exit 1
+fi
+
 RAW_DATA_FILE="reddit_subreddits.ndjson"
 
 if [ ! -f "${RAW_DATA_FILE}.zst" ]
@@ -16,8 +36,6 @@ then
 else
     echo "File already decompressed..."
 fi
-
-MONGO_PW="$(kubectl get secret --namespace default my-release-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)"
 
 # effing hell. head causes a non-zero exit code -- by design
 # ... if not all records are consumed.

@@ -21,4 +21,11 @@ then
    exit 1
 fi
 
-mongosh --eval "var mongopw='${MONGO_PW}'" --file query.js
+rm -rf "$(pwd)/dump"
+
+mongodump \
+    -u root \
+    -p "${MONGO_PW}" \
+    --authenticationDatabase admin \
+    -d reddit \
+    -c subreddits
