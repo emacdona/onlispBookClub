@@ -103,6 +103,20 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/d
 RUN apt-get update
 RUN apt-get install -y docker-ce-cli
 
+# https://docs.mongodb.com/mongodb-shell/install/#std-label-mdb-shell-install
+RUN wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | apt-key add - && \
+    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-5.0.list && \
+    apt-get update && \
+    apt-get install -y mongodb-mongosh
+
+# https://docs.mongodb.com/database-tools/installation/installation-linux/
+# Note: download link specific to this version of Ubuntu
+RUN curl -sO https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.5.2.deb && \
+    apt install ./mongodb-database-tools-*-100.5.2.deb
+
+# Reddit data is compressed using this command.
+RUN   apt-get install -y zstd
+
 
 # https://unix.stackexchange.com/questions/90772/first-characters-of-the-command-repeated-in-the-display-when-completing
 # https://askubuntu.com/questions/581458/how-to-configure-locales-to-unicode-in-a-docker-ubuntu-14-04-container
@@ -268,6 +282,12 @@ RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && python -m pip install vi
 RUN sudo -i -u "${USERNAME}" zsh -c 'mkdir -p ~/venv'
 RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && cd ~/venv && python -m virtualenv ansible && . ansible/bin/activate && pip install ansible && deactivate'
 
+# Installing Anaconda
+RUN sudo -i -u "${USERNAME}" zsh -c '\
+    curl -O https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh && \
+    chmod +x Anaconda3-2021.11-Linux-x86_64.sh && \
+    zsh ./Anaconda3-2021.11-Linux-x86_64.sh -b && \
+    rm Anaconda3-2021.11-Linux-x86_64.sh'
 
 # spacemacs
 RUN git clone https://github.com/syl20bnr/spacemacs "/home/${USERNAME}/.emacs.d"
@@ -314,25 +334,6 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'cd ~/usr/src \
     && cd mdp \
     && make \
     && sudo make install'
-
-# TODO: EFM: Move this up (just don't want to pay the rebuild price at the moment)
-# https://docs.mongodb.com/mongodb-shell/install/#std-label-mdb-shell-install
-RUN   sudo -i -u "${USERNAME}" bash -c '\
-    wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add - && \
-    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list && \
-    sudo apt-get update && \
-    sudo apt-get install -y mongodb-mongosh'
-
-# https://docs.mongodb.com/database-tools/installation/installation-linux/
-# Note: download link specific to this version of Ubuntu
-RUN   sudo -i -u "${USERNAME}" bash -c '\
-    curl -sO https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu2004-x86_64-100.5.2.deb && \
-    sudo apt install ./mongodb-database-tools-*-100.5.2.deb'
-
-# TODO: EFM: Move this up. Just didn't want to pay the rebuild price).
-# Reddit data is compressed using this command.
-RUN   sudo -i -u "${USERNAME}" bash -c 'sudo apt-get install -y zstd'
-
 
 # Set up shell completion for some utils
 RUN   sudo -i -u "${USERNAME}" bash -c 'mkdir ~/.oh-my-zsh/completions'
