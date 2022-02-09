@@ -37,29 +37,36 @@ else
     echo "File already decompressed..."
 fi
 
-# effing hell. head causes a non-zero exit code -- by design
-# ... if not all records are consumed.
-# https://github.com/stedolan/jq/issues/1017
-set +e
-cat reddit_subreddits.ndjson \
-    | head -n 2000000 \
-    | jq -c '. |
-{
-"created_utc": .created_utc,
-"display_name": .display_name,
-"title": .title,
-"url": .url,
-"active_user_count": .active_user_count,
-"lang": .lang,
-"over18": .over18,
-"allow_images": .allow_images,
-"allow_videos": .allow_videos,
-"allow_videogifs": .allow_videogifs,
-"public_description": .public_description,
-"subscribers": .subscribers,
-"header_img": .header_img
-}' > data.json
-set -e
+if [ ! -f "data.json" ]
+then
+   # effing hell. head causes a non-zero exit code -- by design
+   # ... if not all records are consumed.
+   # https://github.com/stedolan/jq/issues/1017
+   set +e
+   cat reddit_subreddits.ndjson \
+       | head -n 2000000 \
+       | jq -c '. |
+   {
+   "created_utc": .created_utc,
+   "display_name": .display_name,
+   "title": .title,
+   "url": .url,
+   "active_user_count": .active_user_count,
+   "lang": .lang,
+   "over18": .over18,
+   "allow_images": .allow_images,
+   "allow_videos": .allow_videos,
+   "allow_videogifs": .allow_videogifs,
+   "public_description": .public_description,
+   "subscribers": .subscribers,
+   "header_img": .header_img
+   }' > data.json
+   set -e
+else
+   echo "Data file already created..."
+fi
+
+echo "Importing to mongo..."
 
 mongoimport \
     --authenticationDatabase admin \
@@ -68,5 +75,7 @@ mongoimport \
     -d reddit \
     -c subreddits \
     data.json
+
+echo "Converting dates..."
 
 mongosh --eval "var mongopw='${MONGO_PW}'" --file dateConversion.js
