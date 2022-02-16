@@ -117,6 +117,26 @@ RUN curl -sO https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu20
 # Reddit data is compressed using this command.
 RUN   apt-get install -y zstd
 
+# dotnet core
+# https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#2004-
+RUN wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -y && \
+    apt-get install -y apt-transport-https && \
+    apt-get install -y dotnet-sdk-6.0 && \
+    apt-get install -y aspnetcore-runtime-6.0
+
+# vscode
+# https://code.visualstudio.com/docs/setup/linux
+RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg && \
+    install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/ && \
+    sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list' && \
+    rm -f packages.microsoft.gpg && \
+    apt install apt-transport-https && \
+    apt update && \
+    apt install code
 
 # https://unix.stackexchange.com/questions/90772/first-characters-of-the-command-repeated-in-the-display-when-completing
 # https://askubuntu.com/questions/581458/how-to-configure-locales-to-unicode-in-a-docker-ubuntu-14-04-container
@@ -288,6 +308,9 @@ RUN sudo -i -u "${USERNAME}" zsh -c '\
     chmod +x Anaconda3-2021.11-Linux-x86_64.sh && \
     zsh ./Anaconda3-2021.11-Linux-x86_64.sh -b && \
     rm Anaconda3-2021.11-Linux-x86_64.sh'
+
+# https://anaconda.org/anaconda/pymongo
+RUN sudo -i -u "${USERNAME}" zsh -c '~/anaconda3/bin/conda install -y -c anaconda pymongo'
 
 # spacemacs
 RUN git clone https://github.com/syl20bnr/spacemacs "/home/${USERNAME}/.emacs.d"
