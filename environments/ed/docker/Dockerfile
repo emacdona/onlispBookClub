@@ -358,6 +358,11 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'cd ~/usr/src \
     && make \
     && sudo make install'
 
+# ZAP
+RUN cd "/home/${USERNAME}/usr/local" && \
+    curl -OL https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Linux.tar.gz && \
+    tar xvfz ZAP_2.11.1_Linux.tar.gz
+
 # Set up shell completion for some utils
 RUN   sudo -i -u "${USERNAME}" bash -c 'mkdir ~/.oh-my-zsh/completions'
 RUN   sudo -i -u "${USERNAME}" bash -c 'kubectl completion zsh > ~/.oh-my-zsh/completions/_kubectl'

@@ -115,7 +115,11 @@ then
    then
        # "host.docker.internal": https://github.com/moby/moby/pull/40007#issuecomment-578729356
        # https://robcogenteam.bitbucket.io/bonus-download.html (re: --security-opt)
+       # Re: shm-size (an attempt to fix crashing vscode):
+       #  https://github.com/microsoft/vscode/issues/139984
+       #  https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html
    CONTAINER_ID=$(docker run \
+      --shm-size 4G \
       --add-host host.docker.internal:host-gateway \
       --security-opt seccomp=unconfined \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
@@ -139,6 +143,7 @@ then
    echo "Running in daemon mode"
    set -x
    docker run --rm -d \
+      --shm-size 4G \
       --add-host host.docker.internal:host-gateway \
       --security-opt seccomp=unconfined \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
