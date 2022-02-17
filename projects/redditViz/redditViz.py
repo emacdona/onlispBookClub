@@ -11,10 +11,11 @@ Created on Wed Feb  9 01:15:52 2022
 import matplotlib.pyplot as plt
 import pandas as pd
 import pymongo as pm
+import os
 
 client = pm.MongoClient(
     username="root",
-    password="YjLuR307Vl",
+    password=os.popen('kubectl get secret --namespace default my-release-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode').read(),
     authSource="admin"
 )
 
