@@ -67,3 +67,5 @@ helm install my-release bitnami/mongodb
 ./dashboard.sh
 
 ./ingress.sh
+
+./keycloak/kc
