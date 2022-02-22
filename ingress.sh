@@ -14,35 +14,23 @@ echo 'apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: master-ingress
-  annotations:
-    nginx.org/mergeable-ingress-type: "master"
 spec:
   ingressClassName: nginx
   rules:
-  - host: host.docker.internal
-' | kubectl create -f -
-
-echo 'apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: infrastructure-ingress
-  annotations:
-    nginx.org/rewrites: "serviceName=prometheus-grafana rewrite=/;serviceName=kibana-kibana rewrite=/;serviceName=kubernetes-dashboard rewrite=/"
-    nginx.org/mergeable-ingress-type: "minion"
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: host.docker.internal
+  - host: grafana.test
     http:
       paths:
-      - path: /grafana/
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: prometheus-grafana
             port:
               number: 80
-      - path: /kibana/
+  - host: kibana.test
+    http:
+      paths:
+      - path: /
         pathType: Prefix
         backend:
           service:
@@ -50,3 +38,4 @@ spec:
             port:
               number: 5601
 ' | kubectl create -f -
+

@@ -118,9 +118,13 @@ then
        # Re: shm-size (an attempt to fix crashing vscode):
        #  https://github.com/microsoft/vscode/issues/139984
        #  https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html
+       #  https://news.ycombinator.com/item?id=12578908 -- use ".test" domain; RFC-6761 approved
    CONTAINER_ID=$(docker run \
       --shm-size 4G \
       --add-host host.docker.internal:host-gateway \
+      --add-host grafana.test:host-gateway \
+      --add-host kibana.test:host-gateway \
+      --add-host keycloak.test:host-gateway \
       --security-opt seccomp=unconfined \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
@@ -145,6 +149,9 @@ then
    docker run --rm -d \
       --shm-size 4G \
       --add-host host.docker.internal:host-gateway \
+      --add-host grafana.test:host-gateway \
+      --add-host kibana.test:host-gateway \
+      --add-host keycloak.test:host-gateway \
       --security-opt seccomp=unconfined \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \

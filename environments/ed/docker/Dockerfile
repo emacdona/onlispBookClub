@@ -29,6 +29,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y jq
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y iputils-ping
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dia
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libxml2-utils
 
 # Required by spacemacs w3m layer
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y w3m

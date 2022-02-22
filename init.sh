@@ -4,10 +4,13 @@ set -eo pipefail
 k3d cluster delete
 
 # Not sure about this *required* node-filter "server:0". What if I had multiple nodes? I don't want traefik, though.
+# Keycloak, f*ck off. I spent DAYS trying to get keycloak to work with forwarding host port 8081 to LoadBalancer port 80.
+# THERE IS NO WAY TO TELL KEYCLOAK TO ADD THE F*CKING :8080 AS THE PORT IN THE REDIRECT AND NAVIGATION URLS IT GENERATES.
+# So now we're listening on 80. Makes the urls look nicer, I guess.
 k3d cluster create \
    --registry-create registry \
    --api-port host.docker.internal:42042 \
-   -p "8081:80@loadbalancer" \
+   -p "80:80@loadbalancer" \
    --k3s-arg '--no-deploy=traefik@server:0'
 
 # https://github.com/prometheus-community/helm-charts
@@ -15,8 +18,7 @@ k3d cluster create \
 # Delete CRDs after uninstalling: https://github.com/prometheus-community/helm-charts/issues/557
 # Set root_url in conjunction with our ingress
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm install prometheus prometheus-community/kube-prometheus-stack \
-   --set 'grafana.grafana\.ini'.server.root_url=http://host.docker.internal:3000/grafana/
+helm install prometheus prometheus-community/kube-prometheus-stack
 
 echo "Grafana <user,pw>: \
    $(kubectl get secret prometheus-grafana --output json | jq -r '.data."admin-user"' | base64 -d) \
@@ -34,13 +36,7 @@ helm install logstash elastic/logstash
 
 # Unset resources. Otherwise, pod requirements aren't able to be met (1 cpu). Not sure _why_ they can't be met,
 # but this fixes the problem.
-helm install kibana elastic/kibana --set resources=null -f <(echo '---
-kibanaConfig:
-   kibana.yml: |
-      server:
-         basePath: /kibana
-         rewriteBasePath: false
-')
+helm install kibana elastic/kibana --set resources=null
 
 helm install filebeat elastic/filebeat
 

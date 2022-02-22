@@ -39,18 +39,11 @@ docker build . -t net.edmacdonald/customkeycloak:latest
 docker tag net.edmacdonald/customkeycloak:latest localhost:$(dockerRepoPort)/net.edmacdonald/customkeycloak:latest
 docker push localhost:$(dockerRepoPort)/net.edmacdonald/customkeycloak:latest
 
+cd "${SCRIPT_DIR}"
 # https://github.com/bitnami/charts/tree/master/bitnami/keycloak/#installing-the-chart
 helm \
-   install keycloak \
-   --set image.pullPolicy=Always \
-   --set livenessProbe.initialDelaySeconds=300 \
-   --set readinessProbe.initialDelaySeconds=30 \
-   --set image.registry="registry:$(dockerRepoPort)" \
-   --set image.repository=net.edmacdonald/customkeycloak \
-   --set image.tag=latest \
-   --set postgresql.postgresqlPassword=password \
-   --set auth.adminPassword=password \
-   --set service.port=8280 \
-   --set service.httpsPort=2443 \
-   bitnami/keycloak
+    install keycloak \
+    --set image.registry="registry:$(dockerRepoPort)" \
+    --values values.yaml \
+    bitnami/keycloak
 
