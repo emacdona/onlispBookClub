@@ -129,6 +129,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -y && \
     apt-get install -y dotnet-sdk-6.0 && \
     apt-get install -y aspnetcore-runtime-6.0
 
+# Terraform
+# https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started
+# https://phoenixnap.com/kb/add-apt-repository-command-not-found-ubuntu
+RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - \
+    sudo apt-get install -y software-properties-common \
+    apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
+    apt-get update && sudo apt-get install -y terraform
+
 # vscode
 # https://code.visualstudio.com/docs/setup/linux
 RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg && \
