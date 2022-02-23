@@ -137,6 +137,13 @@ RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - \
     apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
     apt-get update && sudo apt-get install -y terraform
 
+# AWS CLI
+# https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+RUN cd /tmp \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    unzip awscliv2.zip \
+    sudo ./aws/install
+
 # vscode
 # https://code.visualstudio.com/docs/setup/linux
 RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg && \
