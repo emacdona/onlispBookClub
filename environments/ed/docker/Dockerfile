@@ -132,16 +132,16 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update -y && \
 # Terraform
 # https://learn.hashicorp.com/tutorials/terraform/install-cli?in=terraform/aws-get-started
 # https://phoenixnap.com/kb/add-apt-repository-command-not-found-ubuntu
-RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - \
-    sudo apt-get install -y software-properties-common \
-    apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
+RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add - && \
+    apt-get install -y software-properties-common && \
+    apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main" && \
     apt-get update && sudo apt-get install -y terraform
 
 # AWS CLI
 # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-RUN cd /tmp \
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
-    unzip awscliv2.zip \
+RUN cd /tmp && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
     sudo ./aws/install
 
 # vscode
