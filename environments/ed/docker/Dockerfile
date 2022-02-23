@@ -6,30 +6,30 @@ RUN yes | unminimize
 # Install packages via apt
 RUN apt-get update
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y screen
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y vim
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sbcl
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y zsh
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y curl
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y unzip
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y zip
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sudo
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y clisp
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y texinfo
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-sphinx
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y locales
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y rlwrap
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y firefox
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4-terminal
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y thunar
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y jq
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dnsutils
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y iputils-ping
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dia
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y libxml2-utils
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git \
+   screen \
+   vim \
+   sbcl \
+   zsh \
+   curl \
+   unzip \
+   zip \
+   sudo \
+   clisp \
+   texinfo \
+   build-essential \
+   python3-sphinx \
+   locales \
+   rlwrap \
+   firefox \
+   xfce4-terminal \
+   thunar \
+   supervisor \
+   jq \
+   dnsutils \
+   iputils-ping \
+   dia \
+   libxml2-utils
 
 # Required by spacemacs w3m layer
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y w3m
@@ -310,6 +310,11 @@ COPY --chown="${USERNAME}:${USERGROUP}" supervisord.conf supervisord.conf
 # Also, don't understand why I HAVE to source ~/.zshrc. But that's a problem for another time
 RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && pyenv install 3.10.2 && pyenv global 3.10.2'
 
+# This seems like as good a place as any to put python packages we want to have installed "globally" (for our own global python).
+# python-language-server: used by spacemacs
+RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && \
+   pip install python-language-server'
+
 # Installing ansible with a pyenv installed python doesn't seem to create an "ansible" shim... so you can't run it unless you know where it's at.
 # Turns out that best practice is to install a virtualenv anyway, and then put ansible there.
 # Probably a project specific venv is best, but for now, I'll create a "common" one for me to use
@@ -336,6 +341,12 @@ RUN git clone https://github.com/venmos/w3m-layer.git ~/.emacs.d/private/w3m
 
 # Run emacs in batch mode to install all packages
 RUN sudo -i -u "${USERNAME}" bash -c 'emacs -batch -l ~/.emacs.d/init.el'
+
+# Tell spacemacs to use the path we get from .zshrc (because of all of the shenanigans we've done with tools like sdk, pyenv, etc)
+# The missing '-i' is why we had to source zshrc above. Need to think more before I decide to add it everywhere I'm doing that.
+RUN sudo -i -u "${USERNAME}" zsh -ic '\
+   printf "\n\n# Installed by Dockerfile\n" >> "${HOME}/.spacemacs.env" && \
+   env | grep "^PATH=" >> "${HOME}/.spacemacs.env"'
 
 # Install istoctl
 # https://istio.io/latest/docs/setup/getting-started/
