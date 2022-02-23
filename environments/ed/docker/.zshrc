@@ -165,3 +165,6 @@ eval "$(pyenv init -)"
 
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /usr/bin/terraform terraform
+
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html#cli-command-completion-linux
+complete -C '/usr/local/bin/aws_completer' aws
