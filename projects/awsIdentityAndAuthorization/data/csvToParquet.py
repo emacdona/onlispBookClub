@@ -1,17 +1,12 @@
-# csv_to_parquet.py
-
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import os
 import re
 
-parquet_file = '/path/to/my.parquet'
-chunksize = 100_000
+data_dir = "s3Data/bucket-%03d/%05d/%s"
 
-data_dir = "s3Data/bucket_%03d/%05d/%s"
-
-for i in range(0,10000):
+for i in range(0,1000):
     for f in os.listdir():
         if(f.endswith(".csv")):
             csv_file = f
