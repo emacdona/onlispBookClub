@@ -3,7 +3,7 @@ set -eo pipefail
 
 usage() { echo "Usage: $0 [-p <bucket name prefix>]" 1>&2; exit 1; }
 
-PREFIX=$(uuidgen)
+PREFIX="identity.experiment.edmacdonald.net"
 
 while getopts ":p:" o; do
     case "${o}" in

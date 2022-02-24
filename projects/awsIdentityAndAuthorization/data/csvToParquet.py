@@ -4,14 +4,14 @@ import pyarrow.parquet as pq
 import os
 import re
 
-data_dir = "s3Data/bucket-%03d/%05d/%s"
+data_dir = "s3Data/bucket-%03d/%05d/%s_%05d"
 
-for i in range(0,1000):
+for i in range(0,10):
     for f in os.listdir():
         if(f.endswith(".csv")):
             csv_file = f
             base_name = os.path.splitext(csv_file)[0]
-            base_dir = data_dir % (i % 5, i, base_name)
+            base_dir = data_dir % (i % 5, i, base_name, i)
             parquet_file = "%s/%05d_%s.parquet" % (base_dir, i, base_name)
             os.makedirs(base_dir, exist_ok=True)
 

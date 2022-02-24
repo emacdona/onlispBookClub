@@ -1,7 +1,7 @@
 
-default: .parquet
+default: s3Data/
 
-.parquet: .deps_installed
+s3Data/: .deps_installed
 	(. .venv/bin/activate \
 	&& python csvToParquet.py)
 

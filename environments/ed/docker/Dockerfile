@@ -30,7 +30,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git \
    iputils-ping \
    dia \
    libxml2-utils \
-   uuid-runtime
+   uuid-runtime \
+   usbutils
 
 # Required by spacemacs w3m layer
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y w3m
