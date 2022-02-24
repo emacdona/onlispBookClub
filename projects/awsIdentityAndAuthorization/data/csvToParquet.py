@@ -9,24 +9,28 @@ import re
 parquet_file = '/path/to/my.parquet'
 chunksize = 100_000
 
-for i in range(0,100):
+data_dir = "s3Data/bucket_%03d/%05d/%s"
+
+for i in range(0,10000):
     for f in os.listdir():
         if(f.endswith(".csv")):
             csv_file = f
-            parquet_file = re.sub('\.csv', '.parquet', f)
-            csv_stream = pd.read_csv(csv_file, sep=',', chunksize=chunksize, low_memory=False)
-            csv_stream["DATASET_ID"] = i
+            base_name = os.path.splitext(csv_file)[0]
+            base_dir = data_dir % (i % 5, i, base_name)
+            parquet_file = "%s/%05d_%s.parquet" % (base_dir, i, base_name)
+            os.makedirs(base_dir, exist_ok=True)
 
-            for i, chunk in enumerate(csv_stream):
-                print("Chunk", i)
-                if i == 0:
-                    # Guess the schema of the CSV file from the first chunk
-                    parquet_schema = pa.Table.from_pandas(df=chunk).schema
-                    # Open a Parquet file for writing
-                    parquet_writer = pq.ParquetWriter(parquet_file, parquet_schema, compression='snappy')
+            df = pd.read_csv(csv_file)
+            df["DATASET_ID"] = i
 
-                # Write CSV chunk to the parquet file
-                table = pa.Table.from_pandas(chunk, schema=parquet_schema)
-                parquet_writer.write_table(table)
+            # Guess the schema of the CSV file from the first chunk
+            parquet_schema = pa.Table.from_pandas(df=df).schema
+
+            # Open a Parquet file for writing
+            parquet_writer = pq.ParquetWriter(parquet_file, parquet_schema, compression='snappy')
+
+            # Write CSV chunk to the parquet file
+            table = pa.Table.from_pandas(df, schema=parquet_schema)
+            parquet_writer.write_table(table)
 
             parquet_writer.close()

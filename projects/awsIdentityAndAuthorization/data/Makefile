@@ -14,4 +14,4 @@ default: .parquet
 	python -m venv ./.venv
 
 clean:
-	rm -rf .venv *.parquet .deps_installed
+	rm -rf .venv *.parquet .deps_installed s3Data
