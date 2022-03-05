@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
+# Putting this here so I don't forget: Keycloak cannot push user accounts to AWS SSO via SCIM, even with this plugin.
+# https://github.com/Captain-P-Goldfish/scim-for-keycloak/issues/2
+
 # This script builds a custom keycloak container and then deploys it with the bitnami keycloak helm chart.
 # The base image in the Dockerfile is the default image in the chart at the time this comment was written.
 # Since I haven't looked into how to pin helm chart versions, it is possible that the helm chart (which is downloaded
