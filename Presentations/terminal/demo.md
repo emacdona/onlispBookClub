@@ -94,12 +94,18 @@
 <br>
 * Okay, why Linux and not Windoze?
 <br>
-   * I can't stand Windows, but...
+   * I can't stand Windoze, but...
 <br>
    * Docker may(?) run natively in WSL.
 <br>
    * I *think* WSL is, itself, native (ie: NOT emulated Linux).
 <br>
-   * This *could* mean bind mounts will work really well on Window$!
+   * This *could* mean bind mounts will work really well on Windoze!
 <br>
    * Definitely tell me if you know this to be the case.
+<br>
+* X Windows
+<br>
+   * For either OS X or Windoze, you'll need to install an X Server if you want a GUI.
+<br>
+   * You'll probably have to connect to it over TCP/IP instead of Unix Domain Sockets.
