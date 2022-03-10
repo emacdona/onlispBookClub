@@ -1,7 +1,8 @@
 FROM ubuntu:20.04
 
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y vim screen octave
+   DEBIAN_FRONTEND=noninteractive \
+   apt-get install -y octave
 
 ARG UID
 ARG GID
@@ -22,5 +23,7 @@ RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> \
 USER "${USERNAME}"
 
 WORKDIR "/home/${USERNAME}/workdir"
+
+COPY myPlot.m myPlot.m
 
 CMD ["octave", "--no-gui", "--quiet"]
