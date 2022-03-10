@@ -1,3 +1,5 @@
+preso:
+	mdp demo.md
 
 demo: demo-magic
 	./demo.sh

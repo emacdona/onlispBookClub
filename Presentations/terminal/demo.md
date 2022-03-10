@@ -16,7 +16,7 @@
 -> # Goals (What do we want?) <-
 
 <br>
-* Use some software without leaving an *install* footprint on our host machine
+* Use some software ( *Octave* ) without leaving an *install* footprint on our host machine
 <br>
 * Use that software to create/modify files on the host
 <br>
@@ -67,3 +67,6 @@
 
 -> (translation: "Demo Time") <-
 
+-------------------------------------------------
+
+-> # Thanks for watching! <-

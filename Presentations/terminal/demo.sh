@@ -5,7 +5,8 @@ set -eo pipefail
 
 clear
 wait
-printf "# Build the container.\n\n"
+printf "# Build the container.\n"
+printf "# Pass user/group info for current user.\n\n"
 pe 'docker build -q \
 --build-arg UID=$(id -u ${USER}) \
 --build-arg GID=$(id -g ${USER}) \
