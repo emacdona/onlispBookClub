@@ -73,3 +73,33 @@
 -------------------------------------------------
 
 -> # Thanks for watching! <-
+
+-------------------------------------------------
+
+-> # We've still got time left?! <-
+
+<br>
+-> ## Let's keep going... <-
+
+<br>
+* Why Linux and not Mac?
+<br>
+   * Docker on Mac is virtualized.
+<br>
+   * Bind mounts to the "host" (OS X) filesystem have to traverse a VM (Linux) layer.
+<br>
+   * No idea how this happens (NFS?), but...
+<br>
+   * This makes bind mounts VERY slow.
+<br>
+* Okay, why Linux and not Windoze?
+<br>
+   * I can't stand Windows, but...
+<br>
+   * Docker may(?) run natively in WSL.
+<br>
+   * I *think* WSL is, itself, native (ie: NOT emulated Linux).
+<br>
+   * This *could* mean bind mounts will work really well on Window$!
+<br>
+   * Definitely tell me if you know this to be the case.
