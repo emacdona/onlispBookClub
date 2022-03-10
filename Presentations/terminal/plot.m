@@ -1,4 +1,4 @@
-#!/home/emacdona/projects/learning/OnLisp/Presentations/terminal/octave.sh
+#!./octave.sh
 
 tx = ty = linspace (-8, 8, 41)';
 [xx, yy] = meshgrid (tx, ty);
