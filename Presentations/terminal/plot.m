@@ -1,0 +1,8 @@
+#!/home/emacdona/projects/learning/OnLisp/Presentations/terminal/octave.sh
+
+tx = ty = linspace (-8, 8, 41)';
+[xx, yy] = meshgrid (tx, ty);
+r = sqrt (xx .^ 2 + yy .^ 2) + eps;
+tz = sin (r) ./ r;
+h = mesh (tx, ty, tz);
+waitfor(h);
