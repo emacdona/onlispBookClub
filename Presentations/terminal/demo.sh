@@ -4,6 +4,8 @@ set -eo pipefail
 . demo-magic/demo-magic.sh
 
 clear
+wait
+printf "# Build the container.\n\n"
 pe 'docker build \
 --build-arg UID=$(id -u ${USER}) \
 --build-arg GID=$(id -g ${USER}) \
@@ -14,6 +16,8 @@ pe 'docker build \
 
 wait
 clear
+printf "# Run the container.\n"
+printf "# Use its default CMD.\n\n"
 pe 'docker run -it emacdona/dockerdemo'
 
 #wait
@@ -26,6 +30,10 @@ pe 'docker run -it emacdona/dockerdemo'
 
 wait
 clear
+printf "# Run the container.\n"
+printf "# Bind mount XWindows socket.\n"
+printf "# Bind mount current directory.\n"
+printf "# Modify CMD to use --gui.\n\n"
 pe 'docker run -it \
 -e "DISPLAY=${DISPLAY}" \
 -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
@@ -36,6 +44,7 @@ octave --gui'
 
 wait
 clear
+printf "# Shebang line.\n\n"
 pe 'cat ./plot.m'
 pe 'cat ./octave.sh'
 
