@@ -16,13 +16,13 @@ wait
 clear
 pe 'docker run -it emacdona/dockerdemo'
 
-wait
-clear
-pe 'docker run -it \
--e "DISPLAY=${DISPLAY}" \
--v /tmp/.X11-unix:/tmp/.X11-unix:ro \
-emacdona/dockerdemo \
-octave --gui'
+#wait
+#clear
+#pe 'docker run -it \
+#-e "DISPLAY=${DISPLAY}" \
+#-v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+#emacdona/dockerdemo \
+#octave --gui'
 
 wait
 clear
