@@ -23,4 +23,4 @@ USER "${USERNAME}"
 
 WORKDIR "/home/${USERNAME}/workdir"
 
-CMD ["octave", "--no-gui"]
+CMD ["octave", "--no-gui", "--quiet"]
