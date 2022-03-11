@@ -74,6 +74,13 @@
 
 -> # Thanks for watching! <-
 
+
+## ... and thanks to the following tools
+* [mdp](https://github.com/visit1985/mdp)
+* [demo-magic](https://github.com/paxtonhare/demo-magic)
+* [octave](https://www.gnu.org/software/octave/)
+* [docker](https://www.docker.com/)
+
 -------------------------------------------------
 
 -> # We've still got time left?! <-
@@ -92,17 +99,13 @@
 <br>
    * This makes bind mounts VERY slow.
 <br>
-* Okay, why Linux and not Windoze?
+* Okay, why Linux and not Windoze + WSL?
 <br>
-   * I can't stand Windoze, but...
+   * Well, I'm not sure. I just haven't tried it.
 <br>
-   * Docker may(?) run natively in WSL.
+   * I *think* WSL is native (ie: NOT emulated Linux).
 <br>
-   * I *think* WSL is, itself, native (ie: NOT emulated Linux).
-<br>
-   * This *could* mean bind mounts will work really well on Windoze!
-<br>
-   * Definitely tell me if you know this to be the case.
+   * This *could* mean that bind mounts will work really well on Windoze!
 <br>
 * X Windows
 <br>
