@@ -46,13 +46,10 @@ service:
 ingress:
   enabled: true
   className: nginx
-  annotations:
-    nginx.org/rewrites: serviceName=hw-helloworld rewrite=/
-    nginx.org/mergeable-ingress-type: "minion"
   hosts:
-    - host: host.docker.internal
+    - host: helloworld.lisp.test
       paths:
-        - path: /helloworld/
+        - path: /
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
