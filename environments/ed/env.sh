@@ -172,6 +172,7 @@ then
       --add-host grafana.test:host-gateway \
       --add-host kibana.test:host-gateway \
       --add-host keycloak.test:host-gateway \
+      --add-host helloworld.lisp.test:host-gateway \
       --security-opt seccomp=unconfined \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
       -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
