@@ -60,6 +60,7 @@ helm install cassandra bitnami/cassandra
 helm install my-release bitnami/mongodb
 
 # Jenkins
+# https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/README.md
 helm repo add jenkins https://charts.jenkins.io
 helm repo update
 helm install jenkins jenkins/jenkins \
