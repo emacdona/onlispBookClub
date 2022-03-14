@@ -141,6 +141,7 @@ then
       --add-host grafana.test:host-gateway \
       --add-host kibana.test:host-gateway \
       --add-host keycloak.test:host-gateway \
+      --add-host jenkins.test:host-gateway \
       --add-host helloworld.lisp.test:host-gateway \
       --security-opt seccomp=unconfined \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
@@ -172,6 +173,7 @@ then
       --add-host grafana.test:host-gateway \
       --add-host kibana.test:host-gateway \
       --add-host keycloak.test:host-gateway \
+      --add-host jenkins.test:host-gateway \
       --add-host helloworld.lisp.test:host-gateway \
       --security-opt seccomp=unconfined \
       -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \

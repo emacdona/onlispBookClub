@@ -59,6 +59,13 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 helm install cassandra bitnami/cassandra
 helm install my-release bitnami/mongodb
 
+# Jenkins
+helm repo add jenkins https://charts.jenkins.io
+helm repo update
+helm install jenkins jenkins/jenkins \
+   --set controller.ingress.enabled=true \
+   --set controller.ingress.hostName=jenkins.test \
+   --set controller.ingress.ingressClassName=nginx
 
 ./dashboard.sh
 
