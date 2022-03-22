@@ -116,10 +116,6 @@ then
       TAG="emacdona/onlisp"
    fi
 
-   # https://stackoverflow.com/questions/24225647/docker-a-way-to-give-access-to-a-host-usb-or-serial-device
-   # (scroll down to the answer by "Wout_bb"). What a f*cking pain it is to get any information about usb devices...
-   YUBI_DEVICE_MAJOR_NUMBER=$(ls -la $(lsusb | grep Yubico | awk '{print "/dev/bus/usb/" $2 "/" $4}'  | sed 's/:$//') | awk '{print $5}' | sed 's/,$//')
-
    # https://jtreminio.com/blog/running-docker-containers-as-current-host-user/
    # https://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/
    # Separating this into "run" then "exec" lets you leave the container running so you can exit
@@ -133,11 +129,7 @@ then
        #  https://www.cyberciti.biz/tips/what-is-devshm-and-its-practical-usage.html
        #  https://news.ycombinator.com/item?id=12578908 -- use ".test" domain; RFC-6761 approved
    CONTAINER_ID=$(docker run \
-      --device-cgroup-rule="c ${YUBI_DEVICE_MAJOR_NUMBER}:* rmw" \
-      -v /run/udev:/run/udev:ro \
-      -v /dev:/dev \
       --shm-size 4G \
-      --add-host host.docker.internal:host-gateway \
       --add-host grafana.test:host-gateway \
       --add-host kibana.test:host-gateway \
       --add-host keycloak.test:host-gateway \
@@ -165,11 +157,7 @@ then
    echo "Running in daemon mode"
    set -x
    docker run --rm -d \
-      --device-cgroup-rule="c ${YUBI_DEVICE_MAJOR_NUMBER}:* rmw" \
-      -v /run/udev:/run/udev:ro \
-      -v /dev:/dev \
       --shm-size 4G \
-      --add-host host.docker.internal:host-gateway \
       --add-host grafana.test:host-gateway \
       --add-host kibana.test:host-gateway \
       --add-host keycloak.test:host-gateway \

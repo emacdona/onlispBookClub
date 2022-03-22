@@ -7,9 +7,18 @@ k3d cluster delete
 # Keycloak, f*ck off. I spent DAYS trying to get keycloak to work with forwarding host port 8081 to LoadBalancer port 80.
 # THERE IS NO WAY TO TELL KEYCLOAK TO ADD THE F*CKING :8080 AS THE PORT IN THE REDIRECT AND NAVIGATION URLS IT GENERATES.
 # So now we're listening on 80. Makes the urls look nicer, I guess.
+#
+# On baremetal Linux, host.docker.internal resolves to 172.17.0.1, as desired. However, in WSL 2, it appears to resolve to
+# 192.168.1.111 -- which is... maybe my windows host's IP address? (and not the vm running all the docker containers?). Anyway
+# It doesn't work for what I want here. Note that this was AFTER I gave up on docker desktop and installed plain ol' dockerd
+# per here: https://dev.to/bowmanjd/install-docker-on-windows-wsl-without-docker-desktop-34m9 (Mostly... I editorialized).
+# The reason I gave up on docker desktop was because the connection between the container and the X Server on the host was
+# UNUSABLY slow (at least that's my theory). Now that I know there are two "host" ips in question, it may be worth switching back
+# To Docker Desktop and trying both of them to see if one is better than the other.
+
 k3d cluster create \
    --registry-create registry \
-   --api-port host.docker.internal:42042 \
+   --api-port 172.17.0.1:42042 \
    -p "80:80@loadbalancer" \
    --k3s-arg '--no-deploy=traefik@server:0'
 
