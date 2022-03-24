@@ -135,6 +135,7 @@ alias mongofwd='kubectl port-forward --namespace default svc/my-release-mongodb 
 alias mongopw='echo $(kubectl get secret --namespace default my-release-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)'
 alias mongosh='mongosh --host 127.0.0.1 --username root --password $(mongopw)'
 alias jenkinspw=$'kubectl get secret jenkins --output json | jq -r \'.data."jenkins-admin-password"\' | base64 -d'
+alias gitlabpw=$'kubectl get secret gitlab-gitlab-initial-root-password -ojsonpath=\'{.data.password}\' | base64 --decode ; echo'
 
 # Get the kube dashboard token
 alias dashtoken='kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}"'

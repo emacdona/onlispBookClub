@@ -16,10 +16,15 @@ k3d cluster delete
 # UNUSABLY slow (at least that's my theory). Now that I know there are two "host" ips in question, it may be worth switching back
 # To Docker Desktop and trying both of them to see if one is better than the other.
 
+# 32022: gitlab ssh port. Not load balancer, it's a nodeport
+# https://k3d.io/v5.0.0/usage/exposing_services/#2-via-nodeport
+
 k3d cluster create \
    --registry-create registry \
    --api-port 172.17.0.1:42042 \
    -p "80:80@loadbalancer" \
+   -p "443:443@loadbalancer" \
+   -p "32022:32022@server:0" \
    --k3s-arg '--no-deploy=traefik@server:0'
 
 # https://github.com/prometheus-community/helm-charts
@@ -82,3 +87,15 @@ helm install jenkins jenkins/jenkins \
 ./ingress.sh
 
 ./keycloak/kc
+
+# Gitlab
+# https://gist.github.com/nirbhabbarat/8fe32ccaaacc782272c9f49a753e97b4
+# https://docs.gitlab.com/charts/development/minikube/
+helm repo add gitlab https://charts.gitlab.io/
+helm repo update
+
+helm upgrade --install gitlab gitlab/gitlab \
+   --timeout 600s \
+   --set global.hosts.domain=test \
+   --set global.hosts.externalIP=172.17.0.1 \
+   -f https://gitlab.com/gitlab-org/charts/gitlab/raw/master/examples/values-minikube.yaml
