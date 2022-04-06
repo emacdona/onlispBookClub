@@ -13,8 +13,16 @@
 
 (defmacro emap-with-it (list &body body)
   (let ((l (gensym)))
-  `(let ((,l ,list))
-     (map 'list (lambda (it) ,@body) ,l))))
+    `(let ((,l ,list))
+       (map 'list (lambda (it) ,@body) ,l))))
+
+(defmacro emap-with-or-without-it (list &body body)
+  (let ((l (gensym)))
+    `(let ((,l ,list))
+       ,(if (or (eq 'lambda (car (car body)))
+                (eq 'function (car (car body))))
+            `(map 'list ,(car body) ,l)
+            `(map 'list (lambda (it) ,@body) ,l)))))
 
 (defun test-bad-emap ()
 (let ((l 10))
@@ -27,5 +35,17 @@
 
 ;; eg: (map-with-it (1 2 3 4 5) (* it 10))
 ;; eg: (emap-with-it (list 1 2 3 4 5) (* it 10))
+
+(functionp (lambda (x) (+ x 1)))
+;; t
+
+(functionp (car '((lambda (x) (+ x 1)))))
+;; nil
+
+(functionp (car '(#'(lambda (x) (+ x 1)))))
+;; nil
+
+(car (car '((lambda (x) (+ x 1)))))
+;; LAMBDA
 
 
