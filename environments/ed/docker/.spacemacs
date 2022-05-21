@@ -73,6 +73,11 @@ This function should only modify configuration layer settings."
 
      ;; https://github.com/venmos/w3m-layer
      w3m
+
+     ;; prompted by need for code formatting
+     ;; https://develop.spacemacs.org/layers/%2Bemacs/semantic/README.html
+     semantic
+
      )
 
 
@@ -591,6 +596,14 @@ before packages are loaded."
 
    ;; https://github.com/syl20bnr/spacemacs/issues/8642#issuecomment-329199745
    (evil-set-initial-state 'term-mode 'emacs)
+
+   ; https://develop.spacemacs.org/layers/+lang/common-lisp/README.html
+   ;(setq inferior-lisp-program "/home/emacdona/scripts/abcl")
+
+   ; https://slime.common-lisp.dev/doc/html/Multiple-Lisps.html
+   (setq slime-lisp-implementations
+         '((abcl ("/home/emacdona/scripts/abcl"))
+           (sbcl ("/usr/bin/sbcl") :coding-system utf-8-unix)))
 )
 
 

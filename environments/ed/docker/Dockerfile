@@ -50,6 +50,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sagemath
 # https://wiki.sagemath.org/ReleaseTours/sage-9.3#Alternative_installation_methods_using_pip
 RUN pip install jupyterlab
 
+# Some library somewhere made a backwards incompatible change. As of the time this comment was written, the sagemath Ubuntu repo hasn't caught up.
+# So we need to force a downgrade of markupsafe.
+# https://techoverflow.net/2022/04/07/how-to-fix-jupyter-lab-importerror-cannot-import-name-soft_unicode-from-markupsafe/
+RUN sudo pip3 install markupsafe==2.0.1
+
 # pyenv pre-reqs (delta from existing installed packages)
 # https://github.com/pyenv/pyenv/wiki#suggested-build-environment
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -235,7 +240,7 @@ RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sd
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install gradle 7.2'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install maven 3.8.3'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install ant 1.10.10'
-RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install kotlin 1.5.31'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install kotlin 1.6.21'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install leiningen 2.9.7'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install scala 3.1.0'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install scala 2.13.7'
@@ -255,9 +260,9 @@ RUN sudo -i -u "${USERNAME}" bash -c "cd ~/.pyenv && src/configure && make -C sr
 # (Not sure how long outdated links will continue to work)
 WORKDIR "/home/${USERNAME}/usr/src"
 COPY --chown="${USERNAME}:${USERGROUP}" abcl-completions.lisp abcl-completions.lisp
-RUN curl -O https://abcl.org/releases/1.8.0/abcl-src-1.8.0.tar.gz && \
-    tar xvfz abcl-src-1.8.0.tar.gz && \
-    cd abcl-src-1.8.0 && \
+RUN curl -O https://abcl.org/releases/1.9.0/abcl-src-1.9.0.tar.gz && \
+    tar xvfz abcl-src-1.9.0.tar.gz && \
+    cd abcl-src-1.9.0 && \
     bash -c 'source ~/.sdkman/bin/sdkman-init.sh && ant -f build.xml' && \
     bash -c 'source ~/.sdkman/bin/sdkman-init.sh && java -jar dist/abcl.jar --load ../abcl-completions.lisp'
 
@@ -295,6 +300,10 @@ RUN sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 RUN sudo -i -u "${USERNAME}" bash -c '\
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash'
 
+# Ansible asks for this plugin
+# https://github.com/databus23/helm-diff
+RUN   sudo -i -u "${USERNAME}" bash -c 'helm plugin install https://github.com/databus23/helm-diff'
+
 # Copy in some dotfiles.
 # Hell, mount them as volumes too when we start the container. That way, if you change them on the host and it doesn't cause this layer to
 # rebuild, you'll still see your changes! (I'm not sure how to force this layer to rebuild if one of these files changes on the host).
@@ -306,6 +315,10 @@ COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
 COPY --chown="${USERNAME}:${USERGROUP}" .spacemacs .spacemacs
 COPY --chown="${USERNAME}:${USERGROUP}" terminalrc .config/xfce4/terminal/terminalrc
 COPY --chown="${USERNAME}:${USERGROUP}" supervisord.conf supervisord.conf
+
+# Couldn't find any combination of command line params and arguments that would let me install quicklisp for ABCL. So, since it's already installed b/c of SBCL, I'm just going to steal
+# the .abclrc file that (ql:add-to-init-file) generates (see: https://www.quicklisp.org/beta/faq.html)
+COPY --chown="${USERNAME}:${USERGROUP}" .abclrc .abclrc
 
 # Since we currently only have pyenv installed for zsh, we need to wait until our zshrc (with manual changes for pyenv) is installed so we can install pythons. Consider installing it for bash too, and
 # running this earlier?

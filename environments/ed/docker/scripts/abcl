@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-ABCL_JAR="/home/${USER}/usr/src/abcl-src-1.8.0/dist/abcl.jar"
+ABCL_JAR="/home/${USER}/usr/src/abcl-src-1.9.0/dist/abcl.jar"
 JAVA=$(which java)
 ABCL="$JAVA -server -Xrs -cp $ABCL_JAR org.armedbear.lisp.Main"
 
