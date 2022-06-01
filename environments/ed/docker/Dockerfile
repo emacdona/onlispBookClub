@@ -320,6 +320,13 @@ COPY --chown="${USERNAME}:${USERGROUP}" supervisord.conf supervisord.conf
 # the .abclrc file that (ql:add-to-init-file) generates (see: https://www.quicklisp.org/beta/faq.html)
 COPY --chown="${USERNAME}:${USERGROUP}" .abclrc .abclrc
 
+# Perl
+# We need to install perl HERE so that the perlbrew line we source in the .zshrc file doesn't result in an error when
+# we use 'zsh' instead of 'bash' to install python via pyenv below
+RUN   sudo -i -u "${USERNAME}" bash -c 'curl -L https://install.perlbrew.pl | bash'
+RUN   sudo -i -u "${USERNAME}" bash -c 'source ~/perl5/perlbrew/etc/bashrc && perlbrew install perl-5.34.0'
+RUN   sudo -i -u "${USERNAME}" bash -c 'source ~/perl5/perlbrew/etc/bashrc && perlbrew switch perl-5.34.0'
+
 # Since we currently only have pyenv installed for zsh, we need to wait until our zshrc (with manual changes for pyenv) is installed so we can install pythons. Consider installing it for bash too, and
 # running this earlier?
 # Also, don't understand why I HAVE to source ~/.zshrc. But that's a problem for another time
@@ -327,8 +334,12 @@ RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && pyenv install 3.10.2 && 
 
 # This seems like as good a place as any to put python packages we want to have installed "globally" (for our own global python).
 # python-language-server: used by spacemacs
+#
+# Note: I went with this yq: https://github.com/kislyuk/yq
+# because this article: https://towardsdatascience.com/yq-mastering-yaml-processing-in-command-line-e1ff5ebc0823
+# Billed it as the one being "more like jq"
 RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && \
-   pip install python-language-server'
+   pip install python-language-server yq'
 
 # Installing ansible with a pyenv installed python doesn't seem to create an "ansible" shim... so you can't run it unless you know where it's at.
 # Turns out that best practice is to install a virtualenv anyway, and then put ansible there.

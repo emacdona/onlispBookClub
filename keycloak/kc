@@ -30,12 +30,11 @@ rm -rf scim-for-keycloak
 git clone https://github.com/Captain-P-Goldfish/scim-for-keycloak.git
 cd scim-for-keycloak
 
-# https://github.com/Captain-P-Goldfish/scim-for-keycloak/issues/46
-git checkout kc-16-b2
+git checkout kc-16-b4
 mvn clean package -DskipTests
 
 cd "${SCRIPT_DIR}"
-cp ./scim-for-keycloak/scim-for-keycloak-deployment/target/scim-for-keycloak-kc-16-b2.ear docker
+cp ./scim-for-keycloak/scim-for-keycloak-deployment/target/scim-for-keycloak-kc-16-b4.ear docker
 
 cd docker
 docker build . -t net.edmacdonald/customkeycloak:latest
@@ -48,5 +47,6 @@ helm \
     install keycloak \
     --set image.registry="registry:$(dockerRepoPort)" \
     --values values.yaml \
-    bitnami/keycloak
+    bitnami/keycloak \
+    --version 7.1.18
 
