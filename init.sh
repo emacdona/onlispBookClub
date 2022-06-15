@@ -96,6 +96,6 @@ helm repo update
 
 helm upgrade --install gitlab gitlab/gitlab \
    --timeout 600s \
-   --set global.hosts.domain=test \
+   --set global.hosts.gitlab.hostnameOverride=gitlab.test \
    --set global.hosts.externalIP=172.17.0.1 \
    -f https://gitlab.com/gitlab-org/charts/gitlab/raw/master/examples/values-minikube.yaml
