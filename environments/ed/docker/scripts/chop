@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+CHARS=100
+
+while getopts ":c:" opt; do
+    case $opt in
+        c)
+            CHARS="${OPTARG}"
+            ;;
+        :)
+            echo "Error: option ${OPTARG} requires an argument"
+            ;;
+        ?)
+            echo "Invalid option: ${OPTARG}"
+            ;;
+    esac
+done
+
+perl -pe "s/^(.{${CHARS}}).*/\1/"
