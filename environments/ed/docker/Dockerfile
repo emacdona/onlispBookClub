@@ -324,8 +324,8 @@ COPY --chown="${USERNAME}:${USERGROUP}" .abclrc .abclrc
 # We need to install perl HERE so that the perlbrew line we source in the .zshrc file doesn't result in an error when
 # we use 'zsh' instead of 'bash' to install python via pyenv below
 RUN   sudo -i -u "${USERNAME}" bash -c 'curl -L https://install.perlbrew.pl | bash'
-RUN   sudo -i -u "${USERNAME}" bash -c 'source ~/perl5/perlbrew/etc/bashrc && perlbrew install perl-5.34.0'
-RUN   sudo -i -u "${USERNAME}" bash -c 'source ~/perl5/perlbrew/etc/bashrc && perlbrew switch perl-5.34.0'
+RUN   sudo -i -u "${USERNAME}" bash -c 'source ~/perl5/perlbrew/etc/bashrc && perlbrew install perl-5.34.0 -Dusethreads --as perl-5.34.0_threads'
+RUN   sudo -i -u "${USERNAME}" bash -c 'source ~/perl5/perlbrew/etc/bashrc && perlbrew switch perl-5.34.0_threads'
 
 # Since we currently only have pyenv installed for zsh, we need to wait until our zshrc (with manual changes for pyenv) is installed so we can install pythons. Consider installing it for bash too, and
 # running this earlier?
@@ -415,6 +415,12 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'cd ~/usr/src \
 RUN cd "/home/${USERNAME}/usr/local" && \
     curl -OL https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Linux.tar.gz && \
     tar xvfz ZAP_2.11.1_Linux.tar.gz
+
+# Squeak
+RUN cd "/home/${USERNAME}/usr/local" && \
+    curl -sOL https://files.squeak.org/5.3/Squeak5.3-19481-64bit/Squeak5.3-19481-64bit-202206021410-Linux-x64.tar.gz && \
+    tar xvfz Squeak5.3-19481-64bit-202206021410-Linux-x64.tar.gz
+
 
 # Set up shell completion for some utils
 RUN   sudo -i -u "${USERNAME}" bash -c 'mkdir ~/.oh-my-zsh/completions'
