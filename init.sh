@@ -19,13 +19,20 @@ k3d cluster delete
 # 32022: gitlab ssh port. Not load balancer, it's a nodeport
 # https://k3d.io/v5.0.0/usage/exposing_services/#2-via-nodeport
 
+# Ports 80,443 => nginx ingress
+# Ports 8080,8443 => istio ingress
 k3d cluster create \
    --registry-create registry \
    --api-port 172.17.0.1:42042 \
    -p "80:80@loadbalancer" \
    -p "443:443@loadbalancer" \
+   -p "8080:8080@loadbalancer" \
+   -p "8443:8443@loadbalancer" \
    -p "32022:32022@server:0" \
    --k3s-arg '--no-deploy=traefik@server:0'
+
+# Uncomment this when messing testing ansible scripts. This line allows you to use this script for creating the k3d cluster only:
+# exit 0
 
 # https://github.com/prometheus-community/helm-charts
 # https://github.com/grafana/helm-charts/tree/main/charts/grafana

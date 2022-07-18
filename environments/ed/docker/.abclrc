@@ -5,3 +5,7 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
+(setf asdf:*central-registry*
+      (append asdf:*central-registry*
+              '(#p"~/onlisp/projects/todo/")))
+

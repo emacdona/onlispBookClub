@@ -281,8 +281,8 @@ RUN git clone https://github.com/hadolint/hadolint \
 RUN sudo -i -u "${USERNAME}" bash -c '\
       mkdir -p ~/usr/local && \
       cd ~/usr/local && \
-      curl -sLO https://download.jetbrains.com/idea/ideaIU-2021.1.3.tar.gz && \
-      tar xvfz ideaIU-2021.1.3.tar.gz'
+      curl -sLO https://download.jetbrains.com/idea/ideaIU-2022.1.3.tar.gz && \
+      tar xvfz ideaIU-2022.1.3.tar.gz'
 
 WORKDIR "/home/${USERNAME}"
 
@@ -313,7 +313,6 @@ COPY --chown="${USERNAME}:${USERGROUP}" .exrc .exrc
 COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
 COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
 COPY --chown="${USERNAME}:${USERGROUP}" .spacemacs .spacemacs
-COPY --chown="${USERNAME}:${USERGROUP}" terminalrc .config/xfce4/terminal/terminalrc
 COPY --chown="${USERNAME}:${USERGROUP}" supervisord.conf supervisord.conf
 
 # Couldn't find any combination of command line params and arguments that would let me install quicklisp for ABCL. So, since it's already installed b/c of SBCL, I'm just going to steal
@@ -329,8 +328,7 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'source ~/perl5/perlbrew/etc/bashrc && pe
 
 # Since we currently only have pyenv installed for zsh, we need to wait until our zshrc (with manual changes for pyenv) is installed so we can install pythons. Consider installing it for bash too, and
 # running this earlier?
-# Also, don't understand why I HAVE to source ~/.zshrc. But that's a problem for another time
-RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && pyenv install 3.10.2 && pyenv global 3.10.2'
+RUN sudo -i -u "${USERNAME}" zsh -ic 'pyenv install 3.10.2 && pyenv global 3.10.2'
 
 # This seems like as good a place as any to put python packages we want to have installed "globally" (for our own global python).
 # python-language-server: used by spacemacs
@@ -338,16 +336,15 @@ RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && pyenv install 3.10.2 && 
 # Note: I went with this yq: https://github.com/kislyuk/yq
 # because this article: https://towardsdatascience.com/yq-mastering-yaml-processing-in-command-line-e1ff5ebc0823
 # Billed it as the one being "more like jq"
-RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && \
-   pip install python-language-server yq'
+RUN sudo -i -u "${USERNAME}" zsh -ic 'pip install python-language-server yq'
 
 # Installing ansible with a pyenv installed python doesn't seem to create an "ansible" shim... so you can't run it unless you know where it's at.
 # Turns out that best practice is to install a virtualenv anyway, and then put ansible there.
 # Probably a project specific venv is best, but for now, I'll create a "common" one for me to use
 # https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html
-RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && python -m pip install virtualenv'
-RUN sudo -i -u "${USERNAME}" zsh -c 'mkdir -p ~/venv'
-RUN sudo -i -u "${USERNAME}" zsh -c 'source ~/.zshrc && cd ~/venv && python -m virtualenv ansible && . ansible/bin/activate && pip install ansible && deactivate'
+RUN sudo -i -u "${USERNAME}" zsh -ic 'python -m pip install virtualenv'
+RUN sudo -i -u "${USERNAME}" zsh -ic 'mkdir -p ~/venv'
+RUN sudo -i -u "${USERNAME}" zsh -ic 'cd ~/venv && python -m virtualenv ansible && . ansible/bin/activate && pip install ansible && deactivate'
 
 # Installing Anaconda
 RUN sudo -i -u "${USERNAME}" zsh -c '\
@@ -420,6 +417,10 @@ RUN cd "/home/${USERNAME}/usr/local" && \
 RUN cd "/home/${USERNAME}/usr/local" && \
     curl -sOL https://files.squeak.org/5.3/Squeak5.3-19481-64bit/Squeak5.3-19481-64bit-202206021410-Linux-x64.tar.gz && \
     tar xvfz Squeak5.3-19481-64bit-202206021410-Linux-x64.tar.gz
+
+# K9s: https://github.com/derailed/k9s
+RUN sudo -i -u "${USERNAME}" zsh -ic '\
+    curl -sS https://webinstall.dev/k9s | zsh'
 
 
 # Set up shell completion for some utils

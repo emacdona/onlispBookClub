@@ -1,0 +1,24 @@
+# abcl-playground
+### _Your Name <your.name@example.com>_
+
+This is a project to do ... something.
+
+## License
+
+Specify license here
+
+## How this directory was initialized
+(ql:quickload "quickproject")
+(quickproject:make-project 
+    "/home/emacdona/onlisp/interestingExamples/abcl/abcl-playground")
+
+## How to add this to your system load path.
+## ql:quickload does this for you the first time
+(setf asdf:*central-registry* 
+    (append asdf:*central-registry* 
+    '("/home/emacdona/onlisp/interestingExamples/abcl/abcl-playground/")))
+
+Notes:
+ABCL (vai :java-collections) implements SEQUENCE protocols for java collections.
+
+Part of the definition of "sequence" is a fixed ordering, which means the expectation is that sequences can be indexed. This excludes Java Sets.

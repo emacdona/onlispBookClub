@@ -1,0 +1,119 @@
+#!/usr/bin/env ansible-playbook
+
+---
+
+- name: Install Grafana
+  hosts: localhost
+  become: false
+  connection: local
+  tasks:
+    - name: Add Grafana Chart Repo
+      kubernetes.core.helm_repository:
+        repo_url: https://prometheus-community.github.io/helm-charts
+        name: prometheus-community
+    - name: Install Grafana
+      kubernetes.core.helm:
+        name: prometheus
+        release_namespace: prometheus
+        create_namespace: true
+        chart_ref: prometheus-community/kube-prometheus-stack
+
+- name: Install Elasticsearch
+  hosts: localhost
+  become: false
+  connection: local
+  tasks:
+    - name: Add Elasticsearch Chart Repo
+      kubernetes.core.helm_repository:
+        repo_url: https://helm.elastic.co
+        name: elastic
+    - name: Install Elasticsearch
+      kubernetes.core.helm:
+        name: elasticsearch
+        release_namespace: elasticsearch
+        create_namespace: true
+        chart_ref: elastic/elasticsearch
+        values:
+          antiAffinity: soft
+    - name: Install Logstash
+      kubernetes.core.helm:
+        name: logstash
+        release_namespace: elasticsearch
+        create_namespace: true
+        chart_ref: elastic/logstash
+    - name: Install Kibana
+      kubernetes.core.helm:
+        name: kibana
+        release_namespace: elasticsearch
+        create_namespace: true
+        chart_ref: elastic/kibana
+    - name: Install Filebeat
+      kubernetes.core.helm:
+        name: filebeat
+        release_namespace: elasticsearch
+        create_namespace: true
+        chart_ref: elastic/filebeat
+
+- name: Install Nginx Ingress
+  hosts: localhost
+  become: false
+  connection: local
+  tasks:
+    - name: Add Nginx Chart Repo
+      kubernetes.core.helm_repository:
+        repo_url: https://helm.nginx.com/stable
+        name: nginx-stable
+    - name: Install Nginx Ingress
+      kubernetes.core.helm:
+        name: nginx-ingress
+        release_namespace: nginx-ingress
+        create_namespace: true
+        chart_ref: nginx-stable/nginx-ingress
+
+- name: Install Cassandra
+  hosts: localhost
+  become: false
+  connection: local
+  tasks:
+    - name: Add Cassandra Chart Repo
+      kubernetes.core.helm_repository:
+        repo_url: https://charts.bitnami.com/bitnami
+        name: bitnami
+    - name: Install Cassandra
+      kubernetes.core.helm:
+        name: cassandra
+        release_namespace: cassandra
+        create_namespace: true
+        chart_ref: bitnami/cassandra
+
+- name: Install Mongodb
+  hosts: localhost
+  become: false
+  connection: local
+  tasks:
+    - name: Add Mongodb Chart Repo
+      kubernetes.core.helm_repository:
+        repo_url: https://charts.bitnami.com/bitnami
+        name: bitnami
+    - name: Install Mongodb
+      kubernetes.core.helm:
+        name: mongodb
+        release_namespace: mongodb
+        create_namespace: true
+        chart_ref: bitnami/mongodb
+
+- name: Install Jenkins
+  hosts: localhost
+  become: false
+  connection: local
+  tasks:
+    - name: Add Jenkins Chart Repo
+      kubernetes.core.helm_repository:
+        repo_url: https://charts.jenkins.io
+        name: jenkins
+    - name: Install Jenkins
+      kubernetes.core.helm:
+        name: jenkins 
+        release_namespace: jenkins
+        create_namespace: true
+        chart_ref: jenkins/jenkins

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -eo pipefail
+set -eox pipefail
 
 # Note: Currently, this script requires the following be installed:
 # docker
@@ -74,24 +74,28 @@ then
    ENVIRONMENT_ROOT="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
    PROJECT_ROOT="${ENVIRONMENT_ROOT}/../.."
 
-   JETBRAINS_PLUGINS=".local/share/JetBrains"
-   JETBRAINS_CONFIGURATION=".config/JetBrains/IntelliJIdea2021.1"
-   JETBRAINS_SYSTEM=".cache/JetBrains/IntelliJIdea2021.1"
-   JETBRAINS_LOGS=".cache/JetBrains/IntelliJIdea2021.1/log"
+
+   DOT_LOCAL=".local"
+   DOT_CONFIG=".config"
+   DOT_CACHE=".cache"
    JETBRAINS_PROJECTS="IdeaProjects"
    FIREFOX_SETTINGS=".mozilla"
 
-   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PLUGINS}"
-   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_CONFIGURATION}"
-   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_SYSTEM}"
-   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_LOGS}"
+   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${DOT_LOCAL}"
+   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${DOT_CONFIG}"
+   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${DOT_CACHE}"
    mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PROJECTS}"
    mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${FIREFOX_SETTINGS}"
 
-   JETBRAINS_PLUGINS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PLUGINS}:/home/${USER}/${JETBRAINS_PLUGINS}:rw"
-   JETBRAINS_CONFIGURATION_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_CONFIGURATION}:/home/${USER}/${JETBRAINS_CONFIGURATION}:rw"
-   JETBRAINS_SYSTEM_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_SYSTEM}:/home/${USER}/${JETBRAINS_SYSTEM}:rw"
-   JETBRAINS_LOGS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_LOGS}:/home/${USER}/${JETBRAINS_LOGS}:rw"
+   mkdir -p "${ENVIRONMENT_ROOT}/.volumes/${DOT_CONFIG}/xfce4/terminal"
+
+   # copy terminalrc into mounted .config directory. "yes" command will prevent prompt if it already exists
+   cp  "${ENVIRONMENT_ROOT}/docker/terminalrc" \
+       "${ENVIRONMENT_ROOT}/.volumes/${DOT_CONFIG}/xfce4/terminal"
+
+   DOT_LOCAL_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${DOT_LOCAL}:/home/${USER}/${DOT_LOCAL}:rw"
+   DOT_CONFIG_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${DOT_CONFIG}:/home/${USER}/${DOT_CONFIG}:rw"
+   DOT_CACHE_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${DOT_CACHE}:/home/${USER}/${DOT_CACHE}:rw"
    JETBRAINS_PROJECTS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PROJECTS}:/home/${USER}/${JETBRAINS_PROJECTS}"
    FIREFOX_SETTINGS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${FIREFOX_SETTINGS}:/home/${USER}/${FIREFOX_SETTINGS}"
 
@@ -142,10 +146,9 @@ then
       -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/${USER}/.spacemacs" \
-      -v "${JETBRAINS_PLUGINS_VOLUME}" \
-      -v "${JETBRAINS_CONFIGURATION_VOLUME}" \
-      -v "${JETBRAINS_SYSTEM_VOLUME}" \
-      -v "${JETBRAINS_LOGS_VOLUME}" \
+      -v "${DOT_LOCAL_VOLUME}" \
+      -v "${DOT_CONFIG_VOLUME}" \
+      -v "${DOT_CACHE_VOLUME}" \
       -v "${JETBRAINS_PROJECTS_VOLUME}" \
       -v "${FIREFOX_SETTINGS_VOLUME}" \
       -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
@@ -171,10 +174,9 @@ then
       -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
       -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/${USER}/.spacemacs" \
-      -v "${JETBRAINS_PLUGINS_VOLUME}" \
-      -v "${JETBRAINS_CONFIGURATION_VOLUME}" \
-      -v "${JETBRAINS_SYSTEM_VOLUME}" \
-      -v "${JETBRAINS_LOGS_VOLUME}" \
+      -v "${DOT_LOCAL_VOLUME}" \
+      -v "${DOT_CONFIG_VOLUME}" \
+      -v "${DOT_CACHE_VOLUME}" \
       -v "${JETBRAINS_PROJECTS_VOLUME}" \
       -v "${FIREFOX_SETTINGS_VOLUME}" \
       -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \

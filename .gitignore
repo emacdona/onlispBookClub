@@ -3,3 +3,4 @@
 *.fasl
 .#*
 .volumes
+.idea/
