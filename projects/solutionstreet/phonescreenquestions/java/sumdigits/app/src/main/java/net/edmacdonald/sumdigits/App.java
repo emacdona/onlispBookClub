@@ -40,11 +40,9 @@ public class App {
           remainder = numerator % denominator;
           sum += quotient;
 
-          /*
           System.out.println(String.format(
                    "%7s / %7s = %1s r %7s",  
                    numerator, denominator, quotient, remainder));
-           */
 
           // Shrink the denominator and prepare to divide the remainder
           denominator = denominator / 10;
