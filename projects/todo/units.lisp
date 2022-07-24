@@ -68,7 +68,8 @@
 
 (defclass unit ()
   ((name
-    :initarg :name)
+    :initarg :name
+    :initform nil)
    (type
     :initarg :type
     :initform nil)
@@ -78,7 +79,7 @@
 
 (defmethod initialize-instance :after ((u unit) &key)
   (let* ((name (slot-value u 'name))
-         (type (handler-case (slot-value u 'type) (simple-error () nil)))
+         (type (slot-value u 'type))
          (default-type (default-unit-type name))
          (valid-types (unit-types name)))
     (cond
