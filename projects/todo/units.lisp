@@ -84,10 +84,10 @@
          (valid-types (unit-types name)))
     (cond
       ((not (member name (units)))
-       (error (format nil "Invalid name. Must be one of: ~a" (units))))
+       (error (format nil "Invalid name. Must be one of: ~s" (units))))
       ((and (not type) (not default-type))
-       (error (format nil "Ambiguous unit. You MUST specify a type. One of: ~a" valid-types)))
+       (error (format nil "Ambiguous unit. You MUST specify a type. One of: ~s" valid-types)))
       ((and type (not (member type valid-types)))
-       (error (format nil "The specified quantity type does not apply for ~a. Try one of ~a." name valid-types)))
+       (error (format nil "The specified quantity type does not apply for ~s. Try one of ~s." name valid-types)))
       ((not type)
        (setf (slot-value u 'type) default-type)))))
