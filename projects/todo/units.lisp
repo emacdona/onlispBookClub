@@ -83,13 +83,13 @@
          (valid-types (unit-types name)))
     (cond
       ((not (member name (units)))
-       (error (format nil "Invalid name. Must be one of: ~s" (units))))
+       (error "Invalid name. Must be one of: ~s" (units)))
       ((and (not type) (not default-type))
-       (error (format nil "Ambiguous unit. You MUST specify a type. One of: ~s" valid-types)))
+       (error "Ambiguous unit. You MUST specify a type. One of: ~s" valid-types))
       ((and type (not (member type valid-types)))
-       (error (format nil "The specified quantity type does not apply for ~s. Try one of ~s." name valid-types))))))
+       (error "The specified quantity type does not apply for ~s. Try one of ~s." name valid-types)))))
 
 (defmethod initialize-instance :after ((u unit) &key)
   (with-slots (name type) u
-    (if (not type)
+    (if (null type)
         (setf type (default-unit-type name)))))
