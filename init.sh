@@ -87,7 +87,8 @@ helm repo update
 helm install jenkins jenkins/jenkins \
    --set controller.ingress.enabled=true \
    --set controller.ingress.hostName=jenkins.test \
-   --set controller.ingress.ingressClassName=nginx
+   --set controller.ingress.ingressClassName=nginx \
+   --set 'controller.ingress.path=/'
 
 ./dashboard.sh
 
