@@ -109,7 +109,7 @@ RUN apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 RUN apt-get update
-RUN apt-get install -y docker-ce-cli
+RUN apt-get install -y docker-ce-cli docker-compose-plugin
 
 # https://docs.mongodb.com/mongodb-shell/install/#std-label-mdb-shell-install
 RUN wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | apt-key add - && \
@@ -245,6 +245,7 @@ RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sd
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install scala 3.1.0'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install scala 2.13.7'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install sbt 1.5.5'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install spark 3.2.1'
 
 # pyenv
 # https://github.com/pyenv/pyenv
