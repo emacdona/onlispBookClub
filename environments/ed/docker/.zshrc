@@ -140,6 +140,14 @@ alias gitlabpw=$'kubectl get secret gitlab-gitlab-initial-root-password -ojsonpa
 # Get the kube dashboard token
 alias dashtoken='kubectl -n kubernetes-dashboard get secret $(kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}") -o go-template="{{.data.token | base64decode}}"'
 
+# Show the cert that kubectl is using to connect to k8s
+# Cert chains in PEM aren't handled well by openssl when rendering them to text. Convert to pkcs7 first.
+# https://unix.stackexchange.com/questions/696224/using-openssl-to-display-all-certificates-of-a-pem-file
+alias kubectlcert=$'openssl crl2pkcs7 -nocrl -certfile <(cat ~/.kube/config | yq "." | jq -r \'.users[0].user."client-certificate-data"\' | base64 -d) | openssl pkcs7 -print_certs -text -noout'
+
+# Add the dashtoken to the kubectl config so that we can use it to authenticate when using the dashboard
+alias kubectltoken=$'yq -yi --arg TOKEN "$(dashtoken)" \'.users |= [.[] | if .name == "admin@k3d-k3s-default" then . | .user.token = $TOKEN  else . end]\' ~/.kube/config'
+
 
 set -o vi
 
