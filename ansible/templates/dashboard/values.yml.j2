@@ -1,0 +1,24 @@
+---
+
+# https://github.com/kubernetes/dashboard/blob/master/charts/helm-chart/kubernetes-dashboard/values.yaml
+
+extraArgs:
+    - --enable-insecure-login
+protocolHttp: true
+ingress:
+    enabled: true
+    annotations:
+    #    kubernetes.io/tls-acme: 'true'
+    ## If you use ingress-nginx < 0.21.0
+        nginx.ingress.kubernetes.io/secure-backends: "true"
+    ## if you use ingress-nginx >= 0.21.0
+    #    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    className: nginx
+    hosts:
+        - dashboard.test
+    paths:
+        - /
+    tls:
+        - secretName: server-cert
+          hosts:
+            - dashboard.test
