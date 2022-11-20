@@ -1,0 +1,11 @@
+all:
+  vars:
+    k3d_registry_port: 0
+    jenkins:
+      admin:
+        user: ed
+        password: password
+    grafana:
+      admin:
+        user: ed
+        password: password

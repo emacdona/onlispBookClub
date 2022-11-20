@@ -1,0 +1,19 @@
+---
+
+# Unset resources. Otherwise, pod requirements aren't able to be met (1 cpu). Not sure _why_ they can't be met,
+# but this fixes the problem.
+resources: null
+ingress:
+    enabled: true
+    className: nginx
+    pathtype: Prefix
+    hosts:
+        - host: kibana.test
+          paths:
+            - path: /
+
+installPlugins:
+    - kubernetes:3706.vdfb_d599579f3
+    - workflow-aggregator:590.v6a_d052e5a_a_b_5
+    - git:4.11.5
+    - configuration-as-code:1512.vb_79d418d5fc8

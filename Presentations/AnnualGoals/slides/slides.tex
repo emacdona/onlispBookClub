@@ -1,0 +1,104 @@
+\documentclass{beamer}
+%\usetheme{default}
+%
+%\title{Beamer Template}
+%\author{Ed MacDonald}
+%\begin{document}
+%\begin{frame}[plain]
+%    \maketitle
+%\end{frame}
+%
+%\end{document}
+
+
+
+\usepackage[utf8]{inputenc}
+%\usepackage{minted}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{adjustbox}
+
+% https://gist.github.com/andrejbauer/ac361549ac2186be0cdb
+\usepackage{pgfpages}
+%\setbeameroption{hide notes} % Only slides
+%\setbeameroption{show only notes} % Only notes
+\setbeameroption{show notes on second screen=right}
+\setbeamertemplate{note page}{\pagecolor{yellow!5}\insertnote}\usepackage{palatino}
+
+
+\usetheme{Madrid}
+\useinnertheme{circles}
+\definecolor{ssgreen}{HTML}{669B41}
+\usecolortheme[named=ssgreen]{structure}
+
+%Change link colors, except for navigation links...
+\definecolor{links}{HTML}{2A1B81}
+\hypersetup{colorlinks,linkcolor=,urlcolor=links}
+%And, except for footer links
+\addtobeamertemplate{footline}{\hypersetup{allcolors=.}}{}
+
+\setbeamertemplate{navigation symbols}{}
+\setlength{\columnseprule}{0.4pt}
+
+\AtBeginEnvironment{frame}{\setcounter{footnote}{0}}
+
+\title[Kubernetes]{My Docker and Kubernetes Sandbox}
+\author[Ed MacDonald]{Ed MacDonald\\emacdonald@solutionstreet.com}
+%\institute[\href{https://solutionstreet.com}{SolutionStreet}]{SolutionStreet\\\href{https://solutionstreet.com}{(solutionstreet.com)}}
+\date{May 2021}
+
+%\titlegraphic{ \includegraphics[width=2cm]{logo} }
+
+% Notes:
+% sync user in container w/ user in host
+% docker beside docker
+% sync fs locations in/out of container so other ``beside'' containers see same files
+% XServer
+% Quick overview of docker..
+
+\begin{document}
+    \frame{\titlepage}
+
+    \begin{frame}
+    \frametitle{What is Linux?}
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+            \begin{itemize}
+                \item Is Redhat Linux?\pause
+                \item Is Ubuntu Linux?\pause
+                \item Is Debian Linux?\pause
+                \item Is Alpine Linux?\pause
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            NO!!
+        \end{column}
+    \end{columns}
+    \note[item]{Hello World}
+    \end{frame}
+
+    \begin{frame}
+    \frametitle{What is Linux?}
+    \begin{itemize}
+        \item Linux is a kernel\pause
+        \item A kernel is a set of system calls providing a hardware abstraction\pause
+        \item Linux maintainers FEEL VERY STRONGLY that new kernel versions should strive to maintain binary compatibility
+    \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+      \frametitle{Why Does That Matter?}
+      \begin{itemize}
+      \item Docker images don't have a kernel\pause
+      \item They have a filesystem with binaries\pause
+      \item You can reasonably expect a Docker image based on an old kernel to run on newer one
+      \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+     \frametitle{foobar}
+    \end{frame}
+
+
+\end{document}

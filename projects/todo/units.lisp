@@ -73,23 +73,126 @@
               (mapcar (lambda (x) (aget :type (cdr x)))
                       *unit-db*)))))
 
-(defclass unit ()
-  ((name :initarg :name)
-   (type :initarg :type :initform nil)
-   (prefix :initarg :prefix)))
+(class/std json-deserializeable-prototype
+  lisp-package
+  lisp-class
+  lisp-superclasses)
 
-(defmethod initialize-instance :before ((u unit) &key name type)
-  (let* ((default-type (default-unit-type name))
-         (valid-types (unit-types name)))
-    (cond
-      ((not (member name (units)))
-       (error "Invalid name. Must be one of: ~s" (units)))
-      ((and (not type) (not default-type))
-       (error "Ambiguous unit. You MUST specify a type. One of: ~s" valid-types))
-      ((and type (not (member type valid-types)))
-       (error "The specified quantity type does not apply for ~s. Try one of ~s." name valid-types)))))
+(class/std json-deserializeable
+  prototype)
+
+(defclass unit (json-deserializeable)
+  ((name :initarg :name :initform nil)
+   (type :initarg :type :initform nil)
+   (prefix :initarg :prefix :initform nil)))
+
+(defmethod initialize-instance :before ((u unit) &key name type))
+;(defmethod initialize-instance :before ((u unit) &key name type)
+;  (let* ((default-type (default-unit-type name))
+;         (valid-types (unit-types name)))
+;    (cond
+;      ((not (member name (units)))
+;       (error "Invalid name: ~s. Must be one of: ~s" name (units)))
+;      ((and (not type) (not default-type))
+;       (error "Ambiguous unit. You MUST specify a type. One of: ~s" valid-types))
+;      ((and type (not (member type valid-types)))
+;       (error "The specified quantity type does not apply for ~s. Try one of ~s." name valid-types)))))
 
 (defmethod initialize-instance :after ((u unit) &key)
-  (with-slots (name type) u
-    (if (null type)
-        (setf type (default-unit-type name)))))
+  (progn
+    (format t "Running after!~%")
+    (with-slots (name type) u
+      (if (null type)
+          (setf type (default-unit-type name))))))
+
+(defgeneric encode (unit))
+
+(defmethod encode ((unit unit))
+  (with-slots (prototype) unit
+    (setf prototype (make-instance 'json-deserializeable-prototype
+                                   :lisp-package 'todo
+                                   :lisp-class 'unit))
+    (encode-json-to-string unit)))
+
+(defun char-concat (string char)
+  (concatenate 'string string
+          (concatenate 'list "" '(char))))
+
+(defun string-to-keyword-handlers (member-names)
+  (let ((convert-string-to-keyword nil)
+        (orig-object-key-handler cl-json:*object-key-handler*)
+        (orig-beginning-of-string-handler cl-json:*beginning-of-string-handler*)
+        (orig-string-char-handler cl-json:*string-char-handler*)
+        (orig-end-of-string-handler cl-json:*end-of-string-handler*))
+    (labels
+        ((object-key-handler (key)
+           (if (memg))
+           ))
+        )))
+
+(defun decode (string)
+  (with-decoder-simple-clos-semantics
+    (let ((convert-string-to-keyword nil)
+          (orig-object-key-handler cl-json:*object-key-handler*)
+          (orig-object-value-handler cl-json:*object-value-handler*)
+          (orig-end-of-string-handler cl-json:*end-of-string-handler*)
+          )
+      (labels
+          ((object-key (key)
+             (if (member-if (lambda (x)
+                              (progn
+                                (string= x key)))
+                            '("name" "type"))
+                 (progn
+                   (format t "~s is a string I know!~%" key)
+                   (setf convert-string-to-keyword t)
+                   (let ((k (funcall orig-object-key-handler key)))
+                     (format t "Value for key that I'm returning: ~s~%" key)
+                     key)
+                 )
+                 (progn
+                   (funcall orig-object-key-handler key)
+                   ))
+             )
+           (object-value (value)
+             (progn
+               ;;(setf convert-string-to-keword nil)
+               (funcall orig-object-value-handler value)
+               )
+             )
+;           (object-value (value)
+;             (if convert-string-to-keyword
+;                 (progn
+;                   (format t "Converting ~s to symbol.~%" value)
+;                   (setf convert-string-to-keyword nil)
+;                   (intern (string-upcase value) "KEYWORD")
+;                   )
+;                 (progn
+;                   (funcall orig-object-value-handler value)
+;                   ))
+                                        ;             )
+           )
+        (json:bind-custom-vars
+            (:object-key #'object-key
+             :object-value #'object-value
+             :end-of-string (lambda ()
+                              (if convert-string-to-keyword
+                                  (progn
+                                    (format t "fuck!~%")
+                                    (setf convert-string-to-keyword nil)
+                                    :KEY
+                                    )
+                                  (progn
+                                    (format t "fuck no!~%")
+                                    (funcall orig-end-of-string-handler))))
+             )
+          (decode-json-from-string string)
+          )
+        )
+      )
+    )
+  )
+
+(defun simple-decode (string)
+  (with-decoder-simple-clos-semantics
+    (decode-json-from-string string)))

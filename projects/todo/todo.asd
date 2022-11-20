@@ -2,6 +2,9 @@
 
 (ql:quickload :alexandria)
 (ql:quickload :cl-ppcre)
+(ql:quickload :yason)
+(ql:quickload :cl-json)
+(ql:quickload :defclass-std)
 
 (asdf:defsystem #:todo
   :description "Describe todo here"

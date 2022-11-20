@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+temp=$(mktemp -d -t helm_pull-XXXXXXXXXX)
+
+clean_up(){
+   if [ -d "${temp}" ]
+   then
+      rm -rf "${temp}"
+   fi
+}
+trap clean_up EXIT
+
+cd $temp
+
+chartVersion=$(helm \
+   search repo keycloak --versions \
+| perl -ne 'my ($chartVer, $keycloakVer)=(split(/\s+/))[1,2]; print($chartVer,"\n") if $keycloakVer =~ /^16\.1/' \
+| head -n 1)
+
+helm pull bitnami/keycloak --version "${chartVersion}"
+
+baseImage=$(tar xfz *.tgz  keycloak/values.yaml --to-stdout  \
+| yq -r '.image | .registry + "/" + .repository + ":" + .tag')
+
+echo "Chart version: $chartVersion"
+echo "Base image: $baseImage"

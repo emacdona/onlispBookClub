@@ -1,0 +1,10 @@
+---
+
+controller:
+    adminUser: {{ jenkins.admin.user }}
+    adminPassword: {{ jenkins.admin.password }}
+    ingress:
+        enabled: true
+        hostName: jenkins.test
+        ingressClassName: nginx
+        path: "/"

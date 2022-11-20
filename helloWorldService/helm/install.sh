@@ -13,5 +13,6 @@ function dockerRepoPort(){
 helm \
     install \
     --set image.repository="registry:$(dockerRepoPort)/net.edmacdonald/lisphelloworld" \
+    --set replicaCount=10 \
     hw \
     ./helloworld

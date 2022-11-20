@@ -1,0 +1,65 @@
+HOME            = .
+RANDFILE        = $ENV::HOME/.rnd
+
+####################################################################
+[ req ]
+prompt             = no
+default_bits       = 2048
+default_keyfile    = serverkey.pem
+distinguished_name = server_distinguished_name
+req_extensions     = server_req_extensions
+string_mask        = utf8only
+
+####################################################################
+[ server_distinguished_name ]
+# If you specify <field> _and_ <field>_default, the former appears to be the value used to prompt the user. If you then
+# also specify 'prompt = no', then the value of <field> (intended as a prompt) becomes the actual value used!
+# countryName         = Country Name (2 letter code)
+# countryName_default = US
+
+# If you specify ONLY <field> and then specify 'prompt = no', you can use the config without prompting the user.
+countryName = US
+
+# stateOrProvinceName         = State or Province Name (full name)
+# stateOrProvinceName_default = Middle Earth
+stateOrProvinceName = Middle Earth
+
+# localityName                = Locality Name (eg, city)
+# localityName_default        = Shire
+localityName = Shire
+
+# organizationName            = Organization Name (eg, company)
+# organizationName_default    = Dev
+organizationName = Dev
+
+# organizationalUnitName         = Organizational Unit (eg, division)
+# organizationalUnitName_default = Developer Environment
+organizationalUnitName = Developer Environment
+
+# commonName         = Common Name (e.g. server FQDN or YOUR name)
+# commonName_default = Developer Environment Certificate Authority
+commonName = Developer Environment Certificate Authority
+
+# emailAddress         = Email Address
+# emailAddress_default = email@example.com
+emailAddress = email@example.com
+
+####################################################################
+[ server_req_extensions ]
+
+subjectKeyIdentifier = hash
+basicConstraints     = CA:FALSE
+keyUsage             = digitalSignature, keyEncipherment
+subjectAltName       = @alternate_names
+nsComment            = "OpenSSL Generated Certificate"
+
+####################################################################
+[ alternate_names ]
+
+DNS.1  = grafana.test
+DNS.2  = kibana.test
+DNS.3  = keycloak.test
+DNS.4  = jenkins.test
+DNS.5  = gitlab.test
+DNS.6  = dashboard.test
+DNS.7  = helloworld.lisp.test

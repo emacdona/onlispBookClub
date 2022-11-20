@@ -1,0 +1,5 @@
+---
+
+# Pod anti-affinity settings mandate one pod per node (so you'd need three nodes for the default
+# setting of 3 pods). This relaxes that requirement. Though, I think k3d would be fine with "3" nodes.
+antiAffinity: soft

@@ -131,8 +131,8 @@ alias abclr="abcl"
 alias ansible-venv=". ~/venv/ansible/bin/activate"
 
 # Just to save me some typing for now (until I think of a better way to do this; like automate setting up a user account in mongodb?)
-alias mongofwd='kubectl port-forward --namespace default svc/my-release-mongodb 27017:27017 &'
-alias mongopw='echo $(kubectl get secret --namespace default my-release-mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)'
+alias mongofwd='kubectl port-forward --namespace mongodb svc/mongodb 27017:27017 &'
+alias mongopw='echo $(kubectl get secret --namespace mongodb mongodb -o jsonpath="{.data.mongodb-root-password}" | base64 --decode)'
 alias mongosh='mongosh --host 127.0.0.1 --username root --password $(mongopw)'
 alias jenkinspw=$'kubectl get secret jenkins --output json | jq -r \'.data."jenkins-admin-password"\' | base64 -d'
 alias gitlabpw=$'kubectl get secret gitlab-gitlab-initial-root-password -ojsonpath=\'{.data.password}\' | base64 --decode ; echo'
@@ -147,6 +147,9 @@ alias kubectlcert=$'openssl crl2pkcs7 -nocrl -certfile <(cat ~/.kube/config | yq
 
 # Add the dashtoken to the kubectl config so that we can use it to authenticate when using the dashboard
 alias kubectltoken=$'yq -yi --arg TOKEN "$(dashtoken)" \'.users |= [.[] | if .name == "admin@k3d-k3s-default" then . | .user.token = $TOKEN  else . end]\' ~/.kube/config'
+
+# 'supervisorctl' is way too much to type
+alias sc="supervisorctl --configuration ~/supervisord.conf"
 
 
 set -o vi
@@ -184,4 +187,25 @@ complete -C '/usr/local/bin/aws_completer' aws
 
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
+
+
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/emacdona/mambaforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/emacdona/mambaforge/etc/profile.d/conda.sh" ]; then
+        . "/home/emacdona/mambaforge/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/emacdona/mambaforge/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+
+if [ -f "/home/emacdona/mambaforge/etc/profile.d/mamba.sh" ]; then
+    . "/home/emacdona/mambaforge/etc/profile.d/mamba.sh"
+fi
+# <<< conda initialize <<<
 

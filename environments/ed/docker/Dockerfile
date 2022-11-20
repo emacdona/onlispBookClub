@@ -6,6 +6,14 @@ RUN yes | unminimize
 # Install packages via apt
 RUN apt-get update
 
+
+# QT Creator note:
+# Why libclang-common-8-dev?
+# https://bugreports.qt.io/browse/QTCREATORBUG-19667?focusedCommentId=508061&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-508061
+
+# pympress install instructions (with dependencies)
+# https://github.com/Cimbali/pympress
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git \
    screen \
    vim \
@@ -31,7 +39,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git \
    dia \
    libxml2-utils \
    uuid-runtime \
-   usbutils
+   usbutils \
+   inkscape \
+   libgtk2.0-dev \
+   libgtkglext1-dev \
+   openssl \
+   libssl-dev \
+   qtcreator \
+   qt5-default \
+   libclang-common-8-dev \
+   kile \
+   pympress libgtk-3-0 libpoppler-glib8 libcairo2 python3-gi python3-gi-cairo gobject-introspection libgirepository-1.0-1 gir1.2-gtk-3.0 gir1.2-poppler-0.18
 
 # Required by spacemacs w3m layer
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y w3m
@@ -44,16 +62,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y pv
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y octave
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y maxima wxmaxima
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sagemath
-
-# Sage seems to use straight up system python (boo!). Their site seems to indicate that maybe someday they'll have a well supported sage venv. Anyway, until
-# then... gotta install "sage" specific things before we switch pythons via pyenv
-# https://wiki.sagemath.org/ReleaseTours/sage-9.3#Alternative_installation_methods_using_pip
-RUN pip install jupyterlab
-
-# Some library somewhere made a backwards incompatible change. As of the time this comment was written, the sagemath Ubuntu repo hasn't caught up.
-# So we need to force a downgrade of markupsafe.
-# https://techoverflow.net/2022/04/07/how-to-fix-jupyter-lab-importerror-cannot-import-name-soft_unicode-from-markupsafe/
-RUN sudo pip3 install markupsafe==2.0.1
 
 # pyenv pre-reqs (delta from existing installed packages)
 # https://github.com/pyenv/pyenv/wiki#suggested-build-environment
@@ -176,12 +184,13 @@ ARG USERNAME
 ARG USERGROUP
 ARG GID
 ARG DOCKER_GID
+ARG HOME_DIR
 
 RUN groupadd -g "${GID}" "${USERGROUP}"
 RUN groupadd -g "${DOCKER_GID}" "docker"
 
 RUN useradd \
-   -d "/home/${USERNAME}" \
+   -d "${HOME_DIR}" \
    -ms /bin/zsh \
    -g "${USERGROUP}" \
    -G sudo,docker \
@@ -199,8 +208,8 @@ RUN sudo -i -u "${USERNAME}" bash -c "git config --global user.email ${GIT_USER_
 RUN sudo -i -u "${USERNAME}" bash -c "git config --global user.name ${GIT_USER_NAME}"
 
 # Quicklsip
-RUN mkdir -p "/home/${USERNAME}/usr/src/quicklisp"
-WORKDIR "/home/${USERNAME}/usr/src/quicklisp"
+RUN mkdir -p "${HOME_DIR}/usr/src/quicklisp"
+WORKDIR "${HOME_DIR}/usr/src/quicklisp"
 RUN curl -O https://beta.quicklisp.org/quicklisp.lisp && \
     curl -O https://beta.quicklisp.org/quicklisp.lisp.asc
 #    gpg --verify quicklisp.lisp.asc quicklisp.lisp
@@ -213,7 +222,7 @@ RUN echo | sbcl --load quicklisp.lisp --script quicklisp-install-script.lisp
 # clon (required by erudite) currently having problems installing via quicklisp b/c of missing package. See:
 # https://githubmemory.com/repo/didierverna/clon/issues/9
 # So, install manually: (git clone clon... lolz)
-WORKDIR "/home/${USERNAME}/quicklisp/local-projects"
+WORKDIR "${HOME_DIR}/quicklisp/local-projects"
 RUN git clone https://github.com/didierverna/clon.git
 
 # on-lisp source code for modern lisps -- so we don't have to type in all of PGs function definitions,
@@ -221,13 +230,13 @@ RUN git clone https://github.com/didierverna/clon.git
 RUN git clone https://github.com/DalekBaldwin/on-lisp.git
 
 # Erudite
-WORKDIR "/home/${USERNAME}/usr/src"
+WORKDIR "${HOME_DIR}/usr/src"
 RUN git clone https://github.com/mmontone/erudite.git
 
-WORKDIR "/home/${USERNAME}/usr/src/erudite"
+WORKDIR "${HOME_DIR}/usr/src/erudite"
 RUN make && sudo make install
 
-WORKDIR "/home/${USERNAME}"
+WORKDIR "${HOME_DIR}"
 
 # Oh My Zsh
 # https://ohmyz.sh/#install
@@ -259,7 +268,7 @@ RUN sudo -i -u "${USERNAME}" bash -c "cd ~/.pyenv && src/configure && make -C sr
 # https://abcl.org/doc/abcl-user.html
 # Note: keep an eye on the download link here: https://abcl.org/
 # (Not sure how long outdated links will continue to work)
-WORKDIR "/home/${USERNAME}/usr/src"
+WORKDIR "${HOME_DIR}/usr/src"
 COPY --chown="${USERNAME}:${USERGROUP}" abcl-completions.lisp abcl-completions.lisp
 RUN curl -O https://abcl.org/releases/1.9.0/abcl-src-1.9.0.tar.gz && \
     tar xvfz abcl-src-1.9.0.tar.gz && \
@@ -274,10 +283,34 @@ RUN curl -sSL https://get.haskellstack.org/ | sh
 # Aforementioned Dockerfile linter
 # https://develop.spacemacs.org/layers/+tools/docker/README.html
 # https://github.com/hadolint/hadolint
-WORKDIR "/home/${USERNAME}/usr/src"
+WORKDIR "${HOME_DIR}/usr/src"
 RUN git clone https://github.com/hadolint/hadolint \
    && cd hadolint \
+   && git fetch --all --tags \
+   && git checkout tags/v2.10.0 -b v2.10.0 \
    && stack install
+
+# I currently have a bug submitted for this: https://github.com/hadolint/hadolint/issues/904
+# Until it's fixed, I won't build from master, but I'll use a tag that works (above)
+## hadolint switched from stack to cabal...
+## https://www.haskell.org/ghcup/guide/
+## https://www.haskell.org/cabal/
+## https://stackoverflow.com/questions/72952659/how-to-do-unattended-haskell-installation
+#RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
+#   BOOTSTRAP_HASKELL_NONINTERACTIVE=1 \
+#   BOOTSTRAP_HASKELL_GHC_VERSION=latest \
+#   BOOTSTRAP_HASKELL_CABAL_VERSION=latest \
+#   BOOTSTRAP_HASKELL_INSTALL_STACK=1 \
+#   BOOTSTRAP_HASKELL_INSTALL_HLS=1 \
+#   BOOTSTRAP_HASKELL_ADJUST_BASHRC=P \
+#   sh
+#
+#RUN git clone https://github.com/hadolint/hadolint \
+#   && cd hadolint \
+#   && . "${HOME_DIR}/.ghcup/env" \
+#   && cabal configure \
+#   && cabal build \
+#   && cabal install
 
 RUN sudo -i -u "${USERNAME}" bash -c '\
       mkdir -p ~/usr/local && \
@@ -285,11 +318,11 @@ RUN sudo -i -u "${USERNAME}" bash -c '\
       curl -sLO https://download.jetbrains.com/idea/ideaIU-2022.1.3.tar.gz && \
       tar xvfz ideaIU-2022.1.3.tar.gz'
 
-WORKDIR "/home/${USERNAME}"
+WORKDIR "${HOME_DIR}"
 
 # https://k3d.io/v5.1.0/
 RUN sudo -i -u "${USERNAME}" bash -c '\
-    curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.0.0 bash'
+    curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=v5.4.6 bash'
 
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
 RUN sudo -i -u "${USERNAME}" bash -c '\
@@ -345,20 +378,26 @@ RUN sudo -i -u "${USERNAME}" zsh -ic 'pip install python-language-server yq'
 # https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html
 RUN sudo -i -u "${USERNAME}" zsh -ic 'python -m pip install virtualenv'
 RUN sudo -i -u "${USERNAME}" zsh -ic 'mkdir -p ~/venv'
-RUN sudo -i -u "${USERNAME}" zsh -ic 'cd ~/venv && python -m virtualenv ansible && . ansible/bin/activate && pip install ansible && deactivate'
+RUN sudo -i -u "${USERNAME}" zsh -ic 'cd ~/venv && python -m virtualenv ansible && . ansible/bin/activate && pip install ansible kubernetes && deactivate'
 
-# Installing Anaconda
+# Installing Mambaforge/Miniforge (per sage install instructions: https://doc.sagemath.org/html/en/installation/conda.html#sec-installation-conda)
 RUN sudo -i -u "${USERNAME}" zsh -c '\
-    curl -O https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh && \
-    chmod +x Anaconda3-2021.11-Linux-x86_64.sh && \
-    zsh ./Anaconda3-2021.11-Linux-x86_64.sh -b && \
-    rm Anaconda3-2021.11-Linux-x86_64.sh'
+    cd /tmp && \
+    curl -L -O https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-$(uname)-$(uname -m).sh && \
+    sh Mambaforge-$(uname)-$(uname -m).sh -b && \
+    ~/mambaforge/condabin/conda init zsh'
 
-# https://anaconda.org/anaconda/pymongo
-RUN sudo -i -u "${USERNAME}" zsh -c '~/anaconda3/bin/conda install -y -c anaconda pymongo'
+RUN sudo -i -u "${USERNAME}" zsh -ic '\
+    conda install mamba -y'
+
+# Install a "sage" environment with other packages
+RUN sudo -i -u "${USERNAME}" zsh -ic '\
+    mamba create -n sage sage \
+      jupyter jupyterlab spyder pymongo \
+      python=3.10 -y'
 
 # spacemacs
-RUN git clone https://github.com/syl20bnr/spacemacs "/home/${USERNAME}/.emacs.d"
+RUN git clone https://github.com/syl20bnr/spacemacs "${HOME_DIR}/.emacs.d"
 
 # https://github.com/venmos/w3m-layer
 RUN git clone https://github.com/venmos/w3m-layer.git ~/.emacs.d/private/w3m
@@ -410,14 +449,47 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'cd ~/usr/src \
     && sudo make install'
 
 # ZAP
-RUN cd "/home/${USERNAME}/usr/local" && \
+RUN cd "${HOME_DIR}/usr/local" && \
     curl -OL https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2.11.1_Linux.tar.gz && \
     tar xvfz ZAP_2.11.1_Linux.tar.gz
 
 # Squeak
-RUN cd "/home/${USERNAME}/usr/local" && \
+RUN cd "${HOME_DIR}/usr/local" && \
     curl -sOL https://files.squeak.org/5.3/Squeak5.3-19481-64bit/Squeak5.3-19481-64bit-202206021410-Linux-x64.tar.gz && \
     tar xvfz Squeak5.3-19481-64bit-202206021410-Linux-x64.tar.gz
+
+# Dr Racket
+# https://download.racket-lang.org/
+# https://github.com/takikawa/drracket-vim-tool
+RUN cd "${HOME_DIR}/usr/local" && \
+    curl -sOL https://download.racket-lang.org/installers/8.6/racket-8.6-x86_64-linux-cs.sh && \
+    chmod +x racket-8.6-x86_64-linux-cs.sh && \
+    ./racket-8.6-x86_64-linux-cs.sh --in-place --dest ./racket && \
+    "${HOME_DIR}/usr/local/racket/bin/raco" pkg install drracket-vim-tool
+
+# Pharo
+# https://pharo.org/download
+RUN cd "${HOME_DIR}/usr/local" && mkdir pharo && cd pharo && \
+    curl -sOL http://files.pharo.org/get-files/100/pharo-vm-Linux-x86_64-stable.zip && \
+    curl -sOL https://files.pharo.org/get-files/100/pharo64.zip && \
+    unzip pharo-vm-Linux-x86_64-stable.zip && \
+    unzip pharo64.zip && \
+    ln -s Pharo*.image Pharo.image
+
+# Factor
+# https://pharo.org/download
+# Note: no close button on windows (use Alt + F4 to close them)
+# https://github.com/factor/factor/issues/2265
+# Also note: In the future, you may want to be more clever about how this starts up. By default, it seems to create a working directory
+# as a descendant of the install directory (just work through the tutorial, you'll see what I mean)
+RUN cd "${HOME_DIR}/usr/local" && \
+    curl -sOL https://downloads.factorcode.org/releases/0.98/factor-linux-x86-64-0.98.tar.gz && \
+    tar xvfz factor-linux-x86-64-0.98.tar.gz
+
+# insomnia
+RUN cd "/tmp" && \
+    curl -sLo Insomnia.deb https://updates.insomnia.rest/downloads/ubuntu/latest\?\&app\=com.insomnia.app\&source\=website && \
+    sudo dpkg -i Insomnia.deb
 
 # K9s: https://github.com/derailed/k9s
 RUN sudo -i -u "${USERNAME}" zsh -ic '\
@@ -430,7 +502,7 @@ RUN   sudo -i -u "${USERNAME}" bash -c 'kubectl completion zsh > ~/.oh-my-zsh/co
 RUN   sudo -i -u "${USERNAME}" bash -c 'helm completion zsh > ~/.oh-my-zsh/completions/_helm'
 RUN   sudo -i -u "${USERNAME}" bash -c 'k3d completion zsh > ~/.oh-my-zsh/completions/_k3d'
 
-WORKDIR "/home/${USERNAME}/onlisp"
+WORKDIR "${HOME_DIR}/onlisp"
 env USER ${USERNAME}
 
 CMD ["zsh" , "-c", "supervisord -n -c ${HOME}/supervisord.conf"]

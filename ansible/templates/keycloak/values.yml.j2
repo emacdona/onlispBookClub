@@ -1,0 +1,42 @@
+---
+
+## https://hub.docker.com/r/jboss/keycloak/
+## https://stackoverflow.com/questions/42342367/keycloak-behind-apache-reverse-proxy
+#extraEnvVars:
+#  - name: "PROXY_ADDRESS_FORWARDING"
+#    value: "true"
+#  - name: "KC_PROXY"
+#    value: "edge"
+##  - name: "KEYCLOAK_FRONTEND_URL"
+##    value: "http://keycloakk.test/auth"
+
+livenessProbe:
+  initialDelaySeconds: 300
+
+readinessProbe:
+  initialDelaySeconds: 30
+
+image:
+  pullPolicy: Always
+  repository: "net.edmacdonald/customkeycloak"
+  tag: "latest"
+
+postgresql:
+  postgresqlPassword: "password"
+
+auth:
+  adminUser: "ed"
+  adminPassword: "password"
+
+service:
+  port: 8280
+  httpsPort: 2443
+  type: "ClusterIP"
+
+# https://github.com/bitnami/charts/issues/5074
+ingress:
+  enabled: true
+  hostname: keycloak.test
+  tls: false
+  ingressClassName: nginx
+  pathType: "Prefix"

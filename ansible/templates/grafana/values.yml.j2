@@ -1,0 +1,13 @@
+---
+
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+grafana:
+    adminUser: {{ grafana.admin.user }}
+    adminPassword: {{ grafana.admin.password }}
+    ingress:
+        enabled: true
+        ingressClassName: nginx
+        path: /
+        pathType: Prefix
+        hosts:
+            - grafana.test

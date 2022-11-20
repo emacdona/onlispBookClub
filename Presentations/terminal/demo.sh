@@ -7,12 +7,12 @@ clear
 wait
 printf "# Build the container.\n"
 printf "# Pass user/group info for current user.\n\n"
-pe 'docker build -q \
---build-arg UID=$(id -u ${USER}) \
---build-arg GID=$(id -g ${USER}) \
---build-arg USERNAME="${USER}" \
---build-arg USERGROUP="${USER}" \
--t emacdona/dockerdemo:latest \
+pe 'docker build -q 
+--build-arg UID=$(id -u ${USER}) 
+--build-arg GID=$(id -g ${USER}) 
+--build-arg USERNAME="${USER}" 
+--build-arg USERGROUP="${USER}" 
+-t emacdona/dockerdemo:latest 
 ./docker'
 
 wait

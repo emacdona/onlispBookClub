@@ -50,7 +50,7 @@
      (:head
       (:title "Hello World"))
      (:body
-      (:h1 "Hello World")
+      (:h1 (format nil "Hello World, from ~d" (machine-instance)))
       (:p "Hello!"))))
   )
 

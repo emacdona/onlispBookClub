@@ -1,0 +1,42 @@
+HOME            = .
+RANDFILE        = $ENV::HOME/.rnd
+
+####################################################################
+[ req ]
+prompt             = no
+default_bits       = 2048
+default_keyfile    = clientkey.pem
+distinguished_name = client_distinguished_name
+req_extensions     = client_req_extensions
+string_mask        = utf8only
+
+####################################################################
+[ client_distinguished_name ]
+countryName = US
+stateOrProvinceName = Middle Earth
+localityName = Shire
+organizationName = cluster-admin
+organizationalUnitName = Developer Environment
+commonName = cluster-admin
+emailAddress = email@example.com
+
+# Well, if you want to duplicate the behavior you get via kubectl whose config is installed by k3d, you would do
+# this:
+# (see:
+#  openssl x509 -in <(cat ~/.kube/config | yq -r '.users[].user."client-certificate-data"' | base64 -d) -text -noout
+# )
+# commonName = system:admin
+# organizationName = system:masters
+# But, FFS, you can't use the api to sign groups with O=system:masters
+# ( https://bugzilla.redhat.com/show_bug.cgi?id=2034933 )
+# And I don't know that that makes it any more "secure", it just forces you to grab the node signing cert from the node
+# and sign it yourself.
+# So, just take the cert and key directly from kubectl, I guess. Or do what they wnat you to do, and set up your own
+# user with exactly the permissions you need.
+
+####################################################################
+[ client_req_extensions ]
+subjectKeyIdentifier = hash
+basicConstraints     = CA:FALSE
+keyUsage             = digitalSignature, keyEncipherment
+nsComment            = "OpenSSL Generated Certificate"

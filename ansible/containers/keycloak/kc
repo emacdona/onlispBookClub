@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+# Putting this here so I don't forget: Keycloak cannot push user accounts to AWS SSO via SCIM, even with this plugin.
+# https://github.com/Captain-P-Goldfish/scim-for-keycloak/issues/2
+
+# This script builds a custom keycloak container and then deploys it with the bitnami keycloak helm chart.
+# The base image in the Dockerfile is the default image in the chart at the time this comment was written.
+# Since I haven't looked into how to pin helm chart versions, it is possible that the helm chart (which is downloaded
+# every time this environment is built) will diverge from the version of keycloak used in the base image of the dockerfile
+# used to build our custom image.
+#
+# The customization made by our Dockerfile: We add the SCIM plugin for keycloak.
+
+function dockerRepoPort(){
+   docker \
+      ps \
+      -f name=registry \
+      --format "{{json .}}" \
+   | jq -r '.Ports' \
+   | perl -ne 'print((split(/:/, (split(/->/))[0]))[1], "\n")'
+}
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# https://github.com/Captain-P-Goldfish/scim-for-keycloak
+
+cd "${SCRIPT_DIR}"
+rm -rf scim-for-keycloak
+git clone https://github.com/Captain-P-Goldfish/scim-for-keycloak.git
+cd scim-for-keycloak
+
+git checkout kc-16-b4
+mvn clean package -DskipTests
+
+cd "${SCRIPT_DIR}"
+cp ./scim-for-keycloak/scim-for-keycloak-deployment/target/scim-for-keycloak-kc-16-b4.ear docker
+
+cd docker
+docker build . -t net.edmacdonald/customkeycloak:latest
+docker tag net.edmacdonald/customkeycloak:latest localhost:$(dockerRepoPort)/net.edmacdonald/customkeycloak:latest
+docker push localhost:$(dockerRepoPort)/net.edmacdonald/customkeycloak:latest
+
+cd "${SCRIPT_DIR}"
+# https://github.com/bitnami/charts/tree/master/bitnami/keycloak/#installing-the-chart
+helm \
+    install keycloak \
+    --set image.registry="registry:$(dockerRepoPort)" \
+    --values values.yaml \
+    bitnami/keycloak \
+    --version 7.1.18
+

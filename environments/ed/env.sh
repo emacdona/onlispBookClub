@@ -72,8 +72,14 @@ then
    fi;
 
    ENVIRONMENT_ROOT="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-   PROJECT_ROOT="${ENVIRONMENT_ROOT}/../.."
+   PROJECT_ROOT=$(readlink -f "${ENVIRONMENT_ROOT}/../..")
 
+   # https://unix.stackexchange.com/a/6454
+   if [[ ${PROJECT_ROOT} != $(readlink -f ${HOME})/* ]]
+   then
+      echo "You need to check out the project that contains this environment under your HOME directory." >&2
+      exit 1
+   fi
 
    DOT_LOCAL=".local"
    DOT_CONFIG=".config"
@@ -93,11 +99,11 @@ then
    cp  "${ENVIRONMENT_ROOT}/docker/terminalrc" \
        "${ENVIRONMENT_ROOT}/.volumes/${DOT_CONFIG}/xfce4/terminal"
 
-   DOT_LOCAL_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${DOT_LOCAL}:/home/${USER}/${DOT_LOCAL}:rw"
-   DOT_CONFIG_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${DOT_CONFIG}:/home/${USER}/${DOT_CONFIG}:rw"
-   DOT_CACHE_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${DOT_CACHE}:/home/${USER}/${DOT_CACHE}:rw"
-   JETBRAINS_PROJECTS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PROJECTS}:/home/${USER}/${JETBRAINS_PROJECTS}"
-   FIREFOX_SETTINGS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${FIREFOX_SETTINGS}:/home/${USER}/${FIREFOX_SETTINGS}"
+   DOT_LOCAL_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${DOT_LOCAL}:${HOME}/${DOT_LOCAL}:rw"
+   DOT_CONFIG_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${DOT_CONFIG}:${HOME}/${DOT_CONFIG}:rw"
+   DOT_CACHE_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${DOT_CACHE}:${HOME}/${DOT_CACHE}:rw"
+   JETBRAINS_PROJECTS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${JETBRAINS_PROJECTS}:${HOME}/${JETBRAINS_PROJECTS}"
+   FIREFOX_SETTINGS_VOLUME="${ENVIRONMENT_ROOT}/.volumes/${FIREFOX_SETTINGS}:${HOME}/${FIREFOX_SETTINGS}"
 
 
    echo "Git User: ${GIT_USER_NAME}"
@@ -106,7 +112,7 @@ then
    if [ -z "${TAG}" ]
    then
       cd "${ENVIRONMENT_ROOT}/docker" && \
-         docker build \
+         DOCKER_BUILDKIT=1 docker build \
             ${NO_CACHE_DOCKER_BUILD} \
             --build-arg USERNAME="${USER}" \
             --build-arg UID=$(id -u ${USER}) \
@@ -115,6 +121,7 @@ then
             --build-arg DOCKER_GID="$(cat /etc/group | grep "^docker" | awk -F ":" '{print $3}')" \
             --build-arg GIT_USER_EMAIL="${GIT_USER_EMAIL}" \
             --build-arg GIT_USER_NAME="${GIT_USER_NAME}" \
+            --build-arg HOME_DIR="${HOME}" \
             -t emacdona/onlisp .
 
       TAG="emacdona/onlisp"
@@ -134,6 +141,7 @@ then
        #  https://news.ycombinator.com/item?id=12578908 -- use ".test" domain; RFC-6761 approved
    CONTAINER_ID=$(docker run \
       --shm-size 4G \
+      --add-host dashboard.test:host-gateway \
       --add-host grafana.test:host-gateway \
       --add-host kibana.test:host-gateway \
       --add-host keycloak.test:host-gateway \
@@ -141,17 +149,17 @@ then
       --add-host gitlab.test:host-gateway \
       --add-host helloworld.lisp.test:host-gateway \
       --security-opt seccomp=unconfined \
-      -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
-      -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
-      -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
-      -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
-      -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/${USER}/.spacemacs" \
+      -v "${PROJECT_ROOT}":"${PROJECT_ROOT}" \
+      -v "${ENVIRONMENT_ROOT}/docker/.exrc":"${HOME}/.exrc" \
+      -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"${HOME}/.screenrc" \
+      -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"${HOME}/.zshrc" \
+      -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"${HOME}/.spacemacs" \
       -v "${DOT_LOCAL_VOLUME}" \
       -v "${DOT_CONFIG_VOLUME}" \
       -v "${DOT_CACHE_VOLUME}" \
       -v "${JETBRAINS_PROJECTS_VOLUME}" \
       -v "${FIREFOX_SETTINGS_VOLUME}" \
-      -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
+      -v "${HOME}/.ssh":"${HOME}/.ssh":ro \
       -v "/tmp/.X11-unix:/tmp/.X11-unix" \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -e "TERM=xterm-256color" \
@@ -162,6 +170,7 @@ then
    set -x
    docker run --rm -d \
       --shm-size 4G \
+      --add-host dashboard.test:host-gateway \
       --add-host grafana.test:host-gateway \
       --add-host kibana.test:host-gateway \
       --add-host keycloak.test:host-gateway \
@@ -169,17 +178,17 @@ then
       --add-host gitlab.test:host-gateway \
       --add-host helloworld.lisp.test:host-gateway \
       --security-opt seccomp=unconfined \
-      -v "${PROJECT_ROOT}":"/home/${USER}/onlisp" \
-      -v "${ENVIRONMENT_ROOT}/docker/.exrc":"/home/${USER}/.exrc" \
-      -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"/home/${USER}/.screenrc" \
-      -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"/home/${USER}/.zshrc" \
-      -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"/home/${USER}/.spacemacs" \
+      -v "${PROJECT_ROOT}":"${PROJECT_ROOT}" \
+      -v "${ENVIRONMENT_ROOT}/docker/.exrc":"${HOME}/.exrc" \
+      -v "${ENVIRONMENT_ROOT}/docker/.screenrc":"${HOME}/.screenrc" \
+      -v "${ENVIRONMENT_ROOT}/docker/.zshrc":"${HOME}/.zshrc" \
+      -v "${ENVIRONMENT_ROOT}/docker/.spacemacs":"${HOME}/.spacemacs" \
       -v "${DOT_LOCAL_VOLUME}" \
       -v "${DOT_CONFIG_VOLUME}" \
       -v "${DOT_CACHE_VOLUME}" \
       -v "${JETBRAINS_PROJECTS_VOLUME}" \
       -v "${FIREFOX_SETTINGS_VOLUME}" \
-      -v "${HOME}/.ssh":"/home/${USER}/.ssh":ro \
+      -v "${HOME}/.ssh":"${HOME}/.ssh":ro \
       -v "/tmp/.X11-unix:/tmp/.X11-unix" \
       -v /var/run/docker.sock:/var/run/docker.sock \
       -e "TERM=xterm-256color" \
