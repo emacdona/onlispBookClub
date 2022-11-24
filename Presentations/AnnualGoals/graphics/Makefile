@@ -33,7 +33,7 @@ windows-wsl-docker-container-A-user-windowsx.eps: diagrams.dia
 
 windows-wsl-docker-container-A-user-windowsx-k3d.eps: diagrams.dia
 		dia \
-			--show-layers=Windows,WSL,WSLuser,WSLdockerCli,Docker,ContainerA,ContainerAPrograms,ContainerAUser,WindowsX,k3d \
+			--show-layers=Windows,WSL,WSLuser,WSLdockerCli,Docker,ContainerA,ContainerAPrograms,ContainerAUser,WindowsX,ContainerB,k3d \
 			--filter=eps-pango --export=$@ $<
 
 clean:
