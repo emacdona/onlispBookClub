@@ -24,10 +24,10 @@
 
 \AtBeginEnvironment{frame}{\setcounter{footnote}{0}}
 
-\title[Kubernetes]{My Docker and Kubernetes Sandbox}
+\title[Sandbox]{My Docker and Kubernetes Sandbox}
 \author[Ed MacDonald]{Ed MacDonald\\emacdonald@solutionstreet.com}
-%\institute[\href{https://solutionstreet.com}{SolutionStreet}]{SolutionStreet\\\href{https://solutionstreet.com}{(solutionstreet.com)}}
-\date{May 2021}
+\institute[\href{https://solutionstreet.com}{SolutionStreet}]{SolutionStreet\\\href{https://solutionstreet.com}{(solutionstreet.com)}}
+\date{December 2022}
 
 %\titlegraphic{ \includegraphics[width=2cm]{logo} }
 
@@ -42,6 +42,18 @@
     \frame{\titlepage}
 
     \begin{frame}
+      \frametitle{Why Do You Need a Sandbox?}
+      \begin{itemize}
+      \pause
+      \item How many versions of Python/Java/Perl/Ruby/Node are on your machine right now?\pause
+      \item If you got a new machine today, how long would it take until all your existing projects built on it?\pause
+      \item Is there any software on your machine that you downloaded once and forgot about?\pause
+      \item Do you love experimenting with new tech?
+      \end{itemize}
+      \note[item]{Hello World}
+    \end{frame}
+
+    \begin{frame}
     \frametitle{What is Linux?}
     \begin{columns}
         \begin{column}{0.5\textwidth}
@@ -53,7 +65,9 @@
             \end{itemize}
         \end{column}
         \begin{column}{0.5\textwidth}
-            NO!!
+          \begin{center}
+            {\Huge \color{red} NO!!}
+          \end{center}
         \end{column}
     \end{columns}
     \note[item]{Hello World}
@@ -78,33 +92,109 @@
     \end{frame}
 
     \begin{frame}
-      \frametitle{Title!}
-      \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl.eps}
+      \frametitle{Baseline}
+      \begin{columns}
+        \begin{column}{0.5\textwidth}
+          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl.eps}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+          \begin{itemize}
+          \item Windows\pause
+          \item WSL\pause
+          \item A user\pause
+          \item That user's home directory\pause
+          \item docker CLI
+          \end{itemize}
+        \end{column}
+      \end{columns}
+      \note[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
+      \note[item]{WSL user, but I'm guessing it maps to a Windows user}
+      \note[item]{WSL directory, but I'm guessing it maps to a Windows directory}
     \end{frame}
 
     \begin{frame}
       \frametitle{Title!}
-      \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker.eps}
+      \begin{columns}
+        \begin{column}{0.5\textwidth}
+          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker.eps}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+          \begin{itemize}
+          \item Item 1
+          \item Item 2
+          \item Item 3
+          \item Item 4
+          \end{itemize}
+        \end{column}
+      \end{columns}
     \end{frame}
 
     \begin{frame}
       \frametitle{Title!}
-      \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A.eps}
+      \begin{columns}
+        \begin{column}{0.5\textwidth}
+          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A.eps}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+          \begin{itemize}
+          \item Item 1
+          \item Item 2
+          \item Item 3
+          \item Item 4
+          \end{itemize}
+        \end{column}
+      \end{columns}
     \end{frame}
 
     \begin{frame}
       \frametitle{Title!}
-      \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A-user.eps}
+      \begin{columns}
+        \begin{column}{0.5\textwidth}
+          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A-user.eps}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+          \begin{itemize}
+          \item Item 1
+          \item Item 2
+          \item Item 3
+          \item Item 4
+          \end{itemize}
+        \end{column}
+      \end{columns}
     \end{frame}
 
     \begin{frame}
       \frametitle{Title!}
-      \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A-user-windowsx.eps}
+      \begin{columns}
+        \begin{column}{0.5\textwidth}
+          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A-user-windowsx.eps}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+          \begin{itemize}
+          \item Item 1
+          \item Item 2
+          \item Item 3
+          \item Item 4
+          \end{itemize}
+        \end{column}
+      \end{columns}
     \end{frame}
 
     \begin{frame}
       \frametitle{Title!}
-      \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A-user-windowsx-k3d.eps}
+      \begin{columns}
+        \begin{column}{0.5\textwidth}
+          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A-user-windowsx-k3d.eps}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+          \begin{itemize}
+          \item Item 1
+          \item Item 2
+          \item Item 3
+          \item Item 4
+          \end{itemize}
+        \end{column}
+      \end{columns}
     \end{frame}
 
 \end{document}

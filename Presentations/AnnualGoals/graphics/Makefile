@@ -23,17 +23,17 @@ windows-wsl-docker-container-A.eps: diagrams.dia
 
 windows-wsl-docker-container-A-user.eps: diagrams.dia
 		dia \
-			--show-layers=Windows,WSL,WSLuser,WSLdockerCli,Docker,ContainerA,ContainerAPrograms,ContainerAUser \
+			--show-layers=Windows,WSL,WSLuser,WSLdockerCli,Docker,ContainerA,ContainerAPrograms,ContainerAUser,ContainerAUserMapping  \
 			--filter=eps-pango --export=$@ $<
 
 windows-wsl-docker-container-A-user-windowsx.eps: diagrams.dia
 		dia \
-			--show-layers=Windows,WSL,WSLuser,WSLdockerCli,Docker,ContainerA,ContainerAPrograms,ContainerAUser,WindowsX \
+			--show-layers=Windows,WSL,WSLuser,WSLdockerCli,Docker,ContainerA,ContainerAPrograms,ContainerAUser,ContainerAUserMapping,WindowsX \
 			--filter=eps-pango --export=$@ $<
 
 windows-wsl-docker-container-A-user-windowsx-k3d.eps: diagrams.dia
 		dia \
-			--show-layers=Windows,WSL,WSLuser,WSLdockerCli,Docker,ContainerA,ContainerAPrograms,ContainerAUser,WindowsX,ContainerB,k3d \
+			--show-layers=Windows,WSL,WSLuser,WSLdockerCli,Docker,ContainerA,ContainerAPrograms,ContainerAUser,ContainerAUserMapping,WindowsX,ContainerB,k3d \
 			--filter=eps-pango --export=$@ $<
 
 clean:
