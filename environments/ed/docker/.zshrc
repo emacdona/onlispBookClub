@@ -170,7 +170,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # perlbrew
-source ~/perl5/perlbrew/etc/bashrc
+[ -f "${HOME}/perl5/perlbrew/etc/bashrc" ] && source "${HOME}/perl5/perlbrew/etc/bashrc"
 
 # Pyenv, hard coded by me. Tailoring these instructions to work inside a Dockerfile was just too much
 # (quoting issues). Also, why the f*ck do they insist on login shells. I'm putting _everything_ here.
@@ -184,6 +184,11 @@ complete -o nospace -C /usr/bin/terraform terraform
 
 # https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-completion.html#cli-command-completion-linux
 complete -C '/usr/local/bin/aws_completer' aws
+
+# Source gvm. We check if it exists first so that this won't cause shell initialization to fail when building the
+# docker container (ie: before we've installed gvm)
+[ -f "${HOME}/.gvm/scripts/gvm" ] && source "${HOME}/.gvm/scripts/gvm"
+
 
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"

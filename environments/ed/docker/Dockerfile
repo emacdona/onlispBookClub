@@ -14,6 +14,9 @@ RUN apt-get update
 # pympress install instructions (with dependencies)
 # https://github.com/Cimbali/pympress
 
+# gvm dependencies
+# https://github.com/moovweb/gvm
+
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git \
    screen \
    vim \
@@ -49,7 +52,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git \
    qt5-default \
    libclang-common-8-dev \
    kile \
-   pympress libgtk-3-0 libpoppler-glib8 libcairo2 python3-gi python3-gi-cairo gobject-introspection libgirepository-1.0-1 gir1.2-gtk-3.0 gir1.2-poppler-0.18
+   pympress libgtk-3-0 libpoppler-glib8 libcairo2 python3-gi python3-gi-cairo gobject-introspection libgirepository-1.0-1 gir1.2-gtk-3.0 gir1.2-poppler-0.18 \
+   bison mercurial
 
 # Required by spacemacs w3m layer
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y w3m
@@ -352,6 +356,16 @@ COPY --chown="${USERNAME}:${USERGROUP}" supervisord.conf supervisord.conf
 # Couldn't find any combination of command line params and arguments that would let me install quicklisp for ABCL. So, since it's already installed b/c of SBCL, I'm just going to steal
 # the .abclrc file that (ql:add-to-init-file) generates (see: https://www.quicklisp.org/beta/faq.html)
 COPY --chown="${USERNAME}:${USERGROUP}" .abclrc .abclrc
+
+# gvm, lazydocker
+# https://github.com/moovweb/gvm (though I subbed zsh for bash)
+# https://github.com/jesseduffield/lazydocker/blob/master/docs/Config.md
+RUN zsh -c 'zsh < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)' && \
+    sudo -i -u "${USERNAME}" zsh -ic 'gvm install go1.4 -B' && \
+    sudo -i -u "${USERNAME}" zsh -ic 'gvm use go1.4 --default' && \
+    sudo -i -u "${USERNAME}" zsh -ic 'gvm install go1.19.3' && \
+    sudo -i -u "${USERNAME}" zsh -ic 'gvm use go1.19.3 --default' && \
+    sudo -i -u "${USERNAME}" zsh -ic 'go install github.com/jesseduffield/lazydocker@latest'
 
 # Perl
 # We need to install perl HERE so that the perlbrew line we source in the .zshrc file doesn't result in an error when
