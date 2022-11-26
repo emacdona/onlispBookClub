@@ -1,0 +1,13 @@
+
+slidesWithoutNotes.pdf
+  Slides with presenter notes.
+
+slidesWithNotes.pdf
+  Slides without presenter notes.
+
+handout.pdf
+  This is probably the easiest one to read.
+
+  Frames only (see Beamer docs for Frame vs Slide) -- basically all "effects" are
+  flattened and each page is the finished "Frame" after all effects ("slides") have
+  been applied.

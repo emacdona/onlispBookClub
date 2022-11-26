@@ -8,3 +8,5 @@ auto/
 *.toc
 *.synctex.gz
 logo.png
+presentation.tar.gz
+target/
