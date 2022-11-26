@@ -108,8 +108,7 @@
           \item <1-> Windows
           \item <2-> XServer
           \item <3-> WSL
-          \item <4-> A user
-          \item <4-> That user's home directory
+          \item <4-> User and Home Directory
           \item <5-> Docker CLI
           \item <6-> Docker
           \end{itemize}
@@ -162,6 +161,33 @@
       \note[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
       \note[item]{WSL user, but I'm guessing it maps to a Windows user}
       \note[item]{WSL directory, but I'm guessing it maps to a Windows directory}
+    \end{frame}
+
+    \begin{frame}
+      \frametitle{Docker-beside-Docker\texttrademark}
+      \begin{itemize}
+      \item If, from inside a container, you want to be able to:\pause
+        \begin{itemize}
+        \item Create new containers\pause
+        \item Share files in your container with these new containers\pause
+        \end{itemize}
+        \item You don't need Docker-in-Docker
+      \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+      \frametitle{Docker-beside-Docker\texttrademark}
+      \begin{itemize}
+      \item Install the docker CLI in your container\pause
+      \item Mount the host's docker unix domain socket into the container\pause
+      \item Ensure directories in the container have the same name as directories on the host\pause
+      \end{itemize}
+      \note[item]{If you follow these instructions, containers you create with
+        the docker cli in your container --- with bind mounts to directories in
+        your container --- will actually be created by the same dockerd your
+        container was created with. Their bind mounts will technically see files
+        on the host, but those will be the same files -- with the same names -- as
+        those in your container.}
     \end{frame}
 
     \begin{frame}
