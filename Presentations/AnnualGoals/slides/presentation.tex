@@ -44,13 +44,15 @@
     \begin{frame}
       \frametitle{Why Do You Need a Sandbox?}
       \begin{itemize}
-      \pause
-      \item How many versions of Python/Java/Perl/Ruby/Node are on your machine right now?\pause
-      \item If you got a new machine today, how long would it take until all your existing projects built on it?\pause
-      \item Is there any software on your machine that you downloaded once and forgot about?\pause
-      \item Do you love experimenting with new tech?
+      \item<2->How many versions of Python/Java/Perl/Ruby/Node are on your
+        machine right now? Where are they installed?
+      \item<3->If you got a new machine today, how long would it take until all
+        of your existing projects built on it?
+      \item<4->Is there any software on your machine that you downloaded once and forgot about?
+      \item<5->Do you love experimenting with new tech?
       \end{itemize}
-      \note[item]{Hello World}
+      \note<5->[item]{FYI: This entire presentation was built solely with tools running
+        in the sandbox.}
     \end{frame}
 
     \begin{frame}
@@ -58,37 +60,40 @@
     \begin{columns}
         \begin{column}{0.5\textwidth}
             \begin{itemize}
-                \item Is Redhat Linux?\pause
-                \item Is Ubuntu Linux?\pause
-                \item Is Debian Linux?\pause
-                \item Is Alpine Linux?\pause
+                \item<2->Is Redhat Linux?
+                \item<3->Is Ubuntu Linux?
+                \item<4->Is Debian Linux?
+                \item<5->Is Alpine Linux?
             \end{itemize}
         \end{column}
         \begin{column}{0.5\textwidth}
           \begin{center}
-            {\Huge \color{red} NO!!}
+            \only<6->{\Huge \color{red} NO!!}
           \end{center}
         \end{column}
     \end{columns}
-    \note[item]{Hello World}
     \end{frame}
 
     \begin{frame}
     \frametitle{What is Linux?}
     \begin{itemize}
-        \item Linux is a kernel\pause
-        \item A kernel is a set of system calls providing a hardware abstraction\pause
-        \item Linux maintainers FEEL VERY STRONGLY that new kernel versions should strive to maintain binary compatibility
+        \item<1-> Linux is a kernel
+        \item<2-> A kernel is a set of system calls providing a hardware abstraction
+        \item<3-> Great efforts are made to keep system calls backwards compatible
     \end{itemize}
+    \note<3->[item]{Linux maintainers FEEL VERY STRONGLY that new kernel versions should strive to maintain binary compatibility}
     \end{frame}
 
     \begin{frame}
       \frametitle{Why Does That Matter?}
       \begin{itemize}
-      \item Docker images don't have a kernel\pause
-      \item They have a filesystem with binaries\pause
-      \item You can reasonably expect a Docker image based on an old kernel to run on newer one
+      \item<1-> Docker images don't have a kernel
+      \item<2-> They have a filesystem with binaries
+      \item<3-> You can reasonably expect a Docker image based on an old kernel to run on newer one
       \end{itemize}
+      \note<1->[item]{one}
+      \note<2->[item]{two}
+      \note<3->[item]{three}
     \end{frame}
 
     % https://tex.stackexchange.com/questions/156480/updating-picture-after-pause
@@ -105,37 +110,37 @@
         \end{column}
         \begin{column}{0.5\textwidth}
           \begin{itemize}
-          \item <1-> Windows
-          \item <2-> XServer
-          \item <3-> WSL
-          \item <4-> User and Home Directory
-          \item <5-> Docker CLI
-          \item <6-> Docker
+          \item<1-> Windows
+          \item<2-> XServer
+          \item<3-> WSL
+          \item<4-> User and Home Directory
+          \item<5-> Docker CLI
+          \item<6-> Docker
           \end{itemize}
         \end{column}
       \end{columns}
-      \note[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
-      \note[item]{WSL user, but I'm guessing it maps to a Windows user}
-      \note[item]{WSL directory, but I'm guessing it maps to a Windows directory}
+      \note<1->[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
+      \note<4->[item]{WSL user, but I'm guessing it maps to a Windows user}
+      \note<4->[item]{WSL directory, but I'm guessing it maps to a Windows directory}
     \end{frame}
 
     \begin{frame}
       \frametitle{A Word on Operating Systems}
-      \begin{itemize}\pause
-      \item Linux: clearly the best choice for this\pause
-      \item Windows: surprisingly great\pause
+      \begin{itemize}
+      \item<2-> Linux: clearly the best choice for this
+      \item<3-> Windows: surprisingly great
         \begin{itemize}
-        \item WSL is \textit{very} nice\pause
-        \item WSL Appears to share all resources (CPU; Memory) with Windows\pause
-        \item VcXsrv is \textit{very} capable\pause
+        \item<4-> WSL is \textit{very} nice
+        \item<5-> WSL Appears to share all resources (CPU; Memory) with Windows
+        \item<6-> VcXsrv is \textit{very} capable
         \end{itemize}
-      \item OS X: surprisingly bad\pause
+      \item<7-> OS X: surprisingly bad
         \begin{itemize}
-        \item Docker desktop ``takes'' resources from host\pause
-        \item XQuartz was not as nice as VcXsrv --- at least in Ventura
+        \item<8-> Docker desktop ``takes'' resources from host
+        \item<9-> XQuartz was not as nice as VcXsrv --- at least in Ventura
         \end{itemize}
       \end{itemize}
-      \note[item]{Why did I choose Windows initially? Because like most gamers, my Windows PC is the most powerful machine I have.}
+      \note<3->[item]{Why did I choose Windows initially? Because like most gamers, my Windows PC is the most powerful machine I have.}
     \end{frame}
 
     \begin{frame}
@@ -150,17 +155,15 @@
         \end{column}
         \begin{column}{0.5\textwidth}
           \begin{itemize}
-          \item <1-> Container
-          \item <2-> Programs
-          \item <3-> User and Home Directory ...
-          \item <4-> ... Mapped to those on the host
-          \item <5-> Docker CLI talks to host's dockerd
+          \item<1-> Container
+          \item<2-> Programs
+          \item<3-> User and Home Directory ...
+          \item<4-> ... Mapped to those on the host
+          \item<5-> Docker CLI talks to host's dockerd
           \end{itemize}
         \end{column}
+        \note<2->[item]{Of particular interest:\\Docker CLI\\supervisord}
       \end{columns}
-      \note[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
-      \note[item]{WSL user, but I'm guessing it maps to a Windows user}
-      \note[item]{WSL directory, but I'm guessing it maps to a Windows directory}
     \end{frame}
 
     \begin{frame}
@@ -178,16 +181,33 @@
     \begin{frame}
       \frametitle{Docker-beside-Docker\texttrademark}
       \begin{itemize}
-      \item Install the docker CLI in your container\pause
-      \item Mount the host's docker unix domain socket into the container\pause
-      \item Ensure directories in the container have the same name as directories on the host\pause
+      \item<1->Install the docker CLI in your container
+      \item<2->Mount the host's docker unix domain socket into the container
+      \item<3->Ensure directories in the container have the same name as directories on the host
       \end{itemize}
-      \note[item]{If you follow these instructions, containers you create with
+      \note<3->[item]{If you follow these instructions, containers you create with
         the docker cli in your container --- with bind mounts to directories in
         your container --- will actually be created by the same dockerd your
         container was created with. Their bind mounts will technically see files
         on the host, but those will be the same files -- with the same names -- as
         those in your container.}
+    \end{frame}
+
+    \begin{frame}
+      \frametitle{Demo I}
+      \begin{center}
+        {\Huge Demo I}
+      \end{center}
+      \note[item]{supervisord/supervisorctl}
+      \note[item]{docker-beside-docker: docker run -it -v `pwd`:/workdir -w /workdir ubuntu ls}
+      \note[item]{'docker ps' from host and container}
+      \note[item]{'lazydocker'; show DISPLAY env var; show 'top'}
+      \note[item]{sc status}
+      \note[item]{sc start emacs}
+      \note[item]{sc start dia}
+      \note[item]{sc start firefox --- Will be able to enter Intellij auth; Useful for Demo II}
+      \note[item]{sc start intellij --- will be able to show ansible config in Demo II}
+      \note[item]{sc start qtcreator}
     \end{frame}
 
     \begin{frame}
@@ -199,22 +219,48 @@
         \end{column}
         \begin{column}{0.5\textwidth}
           \begin{itemize}
-          \item <1-> Another docker container...
-          \item <2-> ...Running K3d
+          \item<1-> Another docker container...
+          \item<2-> ...Running K3d
           \end{itemize}
         \end{column}
       \end{columns}
-      \note[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
-      \note[item]{WSL user, but I'm guessing it maps to a Windows user}
-      \note[item]{WSL directory, but I'm guessing it maps to a Windows directory}
+    \end{frame}
+
+    \begin{frame}
+      \frametitle{Demo II}
+      \begin{center}
+        {\Huge Demo II}
+      \end{center}
+      \note[item]{provision k3d cluster}
+      \note[item]{watch lazydocker}
+      \note[item]{watch k9s}
+      \note[item]{show deployed apps --- if they come up in time}
+      \note[item]{deploy lisp ``hello world'' app and show result}
     \end{frame}
 
     \begin{frame}
       \frametitle{Resources and Tools Used}
       \begin{itemize}
+      \item lazydocker:
+        \href{https://github.com/jesseduffield/lazydocker}{https://github.com/jesseduffield/lazydocker}
+      \item k3d:
+        \href{https://k3d.io/}{https://k3d.io/}
+      \item \LaTeX:
+        \href{https://www.latex-project.org/}{https://www.latex-project.org/}
+      \item Beamer:
+        \href{https://ctan.org/pkg/beamer?lang=en}{https://ctan.org/pkg/beamer?lang=en}
+      \item Pympress:
+        \href{https://github.com/Cimbali/pympress}{https://github.com/Cimbali/pympress}
       \item 12-bit Rainbow Palette:
         \href{https://iamkate.com/data/12-bit-rainbow/}{https://iamkate.com/data/12-bit-rainbow/}
       \end{itemize}
+    \end{frame}
+
+    \begin{frame}
+      \frametitle{Questions}
+      \begin{center}
+        {\Huge Questions ?}
+      \end{center}
     \end{frame}
 
 \end{document}
