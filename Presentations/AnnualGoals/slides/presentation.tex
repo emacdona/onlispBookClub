@@ -97,9 +97,9 @@
       \item<2-> They have a filesystem with binaries
       \item<3-> You can reasonably expect a Docker image based on an old kernel to run on newer one
       \end{itemize}
-      \note<1->[item]{one}
-      \note<2->[item]{two}
-      \note<3->[item]{three}
+      \note<3->[item]{This makes it a great platform for a Sandbox:\\Lump all
+        your software and its configuration in a container which you can
+        reasonably expect to keep running.}
     \end{frame}
 
     % https://tex.stackexchange.com/questions/156480/updating-picture-after-pause
@@ -198,6 +198,8 @@
         container was created with. Their bind mounts will technically see files
         on the host, but those will be the same files -- with the same names -- as
         those in your container.}
+      \note<3->[item]{Just write a startup script to manage all this for you!
+        see: my startup script}
     \end{frame}
 
     \begin{frame}
@@ -244,36 +246,68 @@
       \note[item]{show deployed apps --- if they come up in time}
       \note[item]{deploy lisp ``hello world'' app and show result}
       \note[item]{show ``resource monitor'' to give indication of resources required}
+      \note[item]{helm uninstall hw}
+      \note[item]{
+        init-istio.sh\\
+        yes  xargs -I{} sh -c 'curl -s http://helloworld.lisp.test/hi /dev/null'\\
+        show isto dashboard (default namespace)}
+      \note[item]{reinstall hw (will now have istio sidecar)}
     \end{frame}
 
     \begin{frame}
       \frametitle{Where to next?}
       \begin{itemize}
         \item<2->Replace supervisord with systemd --- which may necessitate
-          moving to podman\footnote{\href{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}}
-        \item<3->LDAP server to mimic Active Directory --- and serve as
+          moving to podman\footnote<2->{\href{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}}
+        \item<3->Self host in the Gitlab instance that's deployed in the sandbox.
+        \item<4->LDAP server to mimic Active Directory --- and serve as
           authoritative identity source for Keycloak...
-        \item<4->... SSO across the cluster
-        \item<5->More cores, more Memory!
+        \item<5->... SSO across the cluster
+        \item<6->Terraform to provision AKS\footnote<6->{Azure Kubernetes Service},
+          EKS\footnote<6->{Elastic Kubernetes Service (Amazon)}, GKE\footnote<6->{Google
+            Kubernetes Engine} deployment target environments
+        \item<7->More cores, more memory!
       \end{itemize}
-      \note<5->[item]{I understand now how one can spend \$10k on a workstation}
+      \note<7->[item]{I understand now how one can spend \$10k on a workstation}
+    \end{frame}
+
+    \begin{frame}
+      \frametitle{Something to think about}
+      \begin{itemize}
+      \item<2->We used to ship our application code (jars, wars, ears, etc)
+      \item<3->Then we shipped containers --- application code plus runtimes and dependencies
+      \item<4->What's preventing us from shipping entire CI/CD pipelines and
+        individual developer environments with our software?
+      \end{itemize}
     \end{frame}
 
     \begin{frame}
       \frametitle{Resources and Tools Used}
       \begin{itemize}
-      \item lazydocker:
-        \href{https://github.com/jesseduffield/lazydocker}{https://github.com/jesseduffield/lazydocker}
-      \item k3d:
-        \href{https://k3d.io/}{https://k3d.io/}
-      \item \LaTeX:
-        \href{https://www.latex-project.org/}{https://www.latex-project.org/}
-      \item Beamer:
-        \href{https://ctan.org/pkg/beamer?lang=en}{https://ctan.org/pkg/beamer?lang=en}
-      \item Pympress:
-        \href{https://github.com/Cimbali/pympress}{https://github.com/Cimbali/pympress}
-      \item 12-bit Rainbow Palette:
-        \href{https://iamkate.com/data/12-bit-rainbow/}{https://iamkate.com/data/12-bit-rainbow/}
+      \item Presentation
+        \begin{itemize}
+        \item \LaTeX:
+          \href{https://www.latex-project.org/}{https://www.latex-project.org/}
+        \item Beamer:
+          \href{https://ctan.org/pkg/beamer?lang=en}{https://ctan.org/pkg/beamer?lang=en}
+        \item Pympress:
+          \href{https://github.com/Cimbali/pympress}{https://github.com/Cimbali/pympress}
+        \item 12-bit Rainbow Palette:
+          \href{https://iamkate.com/data/12-bit-rainbow/}{https://iamkate.com/data/12-bit-rainbow/}
+        \end{itemize}
+      \item Everything else
+        \begin{itemize}
+        \item supervisord:
+          \href{http://supervisord.org/}{http://supervisord.org/}
+        \item k3d:
+          \href{https://k3d.io/}{https://k3d.io/}
+        \item lazydocker:
+          \href{https://github.com/jesseduffield/lazydocker}{https://github.com/jesseduffield/lazydocker}
+        \item k9s:
+          \href{https://k9scli.io/}{https://k9scli.io/}
+        \item spacemacs:
+          \href{https://github.com/syl20bnr/spacemacs}{https://github.com/syl20bnr/spacemacs}
+        \end{itemize}
       \end{itemize}
     \end{frame}
 
