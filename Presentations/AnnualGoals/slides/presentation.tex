@@ -91,19 +91,27 @@
       \end{itemize}
     \end{frame}
 
+    % https://tex.stackexchange.com/questions/156480/updating-picture-after-pause
     \begin{frame}
       \frametitle{Baseline}
       \begin{columns}
         \begin{column}{0.5\textwidth}
-          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl.eps}
+          \includegraphics<1| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/010.eps}
+          \includegraphics<2| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/020.eps}
+          \includegraphics<3| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/030.eps}
+          \includegraphics<4| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/040.eps}
+          \includegraphics<5| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/050.eps}
+          \includegraphics<6>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/060.eps}
         \end{column}
         \begin{column}{0.5\textwidth}
           \begin{itemize}
-          \item Windows\pause
-          \item WSL\pause
-          \item A user\pause
-          \item That user's home directory\pause
-          \item docker CLI
+          \item <1-> Windows
+          \item <2-> XServer
+          \item <3-> WSL
+          \item <4-> A user
+          \item <4-> That user's home directory
+          \item <5-> Docker CLI
+          \item <6-> Docker
           \end{itemize}
         \end{column}
       \end{columns}
@@ -113,86 +121,66 @@
     \end{frame}
 
     \begin{frame}
-      \frametitle{Docker}
-      \begin{columns}
-        \begin{column}{0.5\textwidth}
-          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker.eps}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-          \begin{itemize}
-          \item dockerd runs on the \textbf{host}
-          \end{itemize}
-        \end{column}
-      \end{columns}
-      \note[item]{I point out that it runs on the host to draw the distinction from ``docker in docker''}
+      \frametitle{A Word on Operating Systems}
+      \begin{itemize}\pause
+      \item Linux: clearly the best choice for this\pause
+      \item Windows: surprisingly great\pause
+        \begin{itemize}
+        \item WSL is \textit{very} nice\pause
+        \item WSL Appears to share all resources (CPU; Memory) with Windows\pause
+        \item VcXsrv is \textit{very} capable\pause
+        \end{itemize}
+      \item OS X: surprisingly bad\pause
+        \begin{itemize}
+        \item Docker desktop ``takes'' resources from host\pause
+        \item XQuartz was not as nice as VcXsrv --- at least in Ventura
+        \end{itemize}
+      \end{itemize}
+      \note[item]{Why did I choose Windows initially? Because like most gamers, my Windows PC is the most powerful machine I have.}
     \end{frame}
 
     \begin{frame}
-      \frametitle{Applications}
+      \frametitle{Sandbox}
       \begin{columns}
         \begin{column}{0.5\textwidth}
-          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A.eps}
+          \includegraphics<1| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/070.eps}
+          \includegraphics<2| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/080.eps}
+          \includegraphics<3| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/090.eps}
+          \includegraphics<4| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/100.eps}
+          \includegraphics<5>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/110.eps}
         \end{column}
         \begin{column}{0.5\textwidth}
           \begin{itemize}
-          \item Item 1
-          \item Item 2
-          \item Item 3
-          \item Item 4
+          \item <1-> Container
+          \item <2-> Programs
+          \item <3-> User and Home Directory ...
+          \item <4-> ... Mapped to those on the host
+          \item <5-> Docker CLI talks to host's dockerd
           \end{itemize}
         \end{column}
       \end{columns}
+      \note[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
+      \note[item]{WSL user, but I'm guessing it maps to a Windows user}
+      \note[item]{WSL directory, but I'm guessing it maps to a Windows directory}
     \end{frame}
 
     \begin{frame}
-      \frametitle{``Docker Beside Docker''}
+      \frametitle{Kubernetes in the Sandbox}
       \begin{columns}
         \begin{column}{0.5\textwidth}
-          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A-user.eps}
+          \includegraphics<1| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/120.eps}
+          \includegraphics<2>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/130.eps}
         \end{column}
         \begin{column}{0.5\textwidth}
           \begin{itemize}
-          \item Item 1
-          \item Item 2
-          \item Item 3
-          \item Item 4
+          \item <1-> Another docker container...
+          \item <2-> ...Running K3d
           \end{itemize}
         \end{column}
       \end{columns}
-    \end{frame}
-
-    \begin{frame}
-      \frametitle{Title!}
-      \begin{columns}
-        \begin{column}{0.5\textwidth}
-          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A-user-windowsx.eps}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-          \begin{itemize}
-          \item Item 1
-          \item Item 2
-          \item Item 3
-          \item Item 4
-          \end{itemize}
-        \end{column}
-      \end{columns}
-    \end{frame}
-
-    \begin{frame}
-      \frametitle{Title!}
-      \begin{columns}
-        \begin{column}{0.5\textwidth}
-          \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/windows-wsl-docker-container-A-user-windowsx-k3d.eps}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-          \begin{itemize}
-          \item Item 1
-          \item Item 2
-          \item Item 3
-          \item Item 4
-          \end{itemize}
-        \end{column}
-      \end{columns}
+      \note[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
+      \note[item]{WSL user, but I'm guessing it maps to a Windows user}
+      \note[item]{WSL directory, but I'm guessing it maps to a Windows directory}
     \end{frame}
 
 \end{document}
