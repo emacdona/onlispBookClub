@@ -246,6 +246,19 @@
     \end{frame}
 
     \begin{frame}
+      \frametitle{Where to next?}
+      \begin{itemize}
+        \item<2->Replace supervisord with systemd --- which may necessitate
+          moving to podman\footnote{\href{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}}
+        \item<3->LDAP server to mimic Active Directory --- and serve as
+          authoritative identity source for Keycloak...
+        \item<4->... SSO across the cluster
+        \item<5->More cores, more Memory!
+      \end{itemize}
+      \note<5->[item]{I understand now how one can spend \$10k on a workstation}
+    \end{frame}
+
+    \begin{frame}
       \frametitle{Resources and Tools Used}
       \begin{itemize}
       \item lazydocker:
