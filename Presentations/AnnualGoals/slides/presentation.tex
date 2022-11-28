@@ -62,6 +62,24 @@
     \end{frame}
 
     \begin{frame}
+      \frametitle{Why This Particular Sandbox?}
+      \begin{itemize}
+      \item<2->When I mess around with new software, it's not always clear to me that
+        my first attempt at installing and configuring it will be my ``best'' attempt
+      \item<3->This sandbox started as a Common Lisp development environment
+        (SBCL\footnote<3->{Steel Bank Common Lisp: \href{https://www.sbcl.org/}{https://www.sbcl.org/}}, Spacemacs) --- something which I knew very little about. I knew
+        it would take a few iterations to configure it how I wanted.
+      \item<4->It quickly evolved into a Kubernetes playground --- something
+        even more daunting to configure, requiring more iterations
+      \item<5->If I know I can clean something up easily, I'm more inclined to
+        install it and try it out
+      \item<6->Cleaning up this sandbox is as easy as: ``docker kill ... \&\& docker rmi ...''
+      \end{itemize}
+      \note<5->[item]{I installed minikube once, and I wasn't sure how to remove
+      all traces of it from my machine.}
+    \end{frame}
+
+    \begin{frame}
     \frametitle{What is Linux?}
     \begin{columns}
         \begin{column}{0.5\textwidth}
@@ -108,33 +126,65 @@
       \begin{columns}
         \begin{column}{0.5\textwidth}
           \includegraphics<1| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/010.eps}
-          \includegraphics<2| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/020.eps}
-          \includegraphics<3| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/030.eps}
-          \includegraphics<4| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/040.eps}
-          \includegraphics<5| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/050.eps}
-          \includegraphics<6>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/060.eps}
+          \includegraphics<2->[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/020.eps}
         \end{column}
         \begin{column}{0.5\textwidth}
           \begin{itemize}
           \item<1-> Windows
-          \item<2-> XServer
-          \item<3-> WSL
-          \item<4-> User and Home Directory
-          \item<5-> Docker CLI
-          \item<6-> Docker
+          \item<2-> X Server
           \end{itemize}
         \end{column}
       \end{columns}
       \note<1->[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
-      \note<4->[item]{WSL user, but I'm guessing it maps to a Windows user}
-      \note<4->[item]{WSL directory, but I'm guessing it maps to a Windows directory}
+    \end{frame}
+
+    \begin{frame}
+      \frametitle{Hold On. X-what?}
+      \begin{itemize}
+      \item<1->X Server
+      \item<2->Once upon a time, kernels and windowing systems were developed
+        completely independently of one-another.
+      \item<3->Programs that need to draw windows on a display (X Clients)
+        just send instructions to an X Server that knows how to do so.
+      \item<4->The Server sends things like mouse events back to the clients.
+      \item<5->WSL\footnote<5->{Windows Subsystem for Linux: \href{https://learn.microsoft.com/en-us/windows/wsl/install}{https://learn.microsoft.com/en-us/windows/wsl/install}} doesn't have access to the display, that's Windows'
+        responsibility.
+      \item<6->So we install an X Server that runs on Windows and have WSL (and
+        Docker!) send its window drawing requests to it.
+      \end{itemize}
+    \end{frame}
+
+    % https://tex.stackexchange.com/questions/156480/updating-picture-after-pause
+    \begin{frame}
+      \frametitle{Baseline}
+      \begin{columns}
+        \begin{column}{0.5\textwidth}
+          \includegraphics<1| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/020.eps}
+          \includegraphics<2| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/030.eps}
+          \includegraphics<3| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/040.eps}
+          \includegraphics<4| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/050.eps}
+          \includegraphics<5->[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/060.eps}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+          \begin{itemize}
+          \item<1-> Windows
+          \item<1-> X Server
+          \item<2-> WSL
+          \item<3-> User and Home Directory
+          \item<4-> Docker CLI
+          \item<5-> Docker
+          \end{itemize}
+        \end{column}
+      \end{columns}
+      \note<1->[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
+      \note<3->[item]{WSL user, but I'm guessing it maps to a Windows user}
+      \note<3->[item]{WSL directory, but I'm guessing it maps to a Windows directory}
     \end{frame}
 
     \begin{frame}
       \frametitle{A Word on Operating Systems}
       \begin{itemize}
-      \item<2-> Linux: clearly the best choice for this
-      \item<3-> Windows: surprisingly great
+      \item<2-> Linux: clearly the best choice for this \item<3-> Windows: surprisingly great
         \begin{itemize}
         \item<4-> WSL is \textit{very} nice
         \item<5-> WSL Appears to share all resources (CPU; Memory) with Windows
