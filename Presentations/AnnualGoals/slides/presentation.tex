@@ -169,7 +169,7 @@ docker kill <container> && docker rmi <image>
       \item<4->Programs that need to draw windows on a display (X Clients)
         just send instructions to an X Server that knows how to do so.
       \item<5->The Server sends things like mouse events back to the clients.
-      \item<6->WSL\footnote<5->{Windows Subsystem for Linux: \href{https://learn.microsoft.com/en-us/windows/wsl/install}{https://learn.microsoft.com/en-us/windows/wsl/install}} doesn't have access to the display, that's Windows'
+      \item<6->WSL\footnote<6->{Windows Subsystem for Linux: \href{https://learn.microsoft.com/en-us/windows/wsl/install}{https://learn.microsoft.com/en-us/windows/wsl/install}} doesn't have access to the display, that's Windows'
         responsibility.
       \item<7->So we install an X Server that runs on Windows and have WSL (and
         Docker!) send its window drawing requests to it.
@@ -210,7 +210,7 @@ docker kill <container> && docker rmi <image>
       \item<3-> Windows: surprisingly great.
         \begin{itemize}
         \item<4-> WSL is \textit{very} nice.
-        \item<5-> WSL Appears to share all resources (CPU; Memory) with Windows.
+        \item<5-> WSL appears to share all resources (CPU; Memory) with Windows.
         \item<6-> VcXsrv is \textit{very} capable.
         \end{itemize}
       \item<7-> OS X: surprisingly bad.
@@ -370,6 +370,8 @@ docker kill <container> && docker rmi <image>
         \end{itemize}
       \item Everything else
         \begin{itemize}
+        \item VcXsrv:
+          \href{https://sourceforge.net/projects/vcxsrv/}{https://sourceforge.net/projects/vcxsrv/}
         \item supervisord:
           \href{http://supervisord.org/}{http://supervisord.org/}
         \item k3d:
