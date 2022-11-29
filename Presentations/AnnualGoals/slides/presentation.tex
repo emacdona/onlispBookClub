@@ -146,16 +146,20 @@ docker kill <container> && docker rmi <image>
     % https://tex.stackexchange.com/questions/156480/updating-picture-after-pause
     \begin{frame}
       \frametitle{Baseline}
-      \begin{columns}
+      \begin{columns}[T]
         \begin{column}{0.5\textwidth}
+          \begin{overprint}
           \includegraphics<1| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/010.eps}
           \includegraphics<2->[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/020.eps}
+          \end{overprint}
         \end{column}
         \begin{column}{0.5\textwidth}
+          \begin{overprint}
           \begin{itemize}
           \item<1-> Windows
           \item<2-> X Server
           \end{itemize}
+          \end{overprint}
         \end{column}
       \end{columns}
     \end{frame}
@@ -179,15 +183,18 @@ docker kill <container> && docker rmi <image>
     % https://tex.stackexchange.com/questions/156480/updating-picture-after-pause
     \begin{frame}
       \frametitle{Baseline}
-      \begin{columns}
+      \begin{columns}[T]
         \begin{column}{0.5\textwidth}
+          \begin{overprint}
           \includegraphics<1| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/020.eps}
           \includegraphics<2| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/030.eps}
           \includegraphics<3| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/040.eps}
           \includegraphics<4| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/050.eps}
           \includegraphics<5->[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/060.eps}
+          \end{overprint}
         \end{column}
         \begin{column}{0.5\textwidth}
+          \begin{overprint}
           \begin{itemize}
           \item<1-> Windows
           \item<1-> X Server
@@ -196,6 +203,7 @@ docker kill <container> && docker rmi <image>
           \item<4-> Docker CLI
           \item<5-> Docker
           \end{itemize}
+          \end{overprint}
         \end{column}
       \end{columns}
       \note<2->[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL.}
@@ -225,15 +233,18 @@ docker kill <container> && docker rmi <image>
 
     \begin{frame}
       \frametitle{Sandbox}
-      \begin{columns}
+      \begin{columns}[T]
         \begin{column}{0.5\textwidth}
+          \begin{overprint}
           \includegraphics<1| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/070.eps}
           \includegraphics<2| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/080.eps}
           \includegraphics<3| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/090.eps}
           \includegraphics<4| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/100.eps}
           \includegraphics<5>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/110.eps}
+          \end{overprint}
         \end{column}
         \begin{column}{0.5\textwidth}
+          \begin{overprint}
           \begin{itemize}
           \item<1-> Container
           \item<2-> Programs
@@ -241,6 +252,7 @@ docker kill <container> && docker rmi <image>
           \item<4-> ... Mapped to those on the host.
           \item<5-> Docker CLI talks to host's dockerd.
           \end{itemize}
+          \end{overprint}
         \end{column}
         \note<2->[item]{Of particular interest:\\Docker CLI\\supervisord}
       \end{columns}
@@ -294,16 +306,20 @@ docker kill <container> && docker rmi <image>
 
     \begin{frame}
       \frametitle{Kubernetes in the Sandbox}
-      \begin{columns}
+      \begin{columns}[T]
         \begin{column}{0.5\textwidth}
+          \begin{overprint}
           \includegraphics<1| handout:0>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/120.eps}
           \includegraphics<2>[width=\textwidth,height=0.85\textheight,keepaspectratio]{../graphics/130.eps}
+          \end{overprint}
         \end{column}
         \begin{column}{0.5\textwidth}
+          \begin{overprint}
           \begin{itemize}
           \item<1-> Another docker container...
           \item<2-> ...Running K3d.
           \end{itemize}
+          \end{overprint}
         \end{column}
       \end{columns}
     \end{frame}
@@ -341,6 +357,8 @@ docker kill <container> && docker rmi <image>
             Kubernetes Engine} deployment target environments.
         \item<7->More cores, more memory!
       \end{itemize}
+      \note<2->[item]{Nothing wrong with supervisord, but systemd is a much
+        more complete solution for managing process lifecycles.}
       \note<7->[item]{I understand now how one can spend \$10k on a workstation}
     \end{frame}
 
