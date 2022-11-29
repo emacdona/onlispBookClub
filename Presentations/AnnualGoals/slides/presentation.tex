@@ -68,15 +68,28 @@
     \begin{frame}[fragile]
       \frametitle{Why This Particular Sandbox?}
       \begin{itemize}
-      \item<2->When I mess around with new software, it's not always clear to me that
-        my first attempt at installing and configuring it will be my ``best'' attempt.
-      \item<3->This sandbox started as a Common Lisp development environment
-        (SBCL\footnote<3->{Steel Bank Common Lisp: \href{https://www.sbcl.org/}{https://www.sbcl.org/}}, Spacemacs) --- something which I knew very little about. I knew
-        it would take a few iterations to configure it how I wanted.
-      \item<4->It quickly evolved into a Kubernetes playground --- something
-        even more daunting to configure.
-      \item<5->If I know I can clean something up easily, I'm more inclined to
-        install it and try it out.
+      \item<2->
+        {\color<3-| handout:0>{gray!40}
+          When I mess around with new software, it's not always clear to me that
+          my first attempt at installing and configuring it will be my ``best''
+          attempt.
+        }
+      \item<3->
+        {\color<4-| handout:0>{gray!40}
+          This sandbox started as a Common Lisp development environment
+          (SBCL\footnote<3->{Steel Bank Common Lisp: \href{https://www.sbcl.org/}{https://www.sbcl.org/}}, Spacemacs) --- something which I knew very little about. I knew
+          it would take a few iterations to configure it how I wanted.
+        }
+      \item<4->
+        {\color<5-| handout:0>{gray!40}
+          It quickly evolved into a Kubernetes playground --- something
+          even more daunting to configure.
+        }
+      \item<5->
+        {\color<6-| handout:0>{gray!40}
+          If I know I can clean something up easily, I'm more inclined to
+          install it and try it out.
+        }
       \item<6->Cleaning up this sandbox is as easy as:\\
 \begin{minted}{bash}
 docker kill <container> && docker rmi <image>
