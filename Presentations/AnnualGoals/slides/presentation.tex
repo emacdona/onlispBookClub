@@ -34,18 +34,15 @@
 
 \titlegraphic{ \includegraphics[width=2cm]{logo} }
 
-% Notes:
-% sync user in container w/ user in host
-% docker beside docker
-% sync fs locations in/out of container so other ``beside'' containers see same files
-% XServer
-% Quick overview of docker..
-
 % Frames vs Slides; using slides to expose ever more developed graphics;
 % choosing which slide is used to render handout...
 % https://tex.stackexchange.com/questions/156480/updating-picture-after-pause
 % https://www.overleaf.com/learn/latex/Beamer
 % https://tex.stackexchange.com/questions/120866/how-to-handle-only-overlays-while-printing-a-latex-beamer-notes
+
+% Beamer slide overlays
+% https://www.texdev.net/2014/01/17/the-beamer-slide-overlay-concept/
+% https://www.overleaf.com/learn/latex/Beamer_Presentations%3A_A_Tutorial_for_Beginners_(Part_4)%E2%80%94Overlay_Specifications
 
 \begin{document}
     \frame{\titlepage}
@@ -66,7 +63,7 @@
 
     % https://tex.stackexchange.com/questions/384722/code-in-beamer-presentation
     \begin{frame}[fragile]
-      \frametitle{Why This Particular Sandbox?}
+      \frametitle{What Drove Me to Make This Sandbox?}
       \begin{itemize}
       \item<2->
         {\color<3-| handout:0>{gray!40}
@@ -259,23 +256,26 @@ docker kill <container> && docker rmi <image>
     \end{frame}
 
     \begin{frame}
-      \frametitle{Docker-Beside-Docker\texttrademark}
+      \frametitle{Docker-Beside-Docker}
+      \only<1>{If ``Docker-In-Docker'' means nothing to you, tune out for this slide and the next.}
       \begin{itemize}
-      \item If, from inside a container, you want to be able to:\pause
+      \item<2->If, from inside a container, you want to be able to:
         \begin{itemize}
-        \item Create new containers\pause
-        \item Share files in your container with these new containers\pause
+        \item<3->Create new containers
+        \item<4->Share files in your container with these new containers
         \end{itemize}
-        \item You don't need Docker-in-Docker
+        \item<5->You don't need Docker-in-Docker.
       \end{itemize}
     \end{frame}
 
     \begin{frame}
-      \frametitle{Docker-Beside-Docker\texttrademark}
+      \frametitle{Docker-Beside-Docker}
       \begin{itemize}
       \item<1->Install the docker CLI in your container.
       \item<2->Mount the host's docker unix domain socket into the container.
-      \item<3->Ensure directories in the container have the same name as directories on the host.
+      \item<3->Ensure that for host directories bind-mounted into your container, the
+        container and the host use the same name for them.\\
+        e.g.: -v /home/emacdona/projects:/home/emacdona/projects
       \end{itemize}
       \note<3->[item]{If you follow these instructions, containers you create with
         the docker cli in your container --- with bind mounts to directories in
