@@ -26,6 +26,6 @@ slidesWithoutNotes.pdf: slidesWithoutNotes.tex presentation.tex logo.png
 
 clean:
 	rm -rf auto/ *.aux *.log *.nav *.out *.pdf *.snm *.toc \
-			*.gz target
+			*.gz target _minted-* *.vrb
 	cd ../graphics && make clean
 

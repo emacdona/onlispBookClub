@@ -64,7 +64,8 @@
         in the sandbox.}
     \end{frame}
 
-    \begin{frame}
+    % https://tex.stackexchange.com/questions/384722/code-in-beamer-presentation
+    \begin{frame}[fragile]
       \frametitle{Why This Particular Sandbox?}
       \begin{itemize}
       \item<2->When I mess around with new software, it's not always clear to me that
@@ -76,7 +77,10 @@
         even more daunting to configure.
       \item<5->If I know I can clean something up easily, I'm more inclined to
         install it and try it out.
-      \item<6->Cleaning up this sandbox is as easy as:\\``docker kill <container> \&\& docker rmi <image>''
+      \item<6->Cleaning up this sandbox is as easy as:\\
+\begin{minted}{bash}
+docker kill <container> && docker rmi <image>
+\end{minted}
       \end{itemize}
       \note<5->[item]{I installed minikube once, and I wasn't sure how to remove
       all traces of it from my machine.}
