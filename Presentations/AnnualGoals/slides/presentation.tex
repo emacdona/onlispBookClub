@@ -97,6 +97,18 @@ docker kill <container> && docker rmi <image>
     \end{frame}
 
     \begin{frame}
+      \frametitle{Demo I}
+      \begin{center}
+        {\Huge Demo I}\\
+        This presentation is running in the sandbox --- so if you can read this, the
+        demo is actually already underway.
+      \end{center}
+      \note[item]{run 'lazydocker'\\show 'top'\\show 'pympress' in list}
+      \note[item]{sc status}
+      \note[item]{sc start dia}
+    \end{frame}
+
+    \begin{frame}
     \frametitle{What is Linux?}
     \begin{columns}
         \begin{column}{0.5\textwidth}
@@ -288,20 +300,20 @@ docker kill <container> && docker rmi <image>
     \end{frame}
 
     \begin{frame}
-      \frametitle{Demo I}
+      \frametitle{Demo II}
       \begin{center}
-        {\Huge Demo I}
+        {\Huge Demo II}
       \end{center}
-      \note[item]{supervisord/supervisorctl}
-      \note[item]{docker-beside-docker: docker run -it -v `pwd`:/workdir -w /workdir ubuntu ls}
-      \note[item]{'docker ps' from host and container}
+      \note[item]{alias sc\\ sc status}
       \note[item]{'lazydocker'; show DISPLAY env var; show 'top'}
-      \note[item]{sc status}
       \note[item]{sc start emacs}
-      \note[item]{sc start dia}
       \note[item]{sc start firefox --- Will be able to enter Intellij auth; Useful for Demo II}
       \note[item]{sc start intellij --- will be able to show ansible config in Demo II}
       \note[item]{sc start qtcreator}
+      \note[item]{docker-beside-docker:\\
+        cd /home/emacdona/projects/onlispBookClub \\\&\& docker run -it -v `pwd`:`pwd` -w `pwd`
+        ubuntu sh -c 'ls | sort'
+      }
     \end{frame}
 
     \begin{frame}
@@ -325,9 +337,9 @@ docker kill <container> && docker rmi <image>
     \end{frame}
 
     \begin{frame}
-      \frametitle{Demo II}
+      \frametitle{Demo III}
       \begin{center}
-        {\Huge Demo II}
+        {\Huge Demo III}
       \end{center}
       \note[item]{provision k3d cluster}
       \note[item]{watch lazydocker}
