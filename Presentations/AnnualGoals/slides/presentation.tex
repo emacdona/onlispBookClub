@@ -65,15 +65,15 @@
       \frametitle{Why This Particular Sandbox?}
       \begin{itemize}
       \item<2->When I mess around with new software, it's not always clear to me that
-        my first attempt at installing and configuring it will be my ``best'' attempt
+        my first attempt at installing and configuring it will be my ``best'' attempt.
       \item<3->This sandbox started as a Common Lisp development environment
         (SBCL\footnote<3->{Steel Bank Common Lisp: \href{https://www.sbcl.org/}{https://www.sbcl.org/}}, Spacemacs) --- something which I knew very little about. I knew
         it would take a few iterations to configure it how I wanted.
       \item<4->It quickly evolved into a Kubernetes playground --- something
-        even more daunting to configure, requiring more iterations
+        even more daunting to configure.
       \item<5->If I know I can clean something up easily, I'm more inclined to
-        install it and try it out
-      \item<6->Cleaning up this sandbox is as easy as: ``docker kill ... \&\& docker rmi ...''
+        install it and try it out.
+      \item<6->Cleaning up this sandbox is as easy as:\\``docker kill ... \&\& docker rmi ...''
       \end{itemize}
       \note<5->[item]{I installed minikube once, and I wasn't sure how to remove
       all traces of it from my machine.}
@@ -101,23 +101,26 @@
     \begin{frame}
     \frametitle{What is Linux?}
     \begin{itemize}
-        \item<1-> Linux is a kernel
-        \item<2-> A kernel is a set of system calls providing a hardware abstraction
-        \item<3-> Great efforts are made to keep system calls backwards compatible
+        \item<1-> Linux is a kernel.
+        \item<2-> A kernel is a set of system calls providing a hardware abstraction.
+        \item<3-> Great efforts are made to keep Linux system calls backwards compatible.
     \end{itemize}
-    \note<3->[item]{Linux maintainers FEEL VERY STRONGLY that new kernel versions should strive to maintain binary compatibility}
+    \note<3->[item]{Linux maintainers FEEL VERY STRONGLY that new kernel versions should strive to maintain binary compatibility.}
     \end{frame}
 
     \begin{frame}
       \frametitle{Why Does That Matter?}
       \begin{itemize}
-      \item<1-> Docker images don't have a kernel
-      \item<2-> They have a filesystem with binaries
-      \item<3-> You can reasonably expect a Docker image based on an old kernel to run on newer one
+      \item<1-> Docker images don't have a kernel.
+      \item<2-> They have a filesystem with binaries.
+      \item<3-> You can reasonably expect a Docker image based on an old kernel to run on newer one.
+      \item<4-> This makes it a great platform for a Sandbox:
+        \begin{itemize}
+          \item<5-> Lump all your software and its configuration in a container.
+          \item<6-> You can reasonably expect that container to run on future
+            kernel versions.
+          \end{itemize}
       \end{itemize}
-      \note<3->[item]{This makes it a great platform for a Sandbox:\\Lump all
-        your software and its configuration in a container which you can
-        reasonably expect to keep running.}
     \end{frame}
 
     % https://tex.stackexchange.com/questions/156480/updating-picture-after-pause
@@ -140,15 +143,15 @@
     \begin{frame}
       \frametitle{Hold On. X-what?}
       \begin{itemize}
-      \item<1->X Server
-      \item<2->Once upon a time, kernels and windowing systems were developed
+      \item<2->X Server.
+      \item<3->Once upon a time, kernels and windowing systems were developed
         completely independently of one-another.
-      \item<3->Programs that need to draw windows on a display (X Clients)
+      \item<4->Programs that need to draw windows on a display (X Clients)
         just send instructions to an X Server that knows how to do so.
-      \item<4->The Server sends things like mouse events back to the clients.
-      \item<5->WSL\footnote<5->{Windows Subsystem for Linux: \href{https://learn.microsoft.com/en-us/windows/wsl/install}{https://learn.microsoft.com/en-us/windows/wsl/install}} doesn't have access to the display, that's Windows'
+      \item<5->The Server sends things like mouse events back to the clients.
+      \item<6->WSL\footnote<5->{Windows Subsystem for Linux: \href{https://learn.microsoft.com/en-us/windows/wsl/install}{https://learn.microsoft.com/en-us/windows/wsl/install}} doesn't have access to the display, that's Windows'
         responsibility.
-      \item<6->So we install an X Server that runs on Windows and have WSL (and
+      \item<7->So we install an X Server that runs on Windows and have WSL (and
         Docker!) send its window drawing requests to it.
       \end{itemize}
     \end{frame}
@@ -175,24 +178,25 @@
           \end{itemize}
         \end{column}
       \end{columns}
-      \note<2->[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL}
-      \note<3->[item]{WSL user, but I'm guessing it maps to a Windows user}
-      \note<3->[item]{WSL directory, but I'm guessing it maps to a Windows directory}
+      \note<2->[item]{Whenever I say ``Host'' (unqualified), I'm referring to WSL.}
+      \note<3->[item]{WSL user, but I'm guessing it maps to a Windows user.}
+      \note<3->[item]{WSL directory, but I'm guessing it maps to a Windows directory.}
     \end{frame}
 
     \begin{frame}
       \frametitle{A Word on Operating Systems}
       \begin{itemize}
-      \item<2-> Linux: clearly the best choice for this \item<3-> Windows: surprisingly great
+      \item<2-> Linux: clearly the best choice for this.
+      \item<3-> Windows: surprisingly great.
         \begin{itemize}
-        \item<4-> WSL is \textit{very} nice
-        \item<5-> WSL Appears to share all resources (CPU; Memory) with Windows
-        \item<6-> VcXsrv is \textit{very} capable
+        \item<4-> WSL is \textit{very} nice.
+        \item<5-> WSL Appears to share all resources (CPU; Memory) with Windows.
+        \item<6-> VcXsrv is \textit{very} capable.
         \end{itemize}
-      \item<7-> OS X: surprisingly bad
+      \item<7-> OS X: surprisingly bad.
         \begin{itemize}
-        \item<8-> Docker desktop ``takes'' resources from host
-        \item<9-> XQuartz was not as nice as VcXsrv --- at least in Ventura
+        \item<8-> Docker desktop ``takes'' resources from host.
+        \item<9-> XQuartz was not as nice as VcXsrv --- at least in Ventura.
         \end{itemize}
       \end{itemize}
       \note<2->[item]{I started all this madness on Linux. I ran out of cores.}
@@ -214,8 +218,8 @@
           \item<1-> Container
           \item<2-> Programs
           \item<3-> User and Home Directory ...
-          \item<4-> ... Mapped to those on the host
-          \item<5-> Docker CLI talks to host's dockerd
+          \item<4-> ... Mapped to those on the host.
+          \item<5-> Docker CLI talks to host's dockerd.
           \end{itemize}
         \end{column}
         \note<2->[item]{Of particular interest:\\Docker CLI\\supervisord}
@@ -223,7 +227,7 @@
     \end{frame}
 
     \begin{frame}
-      \frametitle{Docker-beside-Docker\texttrademark}
+      \frametitle{Docker-Beside-Docker\texttrademark}
       \begin{itemize}
       \item If, from inside a container, you want to be able to:\pause
         \begin{itemize}
@@ -235,16 +239,16 @@
     \end{frame}
 
     \begin{frame}
-      \frametitle{Docker-beside-Docker\texttrademark}
+      \frametitle{Docker-Beside-Docker\texttrademark}
       \begin{itemize}
-      \item<1->Install the docker CLI in your container
-      \item<2->Mount the host's docker unix domain socket into the container
-      \item<3->Ensure directories in the container have the same name as directories on the host
+      \item<1->Install the docker CLI in your container.
+      \item<2->Mount the host's docker unix domain socket into the container.
+      \item<3->Ensure directories in the container have the same name as directories on the host.
       \end{itemize}
       \note<3->[item]{If you follow these instructions, containers you create with
         the docker cli in your container --- with bind mounts to directories in
         your container --- will actually be created by the same dockerd your
-        container was created with. Their bind mounts will technically see files
+        container was created with.\\Their bind mounts will technically see files
         on the host, but those will be the same files -- with the same names -- as
         those in your container.}
       \note<3->[item]{Just write a startup script to manage all this for you!
@@ -278,7 +282,7 @@
         \begin{column}{0.5\textwidth}
           \begin{itemize}
           \item<1-> Another docker container...
-          \item<2-> ...Running K3d
+          \item<2-> ...Running K3d.
           \end{itemize}
         \end{column}
       \end{columns}
@@ -304,29 +308,29 @@
     \end{frame}
 
     \begin{frame}
-      \frametitle{Where to next?}
+      \frametitle{Where to Next?}
       \begin{itemize}
         \item<2->Replace supervisord with systemd --- which may necessitate
-          moving to podman\footnote<2->{\href{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}}
+          moving to podman.\footnote<2->{\href{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}{https://developers.redhat.com/blog/2019/04/24/how-to-run-systemd-in-a-container}}
         \item<3->Self host in the Gitlab instance that's deployed in the sandbox.
         \item<4->LDAP server to mimic Active Directory --- and serve as
           authoritative identity source for Keycloak...
-        \item<5->... SSO across the cluster
+        \item<5->... SSO across the cluster.
         \item<6->Terraform to provision AKS\footnote<6->{Azure Kubernetes Service},
           EKS\footnote<6->{Elastic Kubernetes Service (Amazon)}, GKE\footnote<6->{Google
-            Kubernetes Engine} deployment target environments
+            Kubernetes Engine} deployment target environments.
         \item<7->More cores, more memory!
       \end{itemize}
       \note<7->[item]{I understand now how one can spend \$10k on a workstation}
     \end{frame}
 
     \begin{frame}
-      \frametitle{Something to think about}
+      \frametitle{Something to Think About}
       \begin{itemize}
-      \item<2->We used to ship our application code (jars, wars, ears, etc)
-      \item<3->Then we shipped containers --- application code plus runtimes and dependencies
-      \item<4->What's preventing us from shipping entire CI/CD pipelines and
-        individual developer environments with our software?
+      \item<2->We used to ship our application code (jars, wars, ears, etc).
+      \item<3->Then we shipped containers --- application code plus runtimes and dependencies.
+      \item<4->What's preventing us from shipping complete infra (CI/CD,
+        integrated identity provider) and individual developer environments with our software?
       \end{itemize}
     \end{frame}
 
