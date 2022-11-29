@@ -8,6 +8,9 @@
 \usepackage{xcolor}
 \usepackage{adjustbox}
 
+% https://tex.stackexchange.com/questions/2369/why-do-the-less-than-symbol-and-the-greater-than-symbol-appear-wrong-as
+\usepackage[T1]{fontenc}
+
 \usetheme{Madrid}
 \useinnertheme{circles}
 \definecolor{ssgreen}{HTML}{669B41}
@@ -73,7 +76,7 @@
         even more daunting to configure.
       \item<5->If I know I can clean something up easily, I'm more inclined to
         install it and try it out.
-      \item<6->Cleaning up this sandbox is as easy as:\\``docker kill ... \&\& docker rmi ...''
+      \item<6->Cleaning up this sandbox is as easy as:\\``docker kill <container> \&\& docker rmi <image>''
       \end{itemize}
       \note<5->[item]{I installed minikube once, and I wasn't sure how to remove
       all traces of it from my machine.}
