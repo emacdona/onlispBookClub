@@ -66,24 +66,24 @@
       \frametitle{What Drove Me to Make This Sandbox?}
       \begin{itemize}
       \item<2->
-        {\color<3-| handout:0>{gray!40}
+        {\color<3-| handout:0>{gray!30}
           When I mess around with new software, it's not always clear to me that
           my first attempt at installing and configuring it will be my ``best''
           attempt.
         }
       \item<3->
-        {\color<4-| handout:0>{gray!40}
+        {\color<4-| handout:0>{gray!30}
           This sandbox started as a Common Lisp development environment
           (SBCL\footnote<3->{Steel Bank Common Lisp: \href{https://www.sbcl.org/}{https://www.sbcl.org/}}, Spacemacs) --- something which I knew very little about. I knew
           it would take a few iterations to configure it how I wanted.
         }
       \item<4->
-        {\color<5-| handout:0>{gray!40}
+        {\color<5-| handout:0>{gray!30}
           It quickly evolved into a Kubernetes playground --- something
           even more daunting to configure.
         }
       \item<5->
-        {\color<6-| handout:0>{gray!40}
+        {\color<6-| handout:0>{gray!30}
           If I know I can clean something up easily, I'm more inclined to
           install it and try it out.
         }
@@ -176,16 +176,30 @@ docker kill <container> && docker rmi <image>
     \begin{frame}
       \frametitle{Hold On. X-what?}
       \begin{itemize}
-      \item<2->X Server.
-      \item<3->Once upon a time, kernels and windowing systems were developed
-        completely independently of one-another.
-      \item<4->Programs that need to draw windows on a display (X Clients)
-        just send instructions to an X Server that knows how to do so.
-      \item<5->The Server sends things like mouse events back to the clients.
-      \item<6->WSL\footnote<6->{Windows Subsystem for Linux: \href{https://learn.microsoft.com/en-us/windows/wsl/install}{https://learn.microsoft.com/en-us/windows/wsl/install}} doesn't have access to the display, that's Windows'
-        responsibility.
+      \item<2->
+        {\color<3-| handout:0>{gray!30}
+          X Server.}
+      \item<3->
+        {\color<4-| handout:0>{gray!30}
+          Once upon a time, kernels and windowing systems were developed
+          completely independently of one-another.
+        }
+      \item<4->
+        {\color<5-| handout:0>{gray!30}
+          Programs that need to draw windows on a display (X Clients)
+          just send instructions to an X Server that knows how to do so.
+        }
+      \item<5->
+        {\color<6-| handout:0>{gray!30}
+          The Server sends things like mouse events back to the clients.
+        }
+      \item<6->
+        {\color<7-| handout:0>{gray!30}
+          WSL\footnote<6->{Windows Subsystem for Linux: \href{https://learn.microsoft.com/en-us/windows/wsl/install}{https://learn.microsoft.com/en-us/windows/wsl/install}} doesn't have access to the display, that's Windows'
+          responsibility.
+        }
       \item<7->So we install an X Server that runs on Windows and have WSL (and
-        Docker!) send its window drawing requests to it.
+        Docker!) send window drawing requests to it.
       \end{itemize}
     \end{frame}
 
