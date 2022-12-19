@@ -342,6 +342,18 @@ RUN sudo -i -u "${USERNAME}" bash -c '\
 # https://github.com/databus23/helm-diff
 RUN   sudo -i -u "${USERNAME}" bash -c 'helm plugin install https://github.com/databus23/helm-diff'
 
+# RVM: https://rvm.io/
+# Jekyll: https://jekyllrb.com/
+# Note: rvm install will modify zshrc (and zlogin, but ignore that). My plan is to install it here, source it explicitly, then install ruby and jekyll. Then
+# I'm going to copy over top of .zshrc in the container with the one I have in vc. But I've made the same changes to that file that's in vc.
+RUN zsh -c '\
+    gpg --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB && \
+    curl -sSL https://get.rvm.io | bash -s stable && \
+    source "$HOME/.rvm/scripts/rvm" && \
+    rvm install ruby-3.0.0 && \
+    rvm use ruby-3.0.0 && \
+    gem install bundler jekyll'
+
 # Copy in some dotfiles.
 # Hell, mount them as volumes too when we start the container. That way, if you change them on the host and it doesn't cause this layer to
 # rebuild, you'll still see your changes! (I'm not sure how to force this layer to rebuild if one of these files changes on the host).
