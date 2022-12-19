@@ -1,0 +1,118 @@
+<html>
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarpanch:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Sarpanch:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Nunito:wght@300&family=Sarpanch:wght@900&display=swap" rel="stylesheet">
+    <title>Cons Artist - {{page.title}}</title>
+    <style type="text/css">
+        :root{
+            --alternate-bg: rgba(98, 175, 192);
+            --content-bg: rgba(232, 205, 177);
+            --border-bg: rgba(0, 0, 0, 0.85);
+        }
+        body{
+            padding: 0;
+            margin: 0;
+            background-color: var(--alternate-bg);
+        }
+        #logo{
+            font-family: 'Sarpanch', sans-serif;
+            font-size: 50px;
+        }
+        #page{
+            display: grid;
+            grid-template-columns: 3fr 20fr 2fr;
+            grid-template-rows: 150px 1fr 150px;
+            width: 100%;
+            height: 100%;
+        }
+        #header{
+            grid-row: 1 / span 1;
+            grid-column: 1 / span 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #footer{
+            grid-row: 3 / span 1;
+            grid-column: 1 / span 3;
+            padding-bottom: 20px;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+        }
+        #left-gutter{
+            grid-row: 2 / span 1;
+            grid-column: 1 / span 1;
+        }
+        #right-gutter{
+            grid-row: 2 / span 1;
+            grid-column: 3 / span 1;
+        }
+        #content{
+            padding: 20px 5% 10px 5%;
+            grid-row: 2 / span 1;
+            grid-column: 2 / span 1;
+            background-color: var(--content-bg);
+            border-left: 10px solid var(--border-bg);
+            border-right: 10px solid var(--border-bg);
+            border-top: 2px solid var(--border-bg);
+            border-bottom: 2px solid var(--border-bg);
+            font-family: 'Nunito', sans-serif;
+            font-size: 20pt;
+            border-top-left-radius: 40px 40px;
+            border-bottom-left-radius: 40px 40px;
+            border-top-right-radius: 40px 40px;
+            border-bottom-right-radius: 40px 40px;
+        }
+
+     #nav{
+         border-bottom: 3px solid black;
+     }
+
+     .navItem {
+         background-color: transparent;
+         border: 3px solid black;
+         border-top-left-radius: 10px 10px;
+         border-top-right-radius: 10px 10px;
+         padding-left: 10px;
+         padding-right: 10px;
+
+         /* horizontal "border-collapse" for things that aren't TDs :-/ */
+         margin-left: -3px;
+     }
+
+     .navItem > a:visited,
+     .navItem > a:link {
+         color: black;
+         text-decoration: none;
+     }
+
+     #selected-menu-item {
+         border-bottom: 3px solid var(--content-bg);
+     }
+    </style>
+</head>
+<body>
+    <div id="page">
+        <div id="header"><span id="logo">Cons Artist</span></div>
+        <div id="left-gutter"></div>
+        <div id="content">
+            <div id="nav">
+            {% for item in site.data.navigation %}
+                <span class="navItem" {% if page.url == item.link %}id ="selected-menu-item"{% endif %}>
+                    <a href="{{ item.link}}">{{item.name}}</a>
+                </span>
+            {% endfor %}
+            </div>
+            {{content}}
+        </div>
+        <div id="right-gutter"></div>
+        <div id="footer">(cons 'artist '())</div>
+    </div>
+</body>
+</html>
