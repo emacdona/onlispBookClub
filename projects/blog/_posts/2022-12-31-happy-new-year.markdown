@@ -5,7 +5,7 @@ layout: post
 ## Happy New Year!
 
 I hate publicizing New Year's resolutions -- mostly because I love making them, but hate committing to them. Alas, here 
-we are... I'm, publishing a blog and using it to declare a New Year's resolution: 
+we are... I'm publishing a blog and using it to declare a New Year's resolution: 
 
 In 2023, I want to try to write more.
 
