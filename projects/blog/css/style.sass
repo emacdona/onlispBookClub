@@ -2,8 +2,12 @@
 ---
 
 $alternate-bg: rgba(98, 175, 192, 1)
-$content-bg: rgba(232, 205, 177, 1)
+$content-bg: rgba(252, 225, 197, 1)
+$selected-blog-bg: rgba(232, 205, 177, 1)
 $border-bg: rgba(0, 0, 0, 1)
+
+html
+  font-size: 18pt
 
 body
   padding: 0
@@ -56,7 +60,6 @@ body
   border-top: 2px solid $border-bg
   border-bottom: 2px solid $border-bg
   font-family: 'Nunito', sans-serif
-  font-size: 20pt
   border-radius: 40px 40px
 
 #nav
@@ -80,3 +83,38 @@ body
 
 #selected-menu-item
   border-bottom: 3px solid $content-bg
+
+#blogPostWithNav
+  display: grid
+  grid-template-columns: 80% 20%
+  grid-template-rows: 100%
+  width: 100%
+
+#blogPostContent
+  grid-row: 1 / span 1
+  grid-column: 1 / span 1
+  padding-right: 20px
+
+#blogPostNav
+  grid-row: 1 / span 1
+  grid-column: 2 / span 1
+  margin-top: 30px
+  margin-bottom: 30px
+  padding-left: 15px
+  border-left: 1px solid $border-bg
+
+  ul
+    list-style-type: none
+    font-size: 0.8em
+
+    li
+      padding: 5px
+      margin-bottom: 15px
+      text-align: left
+
+    #selected-blog-post
+      background-color: $selected-blog-bg
+
+    a:visited,
+    a:link
+      color: black

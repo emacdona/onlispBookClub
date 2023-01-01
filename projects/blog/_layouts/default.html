@@ -5,6 +5,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarpanch:wght@900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Sarpanch:wght@900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Nunito:wght@300&family=Sarpanch:wght@900&display=swap" rel="stylesheet">
+    <link href="/css/reset.css" rel="stylesheet">
+    <link href="/css/baseline.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
     <title>Cons Artist - {{page.title}}</title>
 </head>
@@ -14,6 +16,10 @@
         <div id="left-gutter"></div>
         <div id="content">
             <div id="nav">
+                <!-- 'hardcode' the blogs link b/c the logic to determine whether it should be selected is more complex -->
+                <span class="navItem" {% if page.layout == 'post'%}id ="selected-menu-item"{% endif %}>
+                    <a href="{{site.posts[0].url}}">Blog</a>
+                </span>
             {% for item in site.data.navigation %}
                 <span class="navItem" {% if page.url == item.link %}id ="selected-menu-item"{% endif %}>
                     <a href="{{ item.link }}">{{item.name}}</a>
