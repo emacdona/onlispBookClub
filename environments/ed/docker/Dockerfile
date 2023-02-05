@@ -250,6 +250,8 @@ RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/inst
 # https://sdkman.io/install
 RUN curl -s "https://get.sdkman.io" | bash
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install java 11.0.11.hs-adpt'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  yes n | sdk install java 17.0.6-tem'
+RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  yes n | sdk install java 19.0.2-tem'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install gradle 7.2'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install maven 3.8.3'
 RUN sudo -i -u "${USERNAME}" bash -c 'source ~/.sdkman/bin/sdkman-init.sh &&  sdk install ant 1.10.10'
@@ -369,15 +371,17 @@ COPY --chown="${USERNAME}:${USERGROUP}" supervisord.conf supervisord.conf
 # the .abclrc file that (ql:add-to-init-file) generates (see: https://www.quicklisp.org/beta/faq.html)
 COPY --chown="${USERNAME}:${USERGROUP}" .abclrc .abclrc
 
-# gvm, lazydocker
+# gvm, lazydocker, cue lang
 # https://github.com/moovweb/gvm (though I subbed zsh for bash)
 # https://github.com/jesseduffield/lazydocker/blob/master/docs/Config.md
+# https://cuelang.org/docs/install/
 RUN zsh -c 'zsh < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)' && \
     sudo -i -u "${USERNAME}" zsh -ic 'gvm install go1.4 -B' && \
     sudo -i -u "${USERNAME}" zsh -ic 'gvm use go1.4 --default' && \
     sudo -i -u "${USERNAME}" zsh -ic 'gvm install go1.19.3' && \
     sudo -i -u "${USERNAME}" zsh -ic 'gvm use go1.19.3 --default' && \
-    sudo -i -u "${USERNAME}" zsh -ic 'go install github.com/jesseduffield/lazydocker@latest'
+    sudo -i -u "${USERNAME}" zsh -ic 'go install github.com/jesseduffield/lazydocker@latest' && \
+    sudo -i -u "${USERNAME}" zsh -ic 'go install cuelang.org/go/cmd/cue@latest'
 
 # Perl
 # We need to install perl HERE so that the perlbrew line we source in the .zshrc file doesn't result in an error when

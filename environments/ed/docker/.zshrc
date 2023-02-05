@@ -100,7 +100,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export PATH="/home/${USER}/scripts:${PATH}"
+export PATH="/home/${USER}/scripts:/home/${USER}/bin:${PATH}"
 
 # Tell screen to use unicode.
 alias screen="screen -U"
