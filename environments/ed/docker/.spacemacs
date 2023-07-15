@@ -598,8 +598,8 @@ before packages are loaded."
 
    ; https://slime.common-lisp.dev/doc/html/Multiple-Lisps.html
    (setq slime-lisp-implementations
-         '((abcl ("/home/emacdona/scripts/abcl"))
-           (sbcl ("/usr/bin/sbcl") :coding-system utf-8-unix)))
+         '((sbcl ("/usr/bin/sbcl") :coding-system utf-8-unix)
+           (abcl ("/home/emacdona/scripts/abcl"))))
 )
 
 

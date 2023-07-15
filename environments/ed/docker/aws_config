@@ -1,0 +1,27 @@
+[profile primary]
+sso_session = primary
+sso_account_id = 107927007528
+sso_role_name = AdministratorAccess
+region = us-east-1
+[sso-session primary]
+sso_start_url = https://d-90674161a6.awsapps.com/start#/
+sso_region = us-east-1
+sso_registration_scopes = sso:account:access
+[profile blog]
+sso_session = blog
+sso_account_id = 071062044970
+sso_role_name = AdministratorAccess
+region = us-east-1
+[sso-session blog]
+sso_start_url = https://d-90674161a6.awsapps.com/start#/
+sso_region = us-east-1
+sso_registration_scopes = sso:account:access
+[profile sandbox]
+sso_session = sandbox
+sso_account_id = 874970720839
+sso_role_name = AdministratorAccess
+region = us-east-1
+[sso-session sandbox]
+sso_start_url = https://d-90674161a6.awsapps.com/start#/
+sso_region = us-east-1
+sso_registration_scopes = sso:account:access

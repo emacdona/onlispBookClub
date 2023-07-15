@@ -41,6 +41,7 @@
   hosts: localhost
   become: false
   connection: local
+  tags: keycloak
   tasks:
     - set_fact:
         image_registry:
@@ -63,6 +64,7 @@
   hosts: localhost
   become: false
   connection: local
+  tags: prometheus
   tasks:
     - name: Add Kube Prometheus Stack
       kubernetes.core.helm_repository:
@@ -80,6 +82,7 @@
   hosts: localhost
   become: false
   connection: local
+  tags: elasticsearch
   tasks:
     - name: Add Elasticsearch Chart Repo
       kubernetes.core.helm_repository:
@@ -118,6 +121,7 @@
   hosts: localhost
   become: false
   connection: local
+  tags: cassandra
   tasks:
     - name: Add Cassandra Chart Repo
       kubernetes.core.helm_repository:
@@ -135,6 +139,7 @@
   hosts: localhost
   become: false
   connection: local
+  tags: mongodb
   tasks:
     - name: Add Mongodb Chart Repo
       kubernetes.core.helm_repository:
@@ -152,6 +157,7 @@
   hosts: localhost
   become: false
   connection: local
+  tags: jenkins
   tasks:
     - name: Add Jenkins Chart Repo
       kubernetes.core.helm_repository:
@@ -172,6 +178,7 @@
   hosts: localhost
   become: false
   connection: local
+  tags: gitlab
   tasks:
     - name: Add Gitlab Chart Repo
       kubernetes.core.helm_repository:
@@ -204,3 +211,74 @@
         values_files:
           - "https://gitlab.com/gitlab-org/charts/gitlab/raw/master/examples/values-minikube.yaml"
         values: "{{ lookup('template', 'templates/gitlab/values.yml.j2') | from_yaml }}"
+
+#- name: PV Test
+#  hosts: localhost
+#  become: false
+#  connection: local
+#  tags: pvtest
+#  tasks:
+#    - name: PV
+#      kubernetes.core.k8s:
+#        state: present
+#        definition:
+#          apiVersion: v1
+#          kind: PersistentVolume
+#          metadata:
+#            name: task-pv-volume
+#            labels:
+#              type: local
+#          spec:
+#            storageClassName: manual
+#            capacity:
+#              storage: 1Gi
+#            accessModes:
+#              - ReadWriteOnce
+#            hostPath:
+#              path: "/tmp/k3dvol"
+#
+#    - name: PVC
+#      kubernetes.core.k8s:
+#        state: present
+#        definition:
+#          apiVersion: v1
+#          kind: PersistentVolumeClaim
+#          metadata:
+#            name: task-pv-claim
+#          spec:
+#            storageClassName: manual
+#            accessModes:
+#              - ReadWriteOnce
+#            resources:
+#              requests:
+#                storage: 1Gi
+#    - name: PV
+#      kubernetes.core.k8s:
+#        state: present
+#        definition:
+#          apiVersion: apps/v1
+#          kind: Deployment
+#          metadata:
+#            name: echo
+#          spec:
+#            selector:
+#              matchLabels:
+#                app: echo
+#            strategy:
+#              type: Recreate
+#            template:
+#              metadata:
+#                labels:
+#                  app: echo
+#              spec:
+#                volumes:
+#                  - name: task-pv-storage
+#                    persistentVolumeClaim:
+#                      claimName: task-pv-claim
+#                containers:
+#                  - image: busybox
+#                    name: echo
+#                    volumeMounts:
+#                      - mountPath: "/data"
+#                        name: task-pv-storage
+#                    command: [ "ping", "127.0.0.1" ]

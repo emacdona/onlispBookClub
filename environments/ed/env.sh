@@ -112,7 +112,7 @@ then
    if [ -z "${TAG}" ]
    then
       cd "${ENVIRONMENT_ROOT}/docker" && \
-         DOCKER_BUILDKIT=1 docker build \
+         DOCKER_BUILDKIT=1 docker build --progress plain \
             ${NO_CACHE_DOCKER_BUILD} \
             --build-arg USERNAME="${USER}" \
             --build-arg UID=$(id -u ${USER}) \

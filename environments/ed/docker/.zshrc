@@ -189,6 +189,9 @@ complete -C '/usr/local/bin/aws_completer' aws
 # docker container (ie: before we've installed gvm)
 [ -f "${HOME}/.gvm/scripts/gvm" ] && source "${HOME}/.gvm/scripts/gvm"
 
+# set up direnv
+eval "$(direnv hook zsh)"
+
 
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"

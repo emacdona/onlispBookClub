@@ -7,3 +7,9 @@
 projects/bootcamp/
 downloads/
 .ipynb_checkpoints/
+.envrc
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+

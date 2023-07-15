@@ -53,7 +53,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y git \
    libclang-common-8-dev \
    kile \
    pympress libgtk-3-0 libpoppler-glib8 libcairo2 python3-gi python3-gi-cairo gobject-introspection libgirepository-1.0-1 gir1.2-gtk-3.0 gir1.2-poppler-0.18 \
-   bison mercurial
+   bison mercurial \
+   direnv
 
 # Required by spacemacs w3m layer
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y w3m
@@ -105,7 +106,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mit-scheme mit-scheme-dbg 
 # https://ubuntuhandbook.org/index.php/2021/12/compile-gnu-emacs-source-ubuntu/
 # https://askubuntu.com/questions/158871/how-do-i-enable-the-source-code-repositories
 RUN sed -i '/deb-src/s/^# //' /etc/apt/sources.list
-RUN DEBIAN_FRONTEND=noninteractive apt-get update -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get clean -y && apt-get update -y
 RUN DEBIAN_FRONTEND=noninteractive apt-get build-dep emacs -y
 RUN DEBIAN_FRONTEND=noninteractive apt-get install autoconf -y
 RUN curl -sO https://ftp.gnu.org/gnu/emacs/emacs-27.2.tar.gz && \
@@ -321,8 +322,8 @@ RUN git clone https://github.com/hadolint/hadolint \
 RUN sudo -i -u "${USERNAME}" bash -c '\
       mkdir -p ~/usr/local && \
       cd ~/usr/local && \
-      curl -sLO https://download.jetbrains.com/idea/ideaIU-2022.1.3.tar.gz && \
-      tar xvfz ideaIU-2022.1.3.tar.gz'
+      curl -sLO https://download.jetbrains.com/idea/ideaIU-2023.1.3.tar.gz && \
+      tar xvfz ideaIU-2023.1.3.tar.gz'
 
 WORKDIR "${HOME_DIR}"
 
@@ -366,6 +367,7 @@ COPY --chown="${USERNAME}:${USERGROUP}" .screenrc .screenrc
 COPY --chown="${USERNAME}:${USERGROUP}" .zshrc .zshrc
 COPY --chown="${USERNAME}:${USERGROUP}" .spacemacs .spacemacs
 COPY --chown="${USERNAME}:${USERGROUP}" supervisord.conf supervisord.conf
+COPY --chown="${USERNAME}:${USERGROUP}" aws_config .aws/config
 
 # Couldn't find any combination of command line params and arguments that would let me install quicklisp for ABCL. So, since it's already installed b/c of SBCL, I'm just going to steal
 # the .abclrc file that (ql:add-to-init-file) generates (see: https://www.quicklisp.org/beta/faq.html)

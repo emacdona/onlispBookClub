@@ -30,6 +30,7 @@ twitter_username: jekyllrb
 github_username:  jekyll
 
 # Build settings
+encoding: utf-8
 theme: minima
 plugins:
   - jekyll-feed
