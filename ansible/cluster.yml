@@ -166,9 +166,7 @@
     - name: Install Jenkins
       kubernetes.core.helm:
         name: jenkins
-        # somewhere in the 4.1 chart versions, they have a plugin incompatiblity. We could override their default values,
-        # but I'd rather just find a version that works out of the box
-        chart_version: 4.0.0
+        chart_version: 4.1.17
         release_namespace: jenkins
         create_namespace: true
         chart_ref: jenkins/jenkins
