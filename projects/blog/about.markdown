@@ -16,4 +16,4 @@ This website is an attempt to learn to like it.
 ## What's with this website's name?
 Let me prefix this with "I'm not going to pretend to be a Lisp expert, but..."
 
-If you're wondering what the name of this website means, there's a good chance you've never used Lisp. A "cons" is a fundamental Lisp data structure. You can think of it as a pair whose first element contains a value and whose second element contains either a pointer to another cons or a pointer to nil.
+If you're wondering what the name of this website means, then there's a good chance you've never used Lisp. A "cons" is a fundamental Lisp data structure. You can think of it as a pair whose first element contains a value and whose second element contains either a pointer to another cons or a pointer to nil.
