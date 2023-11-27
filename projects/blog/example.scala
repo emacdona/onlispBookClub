@@ -8,12 +8,7 @@ def slopeInterceptLine(slope: Float, intercept: Float) = y(slope, _, intercept)
 def y1 = slopeInterceptLine(2,0)
 def y2 = slopeInterceptLine(2,-1)
 
-println(y1(1))
-println(y1(2))
-println(y1(3))
-println(y1(4))
-println()
-println(y2(1))
-println(y2(2))
-println(y2(3))
-println(y2(4))
+val indexes :List[Float] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+println(List(indexes.map(y1), indexes.map(y2)))
+
