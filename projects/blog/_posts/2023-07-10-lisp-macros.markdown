@@ -68,8 +68,9 @@ Lisp!
 
 ## The Example
 
-One of the things that makes macros so powerful is the ability they give you -- in application code -- to extend the language (Lisp) using the language you are extending (again, Lisp). Contrast this with, say, the C language. If you are working with a C compiler which happens to be written in C, you can extend the language (in C) by modifying
-that compiler. However, that is your only option -- you cannot modify the language in the C application code you happen to be writing at the time.
+One of the things that makes Lisp macros so powerful is that they allow you to extend Lisp _in the application code_ you are writing -- using the _same_ language (Lisp). Contrast this with, say, the C language.
+_If_ you are working with a C compiler which happens to be written in C, you _can_ extend the language (C) in C. However, you can _only_ do so by modifying the compiler. You can't do it in the code of
+the applciation you are writing.
 
 As stated above, the example must "Exhibit the topic being studied" -- macros -- "in a non-trivial way". One way of achieving that would be to
 extend the Lisp language using a Lisp macro. 
@@ -92,12 +93,21 @@ def y(m: Float, x: Float, b: Float) = m * x + b
 
 def slopeInterceptLine(slope: Float, intercept: Float) = y(slope, _, intercept)
 
+// function that pairs integral inputs with even integers
 def y1 = slopeInterceptLine(2, 0)
+
+// function that pairs integral inputs with odd integers
 def y2 = slopeInterceptLine(2, -1)
 
 val indexes: List[Float] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
-println(List(indexes.map(y1), indexes.map(y2)))
+println(List(indexes.map(y1), "\n", indexes.map(y2)))
+```
+
+which yields:
+```scala
+List(List(2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0),
+  , List(1.0, 3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0, 17.0, 19.0))
 ```
 
 Let me start by saying that I am surely neither a Lisp nor a Lisp Macro expert. However, if you've never heard about

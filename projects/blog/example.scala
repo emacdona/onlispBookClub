@@ -10,5 +10,5 @@ def y2 = slopeInterceptLine(2,-1)
 
 val indexes :List[Float] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
-println(List(indexes.map(y1), indexes.map(y2)))
+println(List(indexes.map(y1), "\n", indexes.map(y2)))
 
