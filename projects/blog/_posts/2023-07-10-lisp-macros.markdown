@@ -9,14 +9,12 @@ published: false
 
 I have this thing where I meet with a group of like-minded nerds once a week to discuss Lisp topics. Ostensibly the
 group started as a book club, and the goal of that club was to read Paul Graham's
-book ["On Lisp"](http://www.paulgraham.com/onlisp.html).
-We constantly find ourselves drifting from that goal, but we keep working our way back towards it. We just can't help ourselves from
-being distracted by various Lisp related topics.
+book ["On Lisp"](http://www.paulgraham.com/onlisp.html). We constantly find ourselves drifting from that goal, but we
+keep working our way back towards it. We just can't help ourselves from being distracted by various Lisp related topics.
 
-As an aside: lots of great books have been written about Lisp[^books]. To me, at least, it seems that **most** books written
-about Lisp are fantastic. Even if you care nothing about the language (you should),
-it's worth your time to pick up one of the more well known books about Lisp -- so that you have an example of quality
-technical writing to study.
+As an aside: lots of great books have been written about Lisp[^books]. To me, at least, it seems that **most** books
+written about Lisp are fantastic. Even if you care nothing about the language (you should), it's worth your time to pick
+up one of the more well known books about Lisp -- so that you have an example of quality technical writing to study.
 
 But we were talking about one book in particular: _On Lisp_. _On Lisp_ covers a lot of topics, but if one were to ask
 the Lisp community:
@@ -33,11 +31,11 @@ one of those nerds will feel the need to write a blog post about macros. This is
 ## The Problem
 
 I've read a lot of articles and blog posts that try to explain the power of Lisp macros. They talk about transformation
-of syntax, evaluation of arguments, [homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity), etc.
-These topics are all important, of course -- but when I want to learn something, it really helps me to see an example.
+of syntax, evaluation of arguments, [homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity), etc. These topics are
+all important, of course -- but when I want to learn something, it really helps me to see an example.
 
-However, creating examples for the purpose of learning or teaching isn't easy. In my opinion, the perfect learning/teaching
-example:
+However, creating examples for the purpose of learning or teaching isn't easy. In my opinion, the perfect
+learning/teaching example:
 
 * Exhibits the topic being studied in a non-trivial way
 * Has an implementation that's small enough to fit on half a page
@@ -50,27 +48,32 @@ I hope the example I've chosen has met those two constraints.
 
 ## The Example
 
-One of the things that makes Lisp macros so powerful is that they allow you to extend Lisp _in the application code_ you are writing -- using the _same_ language (Lisp). Contrast this with, say, the C language.
-_If_ you are working with a C compiler which happens to be written in C, you _can_ extend the language (C) in C. However, you can _only_ do so by modifying the compiler. You can't do it in the code of
-the applciation you are writing.
+One of the things that makes Lisp macros so powerful is that they allow you to extend Lisp _in the application code_ you
+are writing -- using the _same_ language (Lisp). Contrast this with, say, the C language. _If_ you are working with a C
+compiler which happens to be written in C, you _can_ extend the language (C) in C. However, you can _only_ do so by
+modifying the compiler. You can't do it in the code of the applciation you are writing.
 
-As stated above, the example must "Exhibit the topic being studied" -- macros -- "in a non-trivial way". One way of achieving that would be to
-extend the Lisp language using a Lisp macro. 
+As stated above, the example must "Exhibit the topic being studied" -- macros -- "in a non-trivial way". One way of
+achieving that would be to extend the Lisp language using a Lisp macro.
 
-To that end, I did a little window shopping in other language syntaxes looking for a feature that Lisp lacks. I settled on the syntax in Scala that allows you to
-use the special variable '_' when defining new functions via [partial application](https://en.wikipedia.org/wiki/Partial_application) of existing functions to
-specify which arguments of the existing function you wish to include as arguments of the new function.
+To that end, I did a little window shopping in other language syntaxes looking for a feature that Lisp lacks. I settled
+on the syntax in Scala that allows you to use the special variable '_' when defining new functions
+via [partial application](https://en.wikipedia.org/wiki/Partial_application) of existing functions to specify which
+arguments of the existing function you wish to include as arguments of the new function.
 
-That's a mouthful. Consider the [slope-intercept form of a line](https://en.wikipedia.org/wiki/Linear_equation#Slope%E2%80%93intercept_form):
-\\(y = mx+b\\)
+That's a mouthful. Consider
+the [slope-intercept form of a line](https://en.wikipedia.org/wiki/Linear_equation#Slope%E2%80%93intercept_form): \\(y =
+mx+b\\)
 
-We think of lines as a function of one independent variable, ie: \\(y = f(x)\\) -- however the function above appears to have three independent variables!
-Never fear: mathematicians just call \\(m\\) and \\(b\\) "parameters" [^param] [^paramdef] -- which, once chosen, define the single function (one of _many_) defining
-whatever line it is we happen to care about.
+We think of lines as a function of one independent variable, ie: \\(y = f(x)\\) -- however the function above appears to
+have three independent variables! Never fear: mathematicians just call \\(m\\) and \\(b\\) "
+parameters" [^param] [^paramdef] -- which, once chosen, define the single function (one of _many_) defining whatever
+line it is we happen to care about.
 
 ### Definining functions using partial application in Scala
 
-This process of specifying two "parameters" for a function of three variables -- to obtain a new function of one variable -- is a PERFECT example of partial function application! In Scala, that looks like this:
+This process of specifying two "parameters" for a function of three variables -- to obtain a new function of one
+variable -- is a PERFECT example of partial function application! In Scala, that looks like this:
 
 ```scala
 def y(m: Float, x: Float, b: Float) = m * x + b
@@ -89,20 +92,22 @@ println(List(indexes.map(y1), "\n", indexes.map(y2)))
 ```
 
 which yields:
+
 ```scala
 List(List(2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0),
   , List(1.0, 3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0, 17.0, 19.0))
 ```
 
-Notice how when defining `slopeInterceptLine`, you can pass its formal parameters -- along with a special '_' identifier -- to what looks
-like an invocation of `y`. It is not, of course, an invocation -- this is special Scala syntax that allows you to concisely define
-functions via partial function application. Part of that syntax is the `_` identifier. In this context, it allows you to specify
-a formal parameter of a function which you wish to remain variable when defining a new function via partial application.
+Notice how when defining `slopeInterceptLine`, you can pass its formal parameters -- along with a special '_'
+identifier -- to what looks like an invocation of `y`. It is not, of course, an invocation -- this is special Scala
+syntax that allows you to concisely define functions via partial function application. Part of that syntax is the `_`
+identifier. In this context, it allows you to specify a formal parameter of a function which you wish to remain variable
+when defining a new function via partial application.
 
 ### Adding this feature to Lisp using a macro
 
-I find that when I first set about writing a Lisp macro, it helps to first determine the signature I want the macro to have and then
-determine the code I want it to generate. _I save the actual implementation for last_. So, to that end:
+I find that when I first set about writing a Lisp macro, it helps to first determine the signature I want the macro to
+have and then determine the code I want it to generate. _I save the actual implementation for last_. So, to that end:
 
 ```lisp
 (defun y (m x b)
@@ -118,14 +123,16 @@ determine the code I want it to generate. _I save the actual implementation for 
 ```
 
 So, let's do this in steps. First, we know that our macro will take as arguments:
+
 1. A function whose partial application we wish to use to build a new function
-2. An optional list of arguments. In this list, we expect to be able to use '_' for parameters we wish not to fix in the partial application.
+2. An optional list of arguments. In this list, we expect to be able to use '_' for parameters we wish not to fix in the
+   partial application.
 
 And we've already determined what we'd like it to return.
 
-Now, wouldn't it be nice if we had a variable called 'new-function-arguments' that was a list of all of the formal parameters to our
-new function, and a variable called 'all-function-arguments' that was a list of all arguments used to invoke the function 'f', which we are partially applying?
-For now, let's assume they exist!
+Now, wouldn't it be nice if we had a variable called 'new-function-arguments' that was a list of all of the formal
+parameters to our new function, and a variable called 'all-function-arguments' that was a list of all arguments used to
+invoke the function 'f', which we are partially applying? For now, let's assume they exist!
 
 ```lisp
 (defmacro partial (f &rest args)
@@ -135,9 +142,9 @@ For now, let's assume they exist!
       `(lambda (,@new-function-parameters) (,f ,@all-function-arguments)))
 ```
 
-Okay... so, how do we get the values of those variables? Well... let's assume we have a function called 'process-args' that can,
-given the list of arguments passed to the macro, retrieve them for us. Note that _this_ is the function that will define
-the semantics of the '_' identifier! We've cleverly separated it out from the rest of the macro.
+Okay... so, how do we get the values of those variables? Well... let's assume we have a function called 'process-args'
+that can, given the list of arguments passed to the macro, retrieve them for us. Note that _this_ is the function that
+will define the semantics of the '_' identifier! We've cleverly separated it out from the rest of the macro.
 
 ```lisp
 (defmacro partial (f &rest args)
@@ -149,20 +156,23 @@ the semantics of the '_' identifier! We've cleverly separated it out from the re
       `(lambda (,@new-function-parameters) (,f ,@all-function-arguments))))
 ```
 
-So, what does this function need to do? Well, it needs to iterate over the 'args' passed to the macro. For each symbol in 'args':
+So, what does this function need to do? Well, it needs to iterate over the 'args' passed to the macro. For each symbol
+in 'args':
+
 1. If it _is not_ '_', it adds it to the 'all-function-arguments' list that it builds up.
-2. If it _is_ '_', it replaces it with a new symbol, and adds that symbol to both the 'new-function-parameters' and the 'all-function-arguments' lists that it's building.
+2. If it _is_ '_', it replaces it with a new symbol, and adds that symbol to both the 'new-function-parameters' and
+   the 'all-function-arguments' lists that it's building.
 
-The symbols added to 'all-function-arguments' in step one are those we are holding fixed. The lambda our macro creates passes them
-in to the function we are partially applying. These symbols are expected to have
-meaning in the context in which this macro was expanded. The lambda that the macro results in will capture the bindings for
-these symbols, and -- if returned as the result of a function call -- create a lexical closure for these bindings. Anywhere
-the lambda is used, these symbols will evaluate to the same values captured in the closure. 
+The symbols added to 'all-function-arguments' in step one are those we are holding fixed. The lambda our macro creates
+passes them in to the function we are partially applying. These symbols are expected to have meaning in the context in
+which this macro was expanded. The lambda that the macro results in will capture the bindings for these symbols, and --
+if returned as the result of a function call -- create a lexical closure for these bindings. Anywhere the lambda is
+used, these symbols will evaluate to the same values captured in the closure.
 
-The symbols created in step two are those needed for the formal parameters when we define the lambda -- so they are added to the 'new-function-parameters' list.
-They must also be passed to the function we are partially applying.
+The symbols created in step two are those needed for the formal parameters when we define the lambda -- so they are
+added to the 'new-function-parameters' list. They must also be passed to the function we are partially applying.
 
-Let's have a look. 
+Let's have a look.
 
 ```lisp
 (defmacro partial (f &rest args)
@@ -219,9 +229,21 @@ Which yields:
 
 <!---@formatter:off--->
 [^draft]: As long as "Draft:" is in the title, this post may undergo significant changes.
-[^param]: Not to be confused with the "formal parameters" of a function definition in a programming language -- which I also happily refer to as "parameters" in this very same blog post. I count on context (and the reader's keen intillect) to distinguish between the two uses. These are the dangers of mixing domains (here: math and programming) in the same article.
+
+[^param]: Not to be confused with the "formal parameters" of a function definition in a programming language -- which I
+    also happily refer to as "parameters" in this very same blog post. I count on context (and the reader's keen intillect)
+    to distinguish between the two uses. These are the dangers of mixing domains (here: math and programming) in the same
+    article.
+
 [^paramdef]: Mathematicans would probably notate this as such: \\(y = f_{m,b}(x)\\)
-[^setf]: Why the do we `setf` the `symbol-function` of the symbol we chose as the name of our function -- instead of just using `defun`? Well, in short: because we aren't _defining_ a function -- we aren't specifying its arguments and we aren't providing a set of expressions which make up the function body. Instead, we already _have_ a function (the one returned by `slope-intercept-line`) and we just want to give it a name. As it turns out, Common Lisp is a "Lisp-2". This means that a symbol can be used to name two different types of things (values and functions) -- and which one it evaluates to will depend on context (whether it is the first element of a list currently being evaluated or not).
+
+[^setf]: Why the do we `setf` the `symbol-function` of the symbol we chose as the name of our function -- instead of
+    just using `defun`? Well, in short: because we aren't _defining_ a function -- we aren't specifying its arguments and we
+    aren't providing a set of expressions which make up the function body. Instead, we already _have_ a function (the one
+    returned by `slope-intercept-line`) and we just want to give it a name. As it turns out, Common Lisp is a "Lisp-2". This
+    means that a symbol can be used to name two different types of things (values and functions) -- and which one it
+    evaluates to will depend on context (whether it is the first element of a list currently being evaluated or not).
+
 [^books]: Some available free online:
     * [Practical Common Lisp](https://gigamonkeys.com/book/)
     * [Common Lisp: An Interactive Approach](https://cse.buffalo.edu/~shapiro/Commonlisp/)
