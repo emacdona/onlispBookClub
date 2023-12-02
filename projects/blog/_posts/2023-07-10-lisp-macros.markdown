@@ -235,7 +235,7 @@ Which yields:
     to distinguish between the two uses. These are the dangers of mixing domains (here: math and programming) in the same
     article.
 
-[^paramdef]: Mathematicans would probably notate this as such: \\(y = f_{m,b}(x)\\)
+[^paramdef]: Mathematicans would possibly notate this as such: \\(y = f_{m,b}(x)\\)
 
 [^setf]: Why the do we `setf` the `symbol-function` of the symbol we chose as the name of our function -- instead of
     just using `defun`? Well, in short: because we aren't _defining_ a function -- we aren't specifying its arguments and we
