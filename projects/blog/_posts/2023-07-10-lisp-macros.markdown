@@ -3,7 +3,7 @@ layout: post
 published: false
 ---
 
-# _Draft:_ Yet Another Lisp Macro Blog Post
+# _Draft:_ (Yet Another) Lisp Macro Blog Post
 
 _Note: as long as "Draft:" is in the title, this post may undergo significant changes_
 
@@ -13,17 +13,15 @@ I have this thing where I meet with a group of like-minded nerds once a week and
 group started as a book club, and the goal of that club was to read Paul Graham's
 book ["On Lisp"](http://www.paulgraham.com/onlisp.html).
 We've since strayed a bit from that goal, but we keep working our way back towards it. We just can't help ourselves from
-being distracted
-by various Lisp related topics.
+being distracted by various Lisp related topics.
 
-Lots of great books have been written about Lisp. In fact -- and this is based purely on my gut feeling -- it seems that
-**most** books written about Lisp are
-fantastic. Even if you care nothing about the language (you should), it's worth your time to pick up one of the more
-well known books about Lisp -- so that you have
-an example of quality technical writing to study.
+As an aside: lots of great books have been written about Lisp[^1]. To me, at least, it seems that **most** books written
+about Lisp are fantastic. Even if you care nothing about the language (you should),
+it's worth your time to pick up one of the more well known books about Lisp -- so that you have an example of quality
+technical writing to study.
 
-But we were talking about one book in particular: On Lisp. On Lisp covers a lot of topics, but if one were to ask the
-Lisp community:
+But we were talking about one book in particular: _On Lisp_. _On Lisp_ covers a lot of topics, but if one were to ask
+the Lisp community:
 
 "Which **one** Lisp book should I read if I want to learn how to write Lisp Macros?"
 
@@ -31,16 +29,29 @@ I believe the community would answer:
 
 "On Lisp."
 
-So it should surprise no one that when a group of nerds get together to read **"the"** book about Lisp macros, at least
+So it should surprise no one that when a group of nerds gets together to read **"the"** book about Lisp macros, at least
 one of those nerds will feel the need to write a blog post about macros. This is one such post.
 
-## Background
+## The Problem
 
 I've read a lot of articles and blog posts that try to explain the power of Lisp macros. They talk about transformation
 of syntax, evaluation of arguments, [homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity), etc.
 These topics are all important, of course -- but when I want to learn something, it really helps me to see an example.
-If the example I'm looking for doesn't exist, it helps me even more to create an example!
 
+But creating examples for the purpose of learning or teaching isn't easy. In my opinion, the perfect learning/teaching
+example:
+
+* Exhibits the topic being studied in a non-trivial way
+* Has an implementation that's small enough to fit on half a page
+
+It can be very hard to strike a balance between those constraints. If an example is "too simple", it feels "useless".
+However, any time we move beyond "simple", we're usually assuming knowledge of some other domain from which we are
+pulling
+our example.
+
+I hope the example I've chosen has met those two constraints.
+
+<!---
 So the question becomes: What do we want an example to show? Well, I would propose that the answer to that question is
 the same as this one:
 What makes macros so powerful? What can I do with a macro that I can't with another language?
@@ -53,8 +64,9 @@ you have the full power of the Lisp language at your disposal.
 
 Given that answer, the route I took was this: Find a feature in another language that Lisp doesn't have... and add it to
 Lisp!
+--->
 
-## An Example
+## The Example
 
 For an example, I've found a language feature that I like in another language that lisp doesnt' have... and will add it
 to lisp. To do this, my macro will take as input the syntax that I want, and transform
@@ -145,3 +157,17 @@ out, Common Lisp is a "Lisp-2". This means
 that a symbol can be used to name two different types of things (values and functions) -- and which one it evaluates to
 will depend on context (whether it is the first
 element of a list currently being evaluated or not).
+
+<!---@formatter:off--->
+[^1]: Some available free online:
+    * [Practical Common Lisp](https://gigamonkeys.com/book/)
+    * [Common Lisp: An Interactive Approach](https://cse.buffalo.edu/~shapiro/Commonlisp/)
+    * [Common Lisp: A Gentle Introduction to Symbolic Computation](https://www.cs.cmu.edu/~dst/LispBook/)
+    * [On Lisp](http://www.paulgraham.com/onlisp.html)
+    * [Paradigms of Artificial Intelligence Programming](https://github.com/norvig/paip-lisp)
+
+    Others available for purchase:
+    * [Common Lisp Recipes](http://weitz.de/cl-recipes/)
+    * [ANSI Common Lisp](http://www.paulgraham.com/acl.html)
+    * [Lisp in Small Pieces](https://www.cambridge.org/core/books/lisp-in-small-pieces/66FD2BE3EDDDC68CA87D652C82CF849E)
+<!---@formatter:on--->
