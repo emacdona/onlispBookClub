@@ -12,7 +12,7 @@ _Note: as long as "Draft:" is in the title, this post may undergo significant ch
 I have this thing where I meet with a group of like-minded nerds once a week and discuss Lisp topics. Ostensibly, the
 group started as a book club, and the goal of that club was to read Paul Graham's
 book ["On Lisp"](http://www.paulgraham.com/onlisp.html).
-We've since strayed a bit from that goal, but we keep working our way back towards it. We just can't help ourselves from
+We constantly find ourselves drifting from that goal, but we keep working our way back towards it. We just can't help ourselves from
 being distracted by various Lisp related topics.
 
 As an aside: lots of great books have been written about Lisp[^1]. To me, at least, it seems that **most** books written
@@ -51,21 +51,6 @@ our example.
 
 I hope the example I've chosen has met those two constraints.
 
-<!---
-So the question becomes: What do we want an example to show? Well, I would propose that the answer to that question is
-the same as this one:
-What makes macros so powerful? What can I do with a macro that I can't with another language?
-
-Lisp macros give you (the programmer) power traditionally reserved for the language compiler and language interpreter
-authors. They do this
-by providing you (the programmer) a way to transform syntax during the Lisp evaluation process. When writing code (a
-macro) to transform syntax,
-you have the full power of the Lisp language at your disposal.
-
-Given that answer, the route I took was this: Find a feature in another language that Lisp doesn't have... and add it to
-Lisp!
---->
-
 ## The Example
 
 One of the things that makes Lisp macros so powerful is that they allow you to extend Lisp _in the application code_ you are writing -- using the _same_ language (Lisp). Contrast this with, say, the C language.
@@ -80,10 +65,10 @@ use the special variable `_` when defining new functions via [partial applicatio
 specify which arguments of the existing function you wish to include as arguments of the new function.
 
 That's a mouthful. Consider the [slope-intercept form of a line](https://en.wikipedia.org/wiki/Linear_equation#Slope%E2%80%93intercept_form):
-`y = mx+b`
+\\(y = mx+b\\)
 
-We think of lines as a function of one independent variable, ie: `y = f(x)` -- however the function above appears to have three independent variables!
-Never fear: mathematicians just call `m` and `b` "parameters" -- which, once chosen, define the single function (of the _many_ functions that describe lines) defining
+We think of lines as a function of one independent variable, ie: \\(y = f(x)\\) -- however the function above appears to have three independent variables!
+Never fear: mathematicians just call \\(m\\) and \\(b\\) "parameters" -- which, once chosen, define the single function (one of the _many_ functions that describe lines) defining
 whatever line it is we happen to care about.
 
 But, that process of specifying two "parameters" for a function of three variables -- to obtain a new function of one variable is a PERFECT example of partial function application! In Scala, that looks like this:
@@ -115,29 +100,25 @@ like an invocation of `y`. It is not, of course, an invocation -- this is specia
 functions via partial function application. Part of that syntax is the `_` identifier. In this context, it allows you to specify
 a formal parameter of a function which you wish to remain variable when defining a new function via partial application.
 
-Let me start by saying that I am surely neither a Lisp nor a Lisp Macro expert. However, if you've never heard about
-Lisp macros, there is a decent chance I may know more than you about them. Which puts me in the position
-many first time macro studiers find themselves in: I want to tell someone who knows less about macros that I do all
-about macros!
+I find that when I first set about writing a Lisp macro, it helps to first determine the signature I want the macro to have and then
+determine the code I want it to generate. _I save the actual implementation for last_. So, to that end:
 
-The funny part about finding yourself in this position is that once there, you **immediately** find yourself in the
-position of answering the question:
+```lisp
+(defun y (m x b)
+  (+ (* m x) b))
 
-"What can I do with macros that I can't already do in my programming language of choice?"
+(defun slope-intercept-line (slope intercept)
 
-You'll hear various answers to this question, such as:
-projects/blog-terraform/terraform.tfstate
-"Well, Lisp and your favorite programming language are both Turing complete, the answer is: there is nothing your
-language can't do that Lisp can do." -- which, while technically correct is pretty unsatisfying. Turing completeness
-doesn't measure expressiveness.
+  ;; mypartial is the macro we will write
+  ;; we would like it to generate code something like the following:
+  ;; (lambda (x) (Y SLOPE x INTERCEPT))
+  
+  (mypartial y slope _ intercept))
+```
 
-or
 
-"Well, you can create expressions that look like function calls but give you complete control over 'when', 'if', and '
-how often' their arguments are evaluated." This is a great answer, the problem is it's not very constructive.
 
-Personally, I prefer to learn things by looking at simple, but non-trivial examples.
-
+<!---
 ```lisp
 (defmacro mypartial (f &rest args)
   (labels ((process-args (args)
@@ -181,6 +162,7 @@ out, Common Lisp is a "Lisp-2". This means
 that a symbol can be used to name two different types of things (values and functions) -- and which one it evaluates to
 will depend on context (whether it is the first
 element of a list currently being evaluated or not).
+--->
 
 <!---@formatter:off--->
 [^1]: Some available free online:
