@@ -231,7 +231,7 @@ Which yields:
 [^draft]: As long as "Draft:" is in the title, this post may undergo significant changes.
 
 [^param]: Not to be confused with the "formal parameters" of a function definition in a programming language -- which I
-    also happily refer to as "parameters" in this very same blog post. I count on context (and the reader's keen intillect)
+    also happily refer to as "parameters" in this very same blog post. I count on context (and the reader's keen intellect)
     to distinguish between the two uses. These are the dangers of mixing domains (here: math and programming) in the same
     article.
 
