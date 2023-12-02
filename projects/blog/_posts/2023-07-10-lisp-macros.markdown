@@ -66,7 +66,7 @@ That's a mouthful. Consider the [slope-intercept form of a line](https://en.wiki
 \\(y = mx+b\\)
 
 We think of lines as a function of one independent variable, ie: \\(y = f(x)\\) -- however the function above appears to have three independent variables!
-Never fear: mathematicians just call \\(m\\) and \\(b\\) "parameters" -- which, once chosen, define the single function (one of the _many_ functions that describe lines) defining
+Never fear: mathematicians just call \\(m\\) and \\(b\\) "parameters" [^param] [^paramdef] -- which, once chosen, define the single function (one of _many_) defining
 whatever line it is we happen to care about.
 
 But, that process of specifying two "parameters" for a function of three variables -- to obtain a new function of one variable is a PERFECT example of partial function application! In Scala, that looks like this:
@@ -114,7 +114,7 @@ determine the code I want it to generate. _I save the actual implementation for 
   (mypartial y slope _ intercept))
 ```
 
-So, let's do this in steps. First, we know that our macro will take, as arguments:
+So, let's do this in steps. First, we know that our macro will take as arguments:
 1. A function whose partial application we wish to use to build a new function
 2. An optional list of arguments. In this list, we expect to be able to use '_' for parameters we wish not to fix in the partial application.
 
@@ -195,6 +195,8 @@ element of a list currently being evaluated or not).
 
 <!---@formatter:off--->
 [^draft]: As long as "Draft:" is in the title, this post may undergo significant changes.
+[^param]: Not to be confused with the "formal parameters" of a function definition in a programming language -- which I also happily refer to as "parameters" in this very same blog post. I count on context (and the reader's keen intillect) to distinguish between the two uses. These are the dangers of mixing domains (here: math and programming) in the same article.
+[^paramdef]: Mathematicans would probably notate this as such: \\(y = f_{m,b}(x)\\)
 [^books]: Some available free online:
     * [Practical Common Lisp](https://gigamonkeys.com/book/)
     * [Common Lisp: An Interactive Approach](https://cse.buffalo.edu/~shapiro/Commonlisp/)
