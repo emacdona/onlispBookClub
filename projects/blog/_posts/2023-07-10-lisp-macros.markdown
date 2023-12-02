@@ -110,6 +110,11 @@ List(List(2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0),
   , List(1.0, 3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0, 17.0, 19.0))
 ```
 
+Notice how when defining `slopeInterceptLine`, you can pass its formal parameters -- along with a special `_` identifier -- to what looks
+like an invocation of `y`. It is not, of course, an invocation -- this is special Scala syntax that allows you to concisely define
+functions via partial function application. Part of that syntax is the `_` identifier. In this context, it allows you to specify
+a formal parameter of a function which you wish to remain variable when defining a new function via partial application.
+
 Let me start by saying that I am surely neither a Lisp nor a Lisp Macro expert. However, if you've never heard about
 Lisp macros, there is a decent chance I may know more than you about them. Which puts me in the position
 many first time macro studiers find themselves in: I want to tell someone who knows less about macros that I do all
