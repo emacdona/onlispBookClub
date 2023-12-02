@@ -240,9 +240,7 @@ Which yields:
 [^setf]: Why the do we `setf` the `symbol-function` of the symbol we chose as the name of our function -- instead of
     just using `defun`? Well, in short: because we aren't _defining_ a function -- we aren't specifying its arguments and we
     aren't providing a set of expressions which make up the function body. Instead, we already _have_ a function (the one
-    returned by `slope-intercept-line`) and we just want to give it a name. As it turns out, Common Lisp is a "Lisp-2". This
-    means that a symbol can be used to name two different types of things (values and functions) -- and which one it
-    evaluates to will depend on context (whether it is the first element of a list currently being evaluated or not).
+    returned by `slope-intercept-line`) and we just want to give it a name.
 
 [^books]: Some available free online:
     * [Practical Common Lisp](https://gigamonkeys.com/book/)
