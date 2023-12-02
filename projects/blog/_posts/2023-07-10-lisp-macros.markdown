@@ -7,7 +7,7 @@ published: false
 
 ## The Inspiration
 
-I have this thing where I meet with a group of like-minded nerds once a week and discuss Lisp topics. Ostensibly, the
+I have this thing where I meet with a group of like-minded nerds once a week to discuss Lisp topics. Ostensibly the
 group started as a book club, and the goal of that club was to read Paul Graham's
 book ["On Lisp"](http://www.paulgraham.com/onlisp.html).
 We constantly find ourselves drifting from that goal, but we keep working our way back towards it. We just can't help ourselves from
@@ -36,7 +36,7 @@ I've read a lot of articles and blog posts that try to explain the power of Lisp
 of syntax, evaluation of arguments, [homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity), etc.
 These topics are all important, of course -- but when I want to learn something, it really helps me to see an example.
 
-But creating examples for the purpose of learning or teaching isn't easy. In my opinion, the perfect learning/teaching
+However, creating examples for the purpose of learning or teaching isn't easy. In my opinion, the perfect learning/teaching
 example:
 
 * Exhibits the topic being studied in a non-trivial way
@@ -44,8 +44,7 @@ example:
 
 It can be very hard to strike a balance between those constraints. If an example is "too simple", it feels "useless".
 However, any time we move beyond "simple", we're usually assuming knowledge of some other domain from which we are
-pulling
-our example.
+pulling our example.
 
 I hope the example I've chosen has met those two constraints.
 
@@ -69,7 +68,9 @@ We think of lines as a function of one independent variable, ie: \\(y = f(x)\\) 
 Never fear: mathematicians just call \\(m\\) and \\(b\\) "parameters" [^param] [^paramdef] -- which, once chosen, define the single function (one of _many_) defining
 whatever line it is we happen to care about.
 
-But, that process of specifying two "parameters" for a function of three variables -- to obtain a new function of one variable is a PERFECT example of partial function application! In Scala, that looks like this:
+### Definining functions using partial application in Scala
+
+This process of specifying two "parameters" for a function of three variables -- to obtain a new function of one variable -- is a PERFECT example of partial function application! In Scala, that looks like this:
 
 ```scala
 def y(m: Float, x: Float, b: Float) = m * x + b
@@ -98,6 +99,8 @@ like an invocation of `y`. It is not, of course, an invocation -- this is specia
 functions via partial function application. Part of that syntax is the `_` identifier. In this context, it allows you to specify
 a formal parameter of a function which you wish to remain variable when defining a new function via partial application.
 
+### Adding this feature to Lisp using a macro
+
 I find that when I first set about writing a Lisp macro, it helps to first determine the signature I want the macro to have and then
 determine the code I want it to generate. _I save the actual implementation for last_. So, to that end:
 
@@ -107,11 +110,11 @@ determine the code I want it to generate. _I save the actual implementation for 
 
 (defun slope-intercept-line (slope intercept)
 
-  ;; mypartial is the macro we will write
+  ;; partial is the macro we will write
   ;; we would like it to generate code something like the following:
   ;; (lambda (x) (Y slope x intercept))
   
-  (mypartial y slope _ intercept))
+  (partial y slope _ intercept))
 ```
 
 So, let's do this in steps. First, we know that our macro will take as arguments:
@@ -125,7 +128,7 @@ new function, and a variable called 'all-function-arguments' that was a list of 
 For now, let's assume they exist!
 
 ```lisp
-(defmacro mypartial (f &rest args)
+(defmacro partial (f &rest args)
 ;;
 ;; missing code here
 ;;
@@ -137,7 +140,7 @@ given the list of arguments passed to the macro, retrieve them for us. Note that
 the semantics of the '_' identifier! We've cleverly separated it out from the rest of the macro.
 
 ```lisp
-(defmacro mypartial (f &rest args)
+(defmacro partial (f &rest args)
 ;;
 ;; missing code here
 ;;
@@ -146,10 +149,20 @@ the semantics of the '_' identifier! We've cleverly separated it out from the re
       `(lambda (,@new-function-parameters) (,f ,@all-function-arguments))))
 ```
 
+So, what does this function need to do? Well, it needs to iterate over the 'args' passed to the macro. For each symbol in 'args':
+1. If it _is not_ '_', it adds it to the 'all-function-arguments' list that it builds up.
+2. If it _is_ '_', it replaces it with a new symbol, and adds that symbol to both the 'new-function-parameters' and the 'all-function-arguments' lists that it's building.
 
-<!---
+The symbols added to 'all-function-arguments' in step one are those we are holding fixed. These symbols are expected to have
+meaning in the context in which this macro was expanded. The lambda that the macro results in will capture the bindings for
+these symbols, and -- if returned as the result of a function call -- create a lexical closure for these bindings. Anywhere
+the lambda is used, these symbols will evaluate to the same values captured in the closure. 
+
+The symbols created in step two are those needed for the formal parameters when we define the lambda -- so they are added to the 'new-function-parameters' list.
+They must also be placed into the
+
 ```lisp
-(defmacro mypartial (f &rest args)
+(defmacro partial (f &rest args)
   (labels ((process-args (args)
              (if args
                  (let ((first (car args))
@@ -166,12 +179,14 @@ the semantics of the '_' identifier! We've cleverly separated it out from the re
     (multiple-value-bind (new-function-parameters all-function-arguments)
         (process-args args)
       `(lambda (,@new-function-parameters) (,f ,@all-function-arguments)))))
-
+```
+<!---
+```
 (defun y (m x b)
   (+ (* m x) b))
 
 (defun slope-intercept-line (slope intercept)
-  (mypartial y slope _ intercept))
+  (partial y slope _ intercept))
 
 (setf (symbol-function 'y1) (slope-intercept-line 2 0))
 (setf (symbol-function 'y2) (slope-intercept-line 2 -1))
