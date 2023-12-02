@@ -153,35 +153,49 @@ So, what does this function need to do? Well, it needs to iterate over the 'args
 1. If it _is not_ '_', it adds it to the 'all-function-arguments' list that it builds up.
 2. If it _is_ '_', it replaces it with a new symbol, and adds that symbol to both the 'new-function-parameters' and the 'all-function-arguments' lists that it's building.
 
-The symbols added to 'all-function-arguments' in step one are those we are holding fixed. These symbols are expected to have
+The symbols added to 'all-function-arguments' in step one are those we are holding fixed. The lambda our macro creates passes them
+in to the function we are partially applying. These symbols are expected to have
 meaning in the context in which this macro was expanded. The lambda that the macro results in will capture the bindings for
 these symbols, and -- if returned as the result of a function call -- create a lexical closure for these bindings. Anywhere
 the lambda is used, these symbols will evaluate to the same values captured in the closure. 
 
 The symbols created in step two are those needed for the formal parameters when we define the lambda -- so they are added to the 'new-function-parameters' list.
-They must also be placed into the
+They must also be passed to the function we are partially applying.
+
+Let's have a look. 
 
 ```lisp
 (defmacro partial (f &rest args)
   (labels ((process-args (args)
              (if args
+                 ;; if args isn't empty
+                       ;; Store the first element of 'args' in a variable
                  (let ((first (car args))
+                       ;; Generate a new symbol, and store it in a variable. We'll use this later, *if* 'first' is '_'
                        (parameter (gensym)))
                    (multiple-value-bind
                          (rest-parameters rest-arguments)
+                       ;; Recur over the remaining args. Note that we expect this function to return two values
                        (process-args (cdr args))
                      (if (eq first '_)
+                         ;; If the first arg is '_', then cons the new symbol we created onto the front of both lists
                          (values (cons parameter rest-parameters)
                                  (cons parameter rest-arguments))
+                         ;; If the first arg is not '_', then cons it only onto the list of arguments our lambda will
+                         ;; pass to the function we are partially applying. Do not add it to the list of formal parameters 
+                         ;; for the lambda we are creating.
                          (values rest-parameters
                                  (cons first rest-arguments)))))
+                 ;; else, just return empty args
                  args)))
     (multiple-value-bind (new-function-parameters all-function-arguments)
         (process-args args)
       `(lambda (,@new-function-parameters) (,f ,@all-function-arguments)))))
 ```
-<!---
-```
+
+Once that macro is defined, we can write the following code[^setf]:
+
+```lisp
 (defun y (m x b)
   (+ (* m x) b))
 
@@ -191,27 +205,23 @@ They must also be placed into the
 (setf (symbol-function 'y1) (slope-intercept-line 2 0))
 (setf (symbol-function 'y2) (slope-intercept-line 2 -1))
 
-(let ((indexes '(1 2 3 4 5 6 7 8)))
+(let ((indexes '(1 2 3 4 5 6 7 8 9 10)))
   (list
    (mapcar #'y1 indexes)
    (mapcar #'y2 indexes)))
 ```
 
-Why the do we `setf` the `symbol-function` of the symbol we chose as the name of our function -- instead of just
-using `defun`? Well, in short: because we
-aren't _defining_ a function -- we aren't specifying its arguments and we aren't providing a set of expressions which
-make up the function body. Instead, we
-already _have_ a function (the one returned by `slope-intercept-line`) and we just want to give it a name. As it turns
-out, Common Lisp is a "Lisp-2". This means
-that a symbol can be used to name two different types of things (values and functions) -- and which one it evaluates to
-will depend on context (whether it is the first
-element of a list currently being evaluated or not).
---->
+Which yields:
+
+```lisp
+((2 4 6 8 10 12 14 16 18 20) (1 3 5 7 9 11 13 15 17 19))
+```
 
 <!---@formatter:off--->
 [^draft]: As long as "Draft:" is in the title, this post may undergo significant changes.
 [^param]: Not to be confused with the "formal parameters" of a function definition in a programming language -- which I also happily refer to as "parameters" in this very same blog post. I count on context (and the reader's keen intillect) to distinguish between the two uses. These are the dangers of mixing domains (here: math and programming) in the same article.
 [^paramdef]: Mathematicans would probably notate this as such: \\(y = f_{m,b}(x)\\)
+[^setf]: Why the do we `setf` the `symbol-function` of the symbol we chose as the name of our function -- instead of just using `defun`? Well, in short: because we aren't _defining_ a function -- we aren't specifying its arguments and we aren't providing a set of expressions which make up the function body. Instead, we already _have_ a function (the one returned by `slope-intercept-line`) and we just want to give it a name. As it turns out, Common Lisp is a "Lisp-2". This means that a symbol can be used to name two different types of things (values and functions) -- and which one it evaluates to will depend on context (whether it is the first element of a list currently being evaluated or not).
 [^books]: Some available free online:
     * [Practical Common Lisp](https://gigamonkeys.com/book/)
     * [Common Lisp: An Interactive Approach](https://cse.buffalo.edu/~shapiro/Commonlisp/)
