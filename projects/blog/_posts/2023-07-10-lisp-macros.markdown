@@ -68,15 +68,24 @@ Lisp!
 
 ## The Example
 
-For an example, I've found a language feature that I like in another language that lisp doesnt' have... and will add it
-to lisp. To do this, my macro will take as input the syntax that I want, and transform
-it to syntax that my Lisp implementation understands. This new syntax will have exactly the same semantics I desire for
-my added syntax.
+One of the things that makes macros so powerful is the ability they give you -- in application code -- to extend the language (Lisp) using the language you are extending (again, Lisp). Contrast this with, say, the C language. If you are working with a C compiler which happens to be written in C, you can extend the language (in C) by modifying
+that compiler. However, that is your only option -- you cannot modify the language in the C application code you happen to be writing at the time.
 
-Scala has a special variable, `_`, that takes on a variety of meanings -- each depending on context. In the context of
-defining new funcitons based on [partial application](https://en.wikipedia.org/wiki/Partial_application) of existing
-functions, it allows you to specify
-which function parameters you wish to remain variable in your new function definition.
+As stated above, the example must "Exhibit the topic being studied" -- macros -- "in a non-trivial way". One way of achieving that would be to
+extend the Lisp language using a Lisp macro. 
+
+To that end, I did a little window shopping in other language syntaxes looking for a feature that Lisp lacks. I settled on the syntax in Scala that allows you to
+use the special variable `_` when defining new functions via [partial application](https://en.wikipedia.org/wiki/Partial_application) of existing functions to
+specify which arguments of the existing function you wish to include as arguments of the new function.
+
+That's a mouthful. Consider the [slope-intercept form of a line](https://en.wikipedia.org/wiki/Linear_equation#Slope%E2%80%93intercept_form):
+`y = mx+b`
+
+We think of lines as a function of one independent variable, ie: `y = f(x)` -- however the function above appears to have three independent variables!
+Never fear: mathematicians just call `m` and `b` "parameters" -- which, once chosen, define the single function (of the _many_ functions that describe lines) defining
+whatever line it is we happen to care about.
+
+But, that process of specifying two "parameters" for a function of three variables -- to obtain a new function of one variable is a PERFECT example of partial function application! In Scala, that looks like this:
 
 ```scala
 def y(m: Float, x: Float, b: Float) = m * x + b
