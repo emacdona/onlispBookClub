@@ -3,9 +3,7 @@ layout: post
 published: false
 ---
 
-# _Draft:_ (Yet Another) Lisp Macro Blog Post
-
-_Note: as long as "Draft:" is in the title, this post may undergo significant changes_
+# Draft:[^draft] (Yet Another) Lisp Macro Blog Post
 
 ## The Inspiration
 
@@ -15,7 +13,7 @@ book ["On Lisp"](http://www.paulgraham.com/onlisp.html).
 We constantly find ourselves drifting from that goal, but we keep working our way back towards it. We just can't help ourselves from
 being distracted by various Lisp related topics.
 
-As an aside: lots of great books have been written about Lisp[^1]. To me, at least, it seems that **most** books written
+As an aside: lots of great books have been written about Lisp[^books]. To me, at least, it seems that **most** books written
 about Lisp are fantastic. Even if you care nothing about the language (you should),
 it's worth your time to pick up one of the more well known books about Lisp -- so that you have an example of quality
 technical writing to study.
@@ -61,7 +59,7 @@ As stated above, the example must "Exhibit the topic being studied" -- macros --
 extend the Lisp language using a Lisp macro. 
 
 To that end, I did a little window shopping in other language syntaxes looking for a feature that Lisp lacks. I settled on the syntax in Scala that allows you to
-use the special variable `_` when defining new functions via [partial application](https://en.wikipedia.org/wiki/Partial_application) of existing functions to
+use the special variable '_' when defining new functions via [partial application](https://en.wikipedia.org/wiki/Partial_application) of existing functions to
 specify which arguments of the existing function you wish to include as arguments of the new function.
 
 That's a mouthful. Consider the [slope-intercept form of a line](https://en.wikipedia.org/wiki/Linear_equation#Slope%E2%80%93intercept_form):
@@ -95,7 +93,7 @@ List(List(2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0),
   , List(1.0, 3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0, 17.0, 19.0))
 ```
 
-Notice how when defining `slopeInterceptLine`, you can pass its formal parameters -- along with a special `_` identifier -- to what looks
+Notice how when defining `slopeInterceptLine`, you can pass its formal parameters -- along with a special '_' identifier -- to what looks
 like an invocation of `y`. It is not, of course, an invocation -- this is special Scala syntax that allows you to concisely define
 functions via partial function application. Part of that syntax is the `_` identifier. In this context, it allows you to specify
 a formal parameter of a function which you wish to remain variable when defining a new function via partial application.
@@ -111,11 +109,42 @@ determine the code I want it to generate. _I save the actual implementation for 
 
   ;; mypartial is the macro we will write
   ;; we would like it to generate code something like the following:
-  ;; (lambda (x) (Y SLOPE x INTERCEPT))
+  ;; (lambda (x) (Y slope x intercept))
   
   (mypartial y slope _ intercept))
 ```
 
+So, let's do this in steps. First, we know that our macro will take, as arguments:
+1. A function whose partial application we wish to use to build a new function
+2. An optional list of arguments. In this list, we expect to be able to use '_' for parameters we wish not to fix in the partial application.
+
+And we've already determined what we'd like it to return.
+
+Now, wouldn't it be nice if we had a variable called 'new-function-arguments' that was a list of all of the formal parameters to our
+new function, and a variable called 'all-function-arguments' that was a list of all arguments used to invoke the function 'f', which we are partially applying?
+For now, let's assume they exist!
+
+```lisp
+(defmacro mypartial (f &rest args)
+;;
+;; missing code here
+;;
+      `(lambda (,@new-function-parameters) (,f ,@all-function-arguments)))
+```
+
+Okay... so, how do we get the values of those variables? Well... let's assume we have a function called 'process-args' that can,
+given the list of arguments passed to the macro, retrieve them for us. Note that _this_ is the function that will define
+the semantics of the '_' identifier! We've cleverly separated it out from the rest of the macro.
+
+```lisp
+(defmacro mypartial (f &rest args)
+;;
+;; missing code here
+;;
+    (multiple-value-bind (new-function-parameters all-function-arguments)
+        (process-args args)
+      `(lambda (,@new-function-parameters) (,f ,@all-function-arguments))))
+```
 
 
 <!---
@@ -165,7 +194,8 @@ element of a list currently being evaluated or not).
 --->
 
 <!---@formatter:off--->
-[^1]: Some available free online:
+[^draft]: As long as "Draft:" is in the title, this post may undergo significant changes.
+[^books]: Some available free online:
     * [Practical Common Lisp](https://gigamonkeys.com/book/)
     * [Common Lisp: An Interactive Approach](https://cse.buffalo.edu/~shapiro/Commonlisp/)
     * [Common Lisp: A Gentle Introduction to Symbolic Computation](https://www.cs.cmu.edu/~dst/LispBook/)
