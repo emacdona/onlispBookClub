@@ -4,6 +4,7 @@
 $alternate-bg: rgba(98, 175, 192, 1)
 $content-bg: rgba(252, 225, 197, 1)
 $selected-blog-bg: rgba(232, 205, 177, 1)
+$callout-bg: rgba(232, 205, 177, 1)
 $border-bg: rgba(0, 0, 0, 1)
 
 html
@@ -31,6 +32,9 @@ ol ol, ul ol
   list-style-type: lower-latin
   list-style-position: inside
   margin-left: 15px
+
+li
+  padding-left: 1em
 
 sup
   vertical-align: super
@@ -145,3 +149,22 @@ sup
   margin-top: 5em
   border-top: 1px solid black
   font-size: small
+
+.callout::before
+  content: "ⓘ"
+  font-size: 30px
+  position: absolute
+  top: 0px
+  left: 5px
+.callout
+  position: relative
+  border-top: 1px solid black
+  border-bottom: 1px solid black
+  padding-top: 1em
+  padding-bottom: 1em
+  padding-left: 50px
+  padding-right: 15px
+  margin-left: 2em
+  background-color: $callout-bg
+  margin-right: -20px
+  font-size: 80%

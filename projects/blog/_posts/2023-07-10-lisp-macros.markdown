@@ -5,19 +5,20 @@ published: false
 
 # Draft:[^draft] (Yet Another) Lisp Macro Blog Post
 
-## The Inspiration
+## The inspiration for this post
 
-I have this thing where I meet with a group of like-minded nerds once a week to discuss Lisp topics. Ostensibly the
-group started as a book club, and the goal of that club was to read Paul Graham's
-book ["On Lisp"](http://www.paulgraham.com/onlisp.html). We constantly find ourselves drifting from that goal, but we
-keep working our way back towards it. We just can't help ourselves from being distracted by various Lisp related topics.
+Once a week, I meet with a group of like-minded nerds to discuss Lisp topics. This group started as a book club, and our
+original goal was to read Paul Graham's book "[On Lisp](http://www.paulgraham.com/onlisp.html)". Although we constantly
+find
+ourselves drifting from that goal, we keep working our way back toward it. We just can't help ourselves from being
+distracted by various Lisp related topics.
 
-As an aside: lots of great books have been written about Lisp[^books]. To me, at least, it seems that **most** books
+{:.callout}
+Lots of great books have been written about Lisp[^books]. To me, at least, it seems that **most** books
 written about Lisp are fantastic. Even if you care nothing about the language (you should), it's worth your time to pick
 up one of the more well known books about Lisp -- so that you have an example of quality technical writing to study.
 
-But we were talking about one book in particular: _On Lisp_. _On Lisp_ covers a lot of topics, but if one were to ask
-the Lisp community:
+_On Lisp_ covers a lot of topics, but if one were to ask the Lisp community:
 
 "Which **one** Lisp book should I read if I want to learn how to write Lisp Macros?"
 
@@ -28,81 +29,101 @@ I believe the community would answer:
 So it should surprise no one that when a group of nerds gets together to read **"the"** book about Lisp macros, at least
 one of those nerds will feel the need to write a blog post about macros. This is one such post.
 
-## The Problem
+## Searching for an example
 
 I've read a lot of articles and blog posts that try to explain the power of Lisp macros. They talk about transformation
 of syntax, evaluation of arguments, [homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity), etc. These topics are
 all important, of course -- but when I want to learn something, it really helps me to see an example.
 
-However, creating examples for the purpose of learning or teaching isn't easy. In my opinion, the perfect
-learning/teaching example:
+Coming up with a good example isn't easy, however. In my opinion, the perfect example should:
 
-* Exhibits the topic being studied in a non-trivial way
-* Has an implementation that's small enough to fit on half a page
+* Exhibit the topic being studied in a non-trivial way
+* Have an implementation that's small enough to fit on half a page
 
-It can be very hard to strike a balance between those constraints. If an example is "too simple", it feels "useless".
-However, any time we move beyond "simple", we're usually assuming knowledge of some other domain from which we are
-pulling our example.
+I'll admit that I don't have a rigorous definition for "non-trivial". The best I can do is give some examples of what
+I don't like about examples I consider to be "trivial":
 
-I hope the example I've chosen has met those two constraints.
+* On their own, they don't convince me that the topic under study has any useful applications.
+* They show me something that already seemed obvious.
 
-## The Example
+What follows is my attempt at a "non-trivial" example whose implementation fits on half a page.
 
-One of the things that makes Lisp macros so powerful is that they allow you to extend Lisp _in the application code_ you
-are writing -- using the _same_ language (Lisp). Contrast this with, say, the C language. _If_ you are working with a C
-compiler which happens to be written in C, you _can_ extend the language (C) in C. However, you can _only_ do so by
-modifying the compiler. You can't do it in the code of the applciation you are writing.
+## A non-trivial example
 
-As stated above, the example must "Exhibit the topic being studied" -- macros -- "in a non-trivial way". One way of
-achieving that would be to extend the Lisp language using a Lisp macro.
+One of the things that makes Lisp macros so powerful is that they grant application developers the ability to extend the
+language
+(Lisp). Contrast this with, say, C. Only compiler developers (not application developers) have the ability to extend C.
 
-To that end, I did a little window shopping in other language syntaxes looking for a feature that Lisp lacks. I settled
-on the syntax in Scala that allows you to use the special variable '_' when defining new functions
-via [partial application](https://en.wikipedia.org/wiki/Partial_application) of existing functions to specify which
-arguments of the existing function you wish to include as arguments of the new function.
+This suggests a possible avenue to explore when searching for a non-trivial example: find a feature in another language
+and add it to Lisp!
 
-That's a mouthful. Consider
-the [slope-intercept form of a line](https://en.wikipedia.org/wiki/Linear_equation#Slope%E2%80%93intercept_form): \\(y =
-mx+b\\)
+To that end, I went shopping for language features that Lisp lacks. I settled on the syntax in Scala that allows you to
+use the identifier '_' when defining new functions
+via [partial application](https://en.wikipedia.org/wiki/Partial_application). This syntax allows you to specify which
+arguments of a given function you wish to remain as formal parameters of the new function you are defining. We'll get
+to an example in Scala in a minute, but first...
+
+### Slope-intercept form of a line
+
+Consider
+the [slope-intercept form of a line](https://en.wikipedia.org/wiki/Linear_equation#Slope%E2%80%93intercept_form):
+\\(y = mx+b\\)
 
 We think of lines as a function of one independent variable, ie: \\(y = f(x)\\) -- however the function above appears to
-have three independent variables! Never fear: mathematicians just call \\(m\\) and \\(b\\) "
-parameters" [^param] [^paramdef] -- which, once chosen, define the single function (one of _many_) defining whatever
-line it is we happen to care about.
+have three independent variables: \\(m, x, b\\)!
+
+So, what gives? Well, mathematicians just call \\(m\\) and \\(b\\) "parameters" [^param] [^paramdef] -- which, once chosen, define the single
+function (one of _many_) defining whatever line it is we happen to care about.
+
+We're programmers, not mathematicians, however -- and to a programmer, that answer may seem unsatisfying...
 
 ### Definining functions using partial application in Scala
 
-This process of specifying two "parameters" for a function of three variables -- to obtain a new function of one
+This mathematicians' process of specifying two "parameters" for a function of three variables -- to obtain a new function of one
 variable -- is a PERFECT example of partial function application! In Scala, that looks like this:
 
 ```scala
 def y(m: Float, x: Float, b: Float) = m * x + b
 
+// Here, we are creating a function, 'slopeInterceptLine', that in turn 
+// allows us to create new functions of a single variable by:
+// 1) Fixing two of the parameters ('slope' and 'intercept') of the 
+//    function 'y'.
+// 2) Making the remaining parameter, 'x', a parameter of the new 
+//    function being created.
+// Note how we use '_' to specify the parameter(s) we wish to be 
+// parameters in the new function being created.
 def slopeInterceptLine(slope: Float, intercept: Float) = y(slope, _, intercept)
 
-// function that pairs integral inputs with even integers
+// Use 'slopeInterceptLine' to create a new function of a single variable.
+// In this case, a function that pairs integral inputs with even integers
 def y1 = slopeInterceptLine(2, 0)
 
-// function that pairs integral inputs with odd integers
+// Use 'slopeInterceptLine' to create a new function of a single variable.
+// In this case, a function that pairs integral inputs with odd integers
 def y2 = slopeInterceptLine(2, -1)
+```
 
+Notice how, when defining 'slopeInterceptLine', you can pass its formal parameters -- along with a special '`_`'
+identifier -- to what looks like an invocation of 'y'. It is not, of course, an invocation -- this is special Scala
+syntax that allows you to concisely define functions via partial function application. '`_`' is part of that special
+syntax -- it allows you to specify which formal parameters of a function which you wish to remain variable
+when defining a new function via partial application.
+
+We can then call our newly defined functions on some values:
+
+```scala
 val indexes: List[Float] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
 println(List(indexes.map(y1), "\n", indexes.map(y2)))
 ```
 
-which yields:
+Which yeilds:
 
 ```scala
 List(List(2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0),
   , List(1.0, 3.0, 5.0, 7.0, 9.0, 11.0, 13.0, 15.0, 17.0, 19.0))
 ```
-
-Notice how when defining `slopeInterceptLine`, you can pass its formal parameters -- along with a special '_'
-identifier -- to what looks like an invocation of `y`. It is not, of course, an invocation -- this is special Scala
-syntax that allows you to concisely define functions via partial function application. Part of that syntax is the `_`
-identifier. In this context, it allows you to specify a formal parameter of a function which you wish to remain variable
-when defining a new function via partial application.
 
 ### Adding this feature to Lisp using a macro
 
@@ -181,19 +202,24 @@ Let's have a look.
                  ;; if args isn't empty
                        ;; Store the first element of 'args' in a variable
                  (let ((first (car args))
-                       ;; Generate a new symbol, and store it in a variable. We'll use this later, *if* 'first' is '_'
+                       ;; Generate a new symbol, and store it in a variable.
+                       ;; We'll use this later, *if* 'first' is '_'
                        (parameter (gensym)))
                    (multiple-value-bind
                          (rest-parameters rest-arguments)
-                       ;; Recur over the remaining args. Note that we expect this function to return two values
+                       ;; Recur over the remaining args. Note that we expect 
+                       ;; this function to return two values
                        (process-args (cdr args))
                      (if (eq first '_)
-                         ;; If the first arg is '_', then cons the new symbol we created onto the front of both lists
+                         ;; If the first arg is '_', then cons the new symbol 
+                         ;; we created onto the front of both lists
                          (values (cons parameter rest-parameters)
                                  (cons parameter rest-arguments))
-                         ;; If the first arg is not '_', then cons it only onto the list of arguments our lambda will
-                         ;; pass to the function we are partially applying. Do not add it to the list of formal parameters 
-                         ;; for the lambda we are creating.
+                         ;; If the first arg is not '_', then cons it only onto 
+                         ;; the list of arguments our lambda will pass to the 
+                         ;; function we are partially applying. Do not add it 
+                         ;; to the list of formal parameters for the lambda 
+                         ;; we are creating.
                          (values rest-parameters
                                  (cons first rest-arguments)))))
                  ;; else, just return empty args
@@ -227,8 +253,11 @@ Which yields:
 ((2 4 6 8 10 12 14 16 18 20) (1 3 5 7 9 11 13 15 17 19))
 ```
 
+The same as the Scala code!
+
 <!---@formatter:off--->
-[^draft]: As long as "Draft:" is in the title, this post may undergo significant changes.
+[^draft]: As long as "Draft:" is in the title, this post may undergo significant changes. I've published it so that I 
+    could solicit feedback from colleagues.
 
 [^param]: Not to be confused with the "formal parameters" of a function definition in a programming language -- which I
     also happily refer to as "parameters" in this very same blog post. I count on context (and the reader's keen intellect)
