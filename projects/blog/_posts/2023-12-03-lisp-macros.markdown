@@ -1,6 +1,6 @@
 ---
 layout: post
-published: false
+published: true
 ---
 
 # Draft:[^draft] (Yet Another) Lisp Macro Blog Post
