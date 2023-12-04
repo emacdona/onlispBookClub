@@ -117,7 +117,7 @@ val indexes: List[Float] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 println(List(indexes.map(y1), "\n", indexes.map(y2)))
 ```
 
-Which yeilds:
+Which yields:
 
 ```scala
 List(List(2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0),
