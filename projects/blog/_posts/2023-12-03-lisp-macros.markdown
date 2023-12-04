@@ -152,7 +152,7 @@ So, let's do this in steps. First, we know that our macro will take as arguments
    partial application.
 
 As shown in the comment in code above, we'd like it to return a lambda whose formal parameters correspond to those in the arg list
-specified as "`_`". We would like that lambda to "fix" the other arguments by creating a lexical closure over them.
+specified as "`_`". We would like that lambda to fix the other arguments by creating a lexical closure over them.
 
 Now, wouldn't it be nice if we had a variable called "new-function-arguments" that was a list of all the formal
 parameters to our new function, and a variable called "all-function-arguments" that was a list of all arguments used to
