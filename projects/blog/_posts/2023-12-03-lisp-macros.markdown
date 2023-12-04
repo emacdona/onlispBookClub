@@ -58,7 +58,7 @@ This suggests a possible avenue to explore when searching for a non-trivial exam
 and add it to Lisp!
 
 To that end, I went shopping for language features that Lisp lacks. I settled on the syntax in Scala that allows you to
-use the identifier '`_`' when defining new functions
+use the identifier "`_`" when defining new functions
 via [partial application](https://en.wikipedia.org/wiki/Partial_application). This syntax allows you to specify which
 arguments of a given function you wish to remain as formal parameters of the new function you are defining. We'll get
 to an example in Scala in a minute, but first...
@@ -85,28 +85,28 @@ variable -- is a PERFECT example of partial function application! In Scala, that
 ```scala
 def y(m: Float, x: Float, b: Float) = m * x + b
 
-// Here, we are creating a function, 'slopeInterceptLine', that in turn 
+// Here, we are creating a function, "slopeInterceptLine", that in turn 
 // allows us to create new functions of a single variable by:
-// 1) Fixing two of the parameters ('slope' and 'intercept') of the 
-//    function 'y'.
-// 2) Making the remaining parameter, 'x', a parameter of the new 
+// 1) Fixing two of the parameters ("slope" and "intercept") of the 
+//    function "y".
+// 2) Making the remaining parameter, "x", a parameter of the new 
 //    function being created.
-// Note how we use '_' to specify the parameter(s) we wish to be 
+// Note how we use "_" to specify the parameter(s) we wish to be 
 // parameter(s) in the new function being created.
 def slopeInterceptLine(slope: Float, intercept: Float) = y(slope, _, intercept)
 
-// Use 'slopeInterceptLine' to create a new function of a single variable.
+// Use "slopeInterceptLine" to create a new function of a single variable.
 // In this case, a function that pairs integral inputs with even integers
 def y1 = slopeInterceptLine(2, 0)
 
-// Use 'slopeInterceptLine' to create a new function of a single variable.
+// Use "slopeInterceptLine" to create a new function of a single variable.
 // In this case, a function that pairs integral inputs with odd integers
 def y2 = slopeInterceptLine(2, -1)
 ```
 
-Notice how when defining 'slopeInterceptLine', you can pass its formal parameters -- along with a special '`_`'
-identifier -- to what looks like an invocation of 'y'. It is not, of course, an invocation; it's special Scala
-syntax that allows you to concisely define functions via partial function application. '`_`' is part of that special
+Notice how when defining "slopeInterceptLine", you can pass its formal parameters -- along with a special "`_`"
+identifier -- to what looks like an invocation of "y". It is not, of course, an invocation; it's special Scala
+syntax that allows you to concisely define functions via partial function application. "`_`" is part of that special
 syntax. 
 
 Once defined, we can then call our new functions on some values:
@@ -138,7 +138,7 @@ have and then determine the code I want it to generate. _I save the actual imple
 
 (defun slope-intercept-line (slope intercept)
 
-  ;; 'partial' is the macro we will write
+  ;; "partial" is the macro we will write
   ;; we would like it to generate code something like the following:
   ;; (lambda (x) (y slope x intercept))
   
@@ -148,15 +148,15 @@ have and then determine the code I want it to generate. _I save the actual imple
 So, let's do this in steps. First, we know that our macro will take as arguments:
 
 1. A function whose partial application we wish to use to build a new function
-2. An optional list of arguments. In this list, we expect to be able to use '`_`' for parameters we wish not to fix in the
+2. An optional list of arguments. In this list, we expect to be able to use "`_`" for parameters we wish not to fix in the
    partial application.
 
 As shown in the comment in code above, we'd like it to return a lambda whose formal parameters correspond to those in the arg list
-specified as '`_`'. We would like that lambda to "fix" the other arguments by creating a lexical closure over them.
+specified as "`_`". We would like that lambda to "fix" the other arguments by creating a lexical closure over them.
 
-Now, wouldn't it be nice if we had a variable called 'new-function-arguments' that was a list of all the formal
-parameters to our new function, and a variable called 'all-function-arguments' that was a list of all arguments used to
-invoke the function 'f', which we are partially applying? For now, let's assume they exist!
+Now, wouldn't it be nice if we had a variable called "new-function-arguments" that was a list of all the formal
+parameters to our new function, and a variable called "all-function-arguments" that was a list of all arguments used to
+invoke the function "f", which we are partially applying? For now, let's assume they exist!
 
 ```lisp
 ;; Don't copy/paste -- this isn't ready to run yet
@@ -168,9 +168,9 @@ invoke the function 'f', which we are partially applying? For now, let's assume 
       `(lambda (,@new-function-parameters) (,f ,@all-function-arguments)))
 ```
 
-Okay... so, how do we get the values of those variables? Well... let's assume we have a function called 'process-args'
+Okay... so, how do we get the values of those variables? Well... let's assume we have a function called "process-args"
 that can, given the list of arguments passed to the macro, retrieve them for us. Note that _this_ is the function that
-will define the semantics of the '`_`' identifier! We've cleverly separated it out from the rest of the macro.
+will define the semantics of the "`_`" identifier! We've cleverly separated it out from the rest of the macro.
 
 ```lisp
 ;; Don't copy/paste -- this isn't ready to run yet
@@ -184,21 +184,21 @@ will define the semantics of the '`_`' identifier! We've cleverly separated it o
       `(lambda (,@new-function-parameters) (,f ,@all-function-arguments))))
 ```
 
-So, what does this function need to do? Well, it needs to iterate over the 'args' passed to the macro. For each symbol
-in 'args':
+So, what does this function need to do? Well, it needs to iterate over the "args" passed to the macro. For each symbol
+in "args":
 
-1. If it _is not_ '`_`', it adds it to the 'all-function-arguments' list that it's building.
-2. If it _is_ '`_`', it replaces it with a new symbol, and adds that symbol to both the 'new-function-parameters' and
-   the 'all-function-arguments' lists that it's building.
+1. If it _is not_ "`_`", it adds it to the "all-function-arguments" list that it's building.
+2. If it _is_ "`_`", it replaces it with a new symbol, and adds that symbol to both the "new-function-parameters" and
+   the "all-function-arguments" lists that it's building.
 
-The symbols added to 'all-function-arguments' in step one are those we are holding fixed. The lambda that our macro creates
+The symbols added to "all-function-arguments" in step one are those we are holding fixed. The lambda that our macro creates
 passes them in to the function we are partially applying. These symbols are expected to have meaning in the context in
 which this macro was expanded. The lambda that the macro results in will capture the bindings for these symbols, and --
 if returned as the result of a function call -- create a lexical closure for these bindings. Anywhere the lambda is
 used, these symbols will evaluate to the same values captured in the closure.
 
 The symbols created in step two are those needed for the formal parameters when we define the lambda -- so they are
-added to the 'new-function-parameters' list. They are _also_ added to the 'all-function-arguments' list -- because they must
+added to the "new-function-parameters" list. They are _also_ added to the "all-function-arguments" list -- because they must
 be passed to the function we are partially applying.
 
 Let's have a look.
@@ -210,10 +210,10 @@ Let's have a look.
   (labels ((process-args (args)
              (if args
                  ;; if args isn't empty
-                       ;; Store the first element of 'args' in a variable
+                       ;; Store the first element of "args" in a variable
                  (let ((first (car args))
                        ;; Generate a new symbol, and store it in a variable.
-                       ;; We'll use this later, *if* 'first' is '_'
+                       ;; We'll use this later, *if* "first" is "_"
                        (parameter (gensym)))
                    (multiple-value-bind
                          (rest-parameters rest-arguments)
@@ -221,11 +221,11 @@ Let's have a look.
                        ;; this function to return two values
                        (process-args (cdr args))
                      (if (eq first '_)
-                         ;; If the first arg is '_', then cons the new symbol 
+                         ;; If the first arg is "_", then cons the new symbol 
                          ;; we created onto the front of both lists
                          (values (cons parameter rest-parameters)
                                  (cons parameter rest-arguments))
-                         ;; If the first arg is not '_', then cons it only onto 
+                         ;; If the first arg is not "_", then cons it only onto 
                          ;; the list of arguments our lambda will pass to the 
                          ;; function we are partially applying. Do not add it 
                          ;; to the list of formal parameters for the lambda 
@@ -296,8 +296,8 @@ this example is, at least, non-trivial ;-)
     returned by `slope-intercept-line`) and we just want to give it a name.
 
 [^out-of-order]: Hold on! Isn't it too early to run this example? We haven't yet run the example that defines 
-    'slope-intercept-line'! The answer is "no", it's not too early. This macro expansion doesn't attempt to call
-    'slope-intercept-line' -- it just generates code that _would_ call it.
+    "slope-intercept-line"! The answer is "no", it's not too early. This macro expansion doesn't attempt to call
+    "slope-intercept-line" -- it just generates code that _would_ call it.
 
 [^books]: Some available free online:
     * [Practical Common Lisp](https://gigamonkeys.com/book/)
