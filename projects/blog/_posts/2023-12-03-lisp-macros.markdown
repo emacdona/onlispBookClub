@@ -14,7 +14,7 @@ ourselves drifting from that goal, we keep working our way back toward it. We ju
 distracted by various Lisp related topics.
 
 {:.callout}
-Lots of great books have been written about Lisp[^books]. To me, at least, it seems that **most** books
+Lots of great books have been written about Lisp[^books]. To me at least, it seems that **most** books
 written about Lisp are fantastic. Even if you care nothing about the language (you should), it's worth your time to pick
 up one of the more well known books about Lisp -- so that you have an example of quality technical writing to study.
 
