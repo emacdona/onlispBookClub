@@ -35,7 +35,7 @@ I've read a lot of articles and blog posts that try to explain the power of Lisp
 of syntax, evaluation of arguments, [homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity), etc. These topics are
 all important, of course -- but when I want to learn something, it really helps me to see an example.
 
-Coming up with a good example isn't easy, however. In my opinion, a good example should:
+Coming up with a good example isn't easy. In my opinion, a good example should:
 
 * Exhibit the topic being studied in a non-trivial way.
 * Have an implementation that's small enough to fit on half a page.
