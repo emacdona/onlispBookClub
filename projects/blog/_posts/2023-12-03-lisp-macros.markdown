@@ -295,7 +295,7 @@ this example is, at least, non-trivial ;-)
     aren't providing a set of expressions which make up the function body. Instead, we already _have_ a function (the one
     returned by `slope-intercept-line`) and we just want to give it a name.
 
-[^out-of-order]: Hold on! Can we execute this expression? "f" doesn't have a definition! The answer is "yes", we can 
+[^out-of-order]: Hold on! Can we execute this expression? "f" doesn't have a value! The answer is "yes", we can 
     evaluate it. This macro expansion doesn't attempt to call "f" -- it just generates code that _would_ call it.
 
 [^books]: Some available free online:
