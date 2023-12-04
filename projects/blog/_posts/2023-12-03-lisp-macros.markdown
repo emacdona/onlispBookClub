@@ -35,10 +35,10 @@ I've read a lot of articles and blog posts that try to explain the power of Lisp
 of syntax, evaluation of arguments, [homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity), etc. These topics are
 all important, of course -- but when I want to learn something, it really helps me to see an example.
 
-Coming up with a good example isn't easy, however. In my opinion, the perfect example should:
+Coming up with a good example isn't easy, however. In my opinion, a good example should:
 
-* Exhibit the topic being studied in a non-trivial way
-* Have an implementation that's small enough to fit on half a page
+* Exhibit the topic being studied in a non-trivial way.
+* Have an implementation that's small enough to fit on half a page.
 
 I'll admit that I don't have a rigorous definition for "non-trivial". The best I can do is give some examples of what
 I don't like about examples I consider to be "trivial":
@@ -58,7 +58,7 @@ This suggests a possible avenue to explore when searching for a non-trivial exam
 and add it to Lisp!
 
 To that end, I went shopping for language features that Lisp lacks. I settled on the syntax in Scala that allows you to
-use the identifier '_' when defining new functions
+use the identifier '`_`' when defining new functions
 via [partial application](https://en.wikipedia.org/wiki/Partial_application). This syntax allows you to specify which
 arguments of a given function you wish to remain as formal parameters of the new function you are defining. We'll get
 to an example in Scala in a minute, but first...
@@ -72,8 +72,8 @@ the [slope-intercept form of a line](https://en.wikipedia.org/wiki/Linear_equati
 We think of lines as a function of one independent variable, ie: \\(y = f(x)\\) -- however the function above appears to
 have three independent variables: \\(m, x, b\\)!
 
-So, what gives? Well, mathematicians just call \\(m\\) and \\(b\\) "parameters" [^param] [^paramdef] -- which, once chosen, define the single
-function (one of _many_) defining whatever line it is we happen to care about.
+So, what gives? Well, mathematicians just call \\(m\\) and \\(b\\) "parameters" [^param] [^paramdef] -- which, once chosen, determine the single
+function (one of _many_) which defines whatever line it is we happen to care about.
 
 We're programmers, not mathematicians, however -- and to a programmer, that answer may seem unsatisfying...
 
@@ -92,7 +92,7 @@ def y(m: Float, x: Float, b: Float) = m * x + b
 // 2) Making the remaining parameter, 'x', a parameter of the new 
 //    function being created.
 // Note how we use '_' to specify the parameter(s) we wish to be 
-// parameters in the new function being created.
+// parameter(s) in the new function being created.
 def slopeInterceptLine(slope: Float, intercept: Float) = y(slope, _, intercept)
 
 // Use 'slopeInterceptLine' to create a new function of a single variable.
@@ -104,13 +104,12 @@ def y1 = slopeInterceptLine(2, 0)
 def y2 = slopeInterceptLine(2, -1)
 ```
 
-Notice how, when defining 'slopeInterceptLine', you can pass its formal parameters -- along with a special '`_`'
-identifier -- to what looks like an invocation of 'y'. It is not, of course, an invocation -- this is special Scala
+Notice how when defining 'slopeInterceptLine', you can pass its formal parameters -- along with a special '`_`'
+identifier -- to what looks like an invocation of 'y'. It is not, of course, an invocation; it's special Scala
 syntax that allows you to concisely define functions via partial function application. '`_`' is part of that special
-syntax -- it allows you to specify which formal parameters of a function which you wish to remain variable
-when defining a new function via partial application.
+syntax. 
 
-We can then call our newly defined functions on some values:
+Once defined, we can then call our newly defined functions on some values:
 
 ```scala
 val indexes: List[Float] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -127,6 +126,7 @@ List(List(2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0),
 
 ### Adding this feature to Lisp using a macro
 
+Now that we've found a feature we'd like to add to Lisp, let's get to it.
 I find that when I first set about writing a Lisp macro, it helps to first determine the signature I want the macro to
 have and then determine the code I want it to generate. _I save the actual implementation for last_. So, to that end:
 
@@ -138,7 +138,7 @@ have and then determine the code I want it to generate. _I save the actual imple
 
   ;; partial is the macro we will write
   ;; we would like it to generate code something like the following:
-  ;; (lambda (x) (Y slope x intercept))
+  ;; (lambda (x) (y slope x intercept))
   
   (partial y slope _ intercept))
 ```
@@ -146,12 +146,13 @@ have and then determine the code I want it to generate. _I save the actual imple
 So, let's do this in steps. First, we know that our macro will take as arguments:
 
 1. A function whose partial application we wish to use to build a new function
-2. An optional list of arguments. In this list, we expect to be able to use '_' for parameters we wish not to fix in the
+2. An optional list of arguments. In this list, we expect to be able to use '`_`' for parameters we wish not to fix in the
    partial application.
 
-And we've already determined what we'd like it to return.
+As shown in the code above, we'd like it to return a lambda whose formal parameters correspond to those in the arg list
+specified as '`_`'. We would like that lambda to "fix" the other arguments by creating a lexical closure over them.
 
-Now, wouldn't it be nice if we had a variable called 'new-function-arguments' that was a list of all of the formal
+Now, wouldn't it be nice if we had a variable called 'new-function-arguments' that was a list of all the formal
 parameters to our new function, and a variable called 'all-function-arguments' that was a list of all arguments used to
 invoke the function 'f', which we are partially applying? For now, let's assume they exist!
 
@@ -165,7 +166,7 @@ invoke the function 'f', which we are partially applying? For now, let's assume 
 
 Okay... so, how do we get the values of those variables? Well... let's assume we have a function called 'process-args'
 that can, given the list of arguments passed to the macro, retrieve them for us. Note that _this_ is the function that
-will define the semantics of the '_' identifier! We've cleverly separated it out from the rest of the macro.
+will define the semantics of the '`_`' identifier! We've cleverly separated it out from the rest of the macro.
 
 ```lisp
 (defmacro partial (f &rest args)
@@ -180,18 +181,19 @@ will define the semantics of the '_' identifier! We've cleverly separated it out
 So, what does this function need to do? Well, it needs to iterate over the 'args' passed to the macro. For each symbol
 in 'args':
 
-1. If it _is not_ '_', it adds it to the 'all-function-arguments' list that it builds up.
-2. If it _is_ '_', it replaces it with a new symbol, and adds that symbol to both the 'new-function-parameters' and
+1. If it _is not_ '`_`', it adds it to the 'all-function-arguments' list that it's building.
+2. If it _is_ '`_`', it replaces it with a new symbol, and adds that symbol to both the 'new-function-parameters' and
    the 'all-function-arguments' lists that it's building.
 
-The symbols added to 'all-function-arguments' in step one are those we are holding fixed. The lambda our macro creates
+The symbols added to 'all-function-arguments' in step one are those we are holding fixed. The lambda that our macro creates
 passes them in to the function we are partially applying. These symbols are expected to have meaning in the context in
 which this macro was expanded. The lambda that the macro results in will capture the bindings for these symbols, and --
 if returned as the result of a function call -- create a lexical closure for these bindings. Anywhere the lambda is
 used, these symbols will evaluate to the same values captured in the closure.
 
 The symbols created in step two are those needed for the formal parameters when we define the lambda -- so they are
-added to the 'new-function-parameters' list. They must also be passed to the function we are partially applying.
+added to the 'new-function-parameters' list. They are _also_ added to the 'all-function-arguments' list -- because they must
+be passed to the function we are partially applying.
 
 Let's have a look.
 
@@ -227,6 +229,18 @@ Let's have a look.
     (multiple-value-bind (new-function-parameters all-function-arguments)
         (process-args args)
       `(lambda (,@new-function-parameters) (,f ,@all-function-arguments)))))
+```
+
+We can test our macro:
+
+```lisp
+(macroexpand-1 '(partial slope-intercept-line 2 _ 0))
+```
+
+Which yields:
+
+```lisp
+(LAMBDA (#:G595) (SLOPE-INTERCEPT-LINE 2 #:G595 0))
 ```
 
 Once that macro is defined, we can write the following code[^setf]:
