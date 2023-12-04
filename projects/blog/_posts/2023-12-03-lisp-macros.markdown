@@ -136,7 +136,7 @@ have and then determine the code I want it to generate. _I save the actual imple
 
 (defun slope-intercept-line (slope intercept)
 
-  ;; partial is the macro we will write
+  ;; 'partial' is the macro we will write
   ;; we would like it to generate code something like the following:
   ;; (lambda (x) (y slope x intercept))
   
