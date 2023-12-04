@@ -3,7 +3,7 @@ layout: post
 published: true
 ---
 
-# Draft:[^draft] (Yet Another) Lisp Macro Blog Post
+# Draft:[^draft] Lisp Macros: Learning by Example
 
 ## The inspiration for this post
 
