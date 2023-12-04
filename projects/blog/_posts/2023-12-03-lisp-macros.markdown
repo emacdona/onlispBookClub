@@ -109,7 +109,7 @@ identifier -- to what looks like an invocation of 'y'. It is not, of course, an 
 syntax that allows you to concisely define functions via partial function application. '`_`' is part of that special
 syntax. 
 
-Once defined, we can then call our newly defined functions on some values:
+Once defined, we can then call our new functions on some values:
 
 ```scala
 val indexes: List[Float] = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -127,7 +127,7 @@ List(List(2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0),
 ### Adding this feature to Lisp using a macro
 
 Now that we've found a feature we'd like to add to Lisp, let's get to it.
-I find that when I first set about writing a Lisp macro, it helps to first determine the signature I want the macro to
+I find that when I set about writing a Lisp macro, it helps to first determine the signature I want the macro to
 have and then determine the code I want it to generate. _I save the actual implementation for last_. So, to that end:
 
 ```lisp
@@ -149,7 +149,7 @@ So, let's do this in steps. First, we know that our macro will take as arguments
 2. An optional list of arguments. In this list, we expect to be able to use '`_`' for parameters we wish not to fix in the
    partial application.
 
-As shown in the code above, we'd like it to return a lambda whose formal parameters correspond to those in the arg list
+As shown in the comment in code above, we'd like it to return a lambda whose formal parameters correspond to those in the arg list
 specified as '`_`'. We would like that lambda to "fix" the other arguments by creating a lexical closure over them.
 
 Now, wouldn't it be nice if we had a variable called 'new-function-arguments' that was a list of all the formal
