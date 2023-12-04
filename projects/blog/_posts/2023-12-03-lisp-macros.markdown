@@ -242,13 +242,13 @@ Let's have a look.
 We can test our macro[^out-of-order]:
 
 ```lisp
-(macroexpand-1 '(partial slope-intercept-line 2 _ 0))
+(macroexpand-1 '(partial f 2 _ 0))
 ```
 
 Which yields:
 
 ```lisp
-(LAMBDA (#:G595) (SLOPE-INTERCEPT-LINE 2 #:G595 0))
+(LAMBDA (#:G609) (F 2 #:G609 0))
 ```
 
 Once that macro is defined, we can write the following code[^setf]:
@@ -295,9 +295,8 @@ this example is, at least, non-trivial ;-)
     aren't providing a set of expressions which make up the function body. Instead, we already _have_ a function (the one
     returned by `slope-intercept-line`) and we just want to give it a name.
 
-[^out-of-order]: Hold on! Isn't it too early to run this example? We haven't yet run the example that defines 
-    "slope-intercept-line"! The answer is "no", it's not too early. This macro expansion doesn't attempt to call
-    "slope-intercept-line" -- it just generates code that _would_ call it.
+[^out-of-order]: Hold on! Can we execute this expression? "f" doesn't have a definition! The answer is "yes", we can 
+    evaluate it. This macro expansion doesn't attempt to call "f" -- it just generates code that _would_ call it.
 
 [^books]: Some available free online:
     * [Practical Common Lisp](https://gigamonkeys.com/book/)
