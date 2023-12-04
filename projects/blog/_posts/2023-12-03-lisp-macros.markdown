@@ -276,8 +276,8 @@ Which yields:
 ```
 
 The same as the Scala code. We've added a feature to Lisp! Is this feature worthwhile? That's debatable. For one, the
-macro call is barely shorter than lambda expression. But "worthwhile" wasn't the intent. I contend that this example is,
-at least, non-trivial ;-)
+macro invocation expression is barely shorter than lambda expression. But "worthwhile" wasn't the intent. I contend that 
+this example is, at least, non-trivial ;-)
 
 <!---@formatter:off--->
 [^draft]: As long as "Draft:" is in the title, this post may undergo significant changes. I've published it so that I 
