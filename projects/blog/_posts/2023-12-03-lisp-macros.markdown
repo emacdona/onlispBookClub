@@ -131,6 +131,8 @@ I find that when I set about writing a Lisp macro, it helps to first determine t
 have and then determine the code I want it to generate. _I save the actual implementation for last_. So, to that end:
 
 ```lisp
+;; Don't copy/paste -- this isn't ready to run yet
+
 (defun y (m x b)
   (+ (* m x) b))
 
@@ -157,6 +159,8 @@ parameters to our new function, and a variable called 'all-function-arguments' t
 invoke the function 'f', which we are partially applying? For now, let's assume they exist!
 
 ```lisp
+;; Don't copy/paste -- this isn't ready to run yet
+
 (defmacro partial (f &rest args)
 ;;
 ;; missing code here
@@ -169,6 +173,8 @@ that can, given the list of arguments passed to the macro, retrieve them for us.
 will define the semantics of the '`_`' identifier! We've cleverly separated it out from the rest of the macro.
 
 ```lisp
+;; Don't copy/paste -- this isn't ready to run yet
+
 (defmacro partial (f &rest args)
 ;;
 ;; missing code here
@@ -198,6 +204,8 @@ be passed to the function we are partially applying.
 Let's have a look.
 
 ```lisp
+;; This and the following snippets are ready to run!
+
 (defmacro partial (f &rest args)
   (labels ((process-args (args)
              (if args
@@ -231,7 +239,7 @@ Let's have a look.
       `(lambda (,@new-function-parameters) (,f ,@all-function-arguments)))))
 ```
 
-We can test our macro:
+We can test our macro[^out-of-order]:
 
 ```lisp
 (macroexpand-1 '(partial slope-intercept-line 2 _ 0))
@@ -286,6 +294,10 @@ at least, non-trivial ;-)
     just using `defun`? Well, in short: because we aren't _defining_ a function -- we aren't specifying its arguments and we
     aren't providing a set of expressions which make up the function body. Instead, we already _have_ a function (the one
     returned by `slope-intercept-line`) and we just want to give it a name.
+
+[^out-of-order]: Hold on! Isn't it too early to run this example? We haven't yet run the example that defines 
+    'slope-intercept-line'! The answer is "no", it's not too early. This macro expansion doesn't attempt to call
+    'slope-intercept-line' -- it just generates code that _would_ call it.
 
 [^books]: Some available free online:
     * [Practical Common Lisp](https://gigamonkeys.com/book/)
