@@ -267,7 +267,9 @@ Which yields:
 ((2 4 6 8 10 12 14 16 18 20) (1 3 5 7 9 11 13 15 17 19))
 ```
 
-The same as the Scala code!
+The same as the Scala code. We've added a feature to Lisp! Is this feature worthwhile? That's debatable. For one, the
+macro call is barely shorter than lambda expression. But "worthwhile" wasn't the intent. I contend that this example is,
+at least, non-trivial ;-)
 
 <!---@formatter:off--->
 [^draft]: As long as "Draft:" is in the title, this post may undergo significant changes. I've published it so that I 
