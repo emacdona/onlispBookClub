@@ -34,7 +34,7 @@ ol ol, ul ol
   margin-left: 15px
 
 li
-  padding-left: 1em
+  padding-left: 1rem
 
 sup
   vertical-align: super
@@ -131,7 +131,7 @@ sup
 
   ul
     list-style-type: none
-    font-size: 0.8em
+    font-size: 0.8rem
 
     li
       padding: 5px
@@ -146,28 +146,35 @@ sup
       color: black
 
 .footnotes
-  margin-top: 5em
+  margin-top: 5rem
   border-top: 1px solid black
   font-size: smaller
 
 .callout::before
   content: "ⓘ"
-  font-size: 30px
   position: absolute
-  top: 0px
-  left: 5px
+  color: $alternate-bg
+
+  // These values are heavily dependent on the font chosen to display the character of "content" here. It turns out that
+  // the font determines the padding for a given character. When we make the font of this character bigger than the
+  // font of the rest of the content, we increase it's padding (vertical padding is what we care about here). So we have
+  // to fiddle with it until it's where we want it (possibly even negative "top")
+  font-size: 1.25rem
+  top: 0.20rem
+  left: 0.25rem
+
 .callout
   position: relative
   border-top: 1px solid black
   border-bottom: 1px solid black
-  padding-top: 1em
-  padding-bottom: 1em
+  padding-top: 1rem
+  padding-bottom: 1rem
   padding-left: 50px
   padding-right: 15px
-  margin-left: 2em
+  margin-left: 2rem
   background-color: $callout-bg
   margin-right: -20px
-  font-size: 80%
+  font-size: 0.8rem
 
 .footnotes ol li
   list-style-position: outside
