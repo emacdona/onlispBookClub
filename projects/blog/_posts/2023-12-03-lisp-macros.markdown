@@ -80,7 +80,7 @@ We're programmers, not mathematicians, however -- and to a programmer, that answ
 ### Definining functions using partial application in Scala
 
 This mathematicians' process of specifying two "parameters" for a function of three variables -- to obtain a new function of one
-variable -- is a PERFECT example of partial function application! In Scala, that looks like this:
+variable -- is a **perfect** example of partial function application. In Scala, that looks like this:
 
 ```scala
 def y(m: Float, x: Float, b: Float) = m * x + b
@@ -156,7 +156,7 @@ specified as "`_`". We would like that lambda to fix the other arguments by crea
 
 Now, wouldn't it be nice if we had a variable called "new-function-arguments" that was a list of all the formal
 parameters to our new function, and a variable called "all-function-arguments" that was a list of all arguments used to
-invoke the function "f", which we are partially applying? For now, let's assume they exist!
+invoke the function "f", which we are partially applying? For now, let's assume they exist.
 
 ```lisp
 ;; Don't copy/paste -- this isn't ready to run yet
@@ -170,7 +170,7 @@ invoke the function "f", which we are partially applying? For now, let's assume 
 
 Okay... so, how do we get the values of those variables? Well... let's assume we have a function called "process-args"
 that can, given the list of arguments passed to the macro, retrieve them for us. Note that _this_ is the function that
-will define the semantics of the "`_`" identifier! We've cleverly separated it out from the rest of the macro.
+will define the semantics of the "`_`" identifier. We've cleverly separated it out from the rest of the macro.
 
 ```lisp
 ;; Don't copy/paste -- this isn't ready to run yet
@@ -204,7 +204,7 @@ be passed to the function we are partially applying.
 Let's have a look.
 
 ```lisp
-;; This and the following snippets are ready to run!
+;; This and the following snippets are ready to run.
 
 (defmacro partial (f &rest args)
   (labels ((process-args (args)
@@ -295,7 +295,7 @@ this example is, at least, non-trivial ;-)
     aren't providing a set of expressions which make up the function body. Instead, we already _have_ a function (the one
     returned by `slope-intercept-line`) and we just want to give it a name.
 
-[^out-of-order]: Hold on! Can we evaluate this expression? "f" doesn't have a value! The answer is "yes", we can 
+[^out-of-order]: Hold on. Can we evaluate this expression? "f" doesn't have a value! The answer is "yes", we can 
     evaluate it. This macro expansion doesn't attempt to call "f" -- it just generates code that _would_ call it.
 
 [^books]: Some available free online:
