@@ -3,7 +3,7 @@ layout: post
 published: true
 ---
 
-# Draft:[^draft] Lisp Macros: Learning by Example
+# Lisp Macros: Learning by Example
 
 ## The inspiration for this post
 
@@ -280,9 +280,6 @@ macro invocation expression is barely shorter than lambda expression. But "worth
 this example is, at least, non-trivial ;-)
 
 <!---@formatter:off--->
-[^draft]: As long as "Draft:" is in the title, this post may undergo significant changes. I've published it so that I 
-    could solicit feedback from colleagues.
-
 [^param]: Not to be confused with the "formal parameters" of a function definition in a programming language -- which I
     also happily refer to as "parameters" in this very same blog post. I count on context (and the reader's keen intellect)
     to distinguish between the two uses. These are the dangers of mixing domains (here: math and programming) in the same
