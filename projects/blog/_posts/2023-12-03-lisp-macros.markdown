@@ -58,7 +58,7 @@ This suggests a possible avenue to explore when searching for a non-trivial exam
 and add it to Lisp!
 
 To that end, I went shopping for language features that Lisp lacks. I settled on the syntax in Scala that allows you to
-use the identifier "`_`" when defining new functions
+use the identifier "`_`{:.language-scala .highlight}" when defining new functions
 via [partial application](https://en.wikipedia.org/wiki/Partial_application). This syntax allows you to specify which
 arguments of a given function you wish to remain as formal parameters of the new function you are defining. We'll get
 to an example in Scala in a minute, but first...
@@ -104,9 +104,9 @@ def y1 = slopeInterceptLine(2, 0)
 def y2 = slopeInterceptLine(2, -1)
 ```
 
-Notice how when defining "slopeInterceptLine", you can pass its formal parameters -- along with a special "`_`"
+Notice how when defining "slopeInterceptLine", you can pass its formal parameters -- along with a special "`_`{:.language-scala .highlight}"
 identifier -- to what looks like an invocation of "y". It is not, of course, an invocation; it's special Scala
-syntax that allows you to concisely define functions via partial function application. "`_`" is part of that special
+syntax that allows you to concisely define functions via partial function application. "`_`{:.language-scala .highlight}" is part of that special
 syntax. 
 
 Once defined, we can then call our new functions on some values:
@@ -148,11 +148,11 @@ have and then determine the code I want it to generate. _I save the actual imple
 So, let's do this in steps. First, we know that our macro will take as arguments:
 
 1. A function whose partial application we wish to use to build a new function
-2. An optional list of arguments. In this list, we expect to be able to use "`_`" for parameters we wish not to fix in the
+2. An optional list of arguments. In this list, we expect to be able to use "`_`{:.language-scala .highlight}" for parameters we wish not to fix in the
    partial application.
 
 As shown in the comment in code above, we'd like it to return a lambda whose formal parameters correspond to those in the arg list
-specified as "`_`". We would like that lambda to fix the other arguments by creating a lexical closure over them.
+specified as "`_`{:.language-scala .highlight}". We would like that lambda to fix the other arguments by creating a lexical closure over them.
 
 Now, wouldn't it be nice if we had a variable called "new-function-arguments" that was a list of all the formal
 parameters to our new function, and a variable called "all-function-arguments" that was a list of all arguments used to
@@ -170,7 +170,7 @@ invoke the function "f", which we are partially applying? For now, let's assume 
 
 Okay... so, how do we get the values of those variables? Well... let's assume we have a function called "process-args"
 that can, given the list of arguments passed to the macro, retrieve them for us. Note that _this_ is the function that
-will define the semantics of the "`_`" identifier. We've cleverly separated it out from the rest of the macro.
+will define the semantics of the "`_`{:.language-scala .highlight}" identifier. We've cleverly separated it out from the rest of the macro.
 
 ```lisp
 ;; Don't copy/paste -- this isn't ready to run yet
@@ -187,8 +187,8 @@ will define the semantics of the "`_`" identifier. We've cleverly separated it o
 So, what does this function need to do? Well, it needs to iterate over the "args" passed to the macro. For each symbol
 in "args":
 
-1. If it _is not_ "`_`", it adds it to the "all-function-arguments" list that it's building.
-2. If it _is_ "`_`", it replaces it with a new symbol, and adds that symbol to both the "new-function-parameters" and
+1. If it _is not_ "`_`{:.language-scala .highlight}", it adds it to the "all-function-arguments" list that it's building.
+2. If it _is_ "`_`{:.language-scala .highlight}", it replaces it with a new symbol, and adds that symbol to both the "new-function-parameters" and
    the "all-function-arguments" lists that it's building.
 
 The symbols added to "all-function-arguments" in step one are those we are holding fixed. The lambda that our macro creates
@@ -287,10 +287,10 @@ this example is, at least, non-trivial ;-)
 
 [^paramdef]: Mathematicans would possibly notate this as such: \\(y = f_{m,b}(x)\\)
 
-[^setf]: Why the do we `setf` the `symbol-function` of the symbol we chose as the name of our function -- instead of
-    just using `defun`? Well, in short: because we aren't _defining_ a function -- we aren't specifying its arguments and we
+[^setf]: Why the do we `setf`{:.language-lisp .highlight} the `symbol-function`{:.language-lisp .highlight} of the symbol we chose as the name of our function -- instead of
+    just using `defun`{:.language-lisp .highlight}? Well, in short: because we aren't _defining_ a function -- we aren't specifying its arguments and we
     aren't providing a set of expressions which make up the function body. Instead, we already _have_ a function (the one
-    returned by `slope-intercept-line`) and we just want to give it a name.
+    returned by `slope-intercept-line`{:.language-lisp .highlight}) and we just want to give it a name.
 
 [^out-of-order]: Hold on. Can we evaluate this expression? "f" doesn't have a value! The answer is "yes", we can 
     evaluate it. This macro expansion doesn't attempt to call "f" -- it just generates code that _would_ call it.
