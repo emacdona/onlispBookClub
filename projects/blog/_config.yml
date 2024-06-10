@@ -54,3 +54,8 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+jekyll-spaceship:
+  mermaid-processor:
+    config:
+      theme: default
