@@ -3,5 +3,13 @@
 services:
   blog:
     build: .
+    volumes:
+      - ./:/app
+    entrypoint: >
+      sh -c '
+      bundle config set --local path "vendor/bundle"
+      && bundle install
+      && bundle exec jekyll serve --host 0.0.0.0 --unpublished --trace
+      '
     ports:
       - 4000:4000
