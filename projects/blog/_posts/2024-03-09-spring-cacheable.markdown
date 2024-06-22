@@ -18,53 +18,69 @@ prompt: "`✗`{:.language-shell .highlight}"
 
 ## Why this blog post?
 
-I had occasion at work recently to consider using Spring's {{page.cacheable}} annotation. I searched the web for 
+I had occasion at work recently to consider using Spring's {{page.cacheable}} annotation. I searched the web for
 some hints on how to use it, but wasn't satisfied with any of the results. Even my favorite source[^baeldung]
-of bite-size Java code samples had examples that I felt were [too](https://www.baeldung.com/spring-cache-tutorial#2-cacheevict) [simple](https://www.baeldung.com/spring-cache-tutorial#3-cacheput). Using "get" methods
-as examples of places where you may want to put {{page.cacheevict}} and {{page.cacheput}} annotations seemed misleading to me.
+of bite-size Java code samples had examples that I felt
+were [too](https://www.baeldung.com/spring-cache-tutorial#2-cacheevict) [simple](https://www.baeldung.com/spring-cache-tutorial#3-cacheput).
+Using "get" methods
+as examples of places where you may want to put {{page.cacheevict}} and {{page.cacheput}} annotations seemed misleading
+to me.
 
-So, at the very least, I wanted to provide more substantial examples. In particular, I wanted to show why Spring's default cache implementation requires careful thought in 
+So, at the very least, I wanted to provide more substantial examples. In particular, I wanted to show why Spring's
+default cache implementation requires careful thought in
 a distributed application environment.
 
-In the process, I ended up going off the rails a bit. I spent way more time setting up an environment in which I could run my examples than I did writing actual Java code.
+In the process, I ended up going off the rails a bit. I spent way more time setting up an environment in which I could
+run my examples than I did writing actual Java code.
+But, in a way, that's great! If you came here to read Java code, the good new is: there's not a lot of it.
 
 ## Sample Code
 
-For this blog post, I bootstrapped a Spring project using the [spring initializr](https://start.spring.io/) and then [put it on Github](https://github.com/emacdona/blog-spring-cacheable).
+For this blog post, I bootstrapped a Spring project using the [spring initializr](https://start.spring.io/) and
+then [put it on Github](https://github.com/emacdona/blog-spring-cacheable).
 
-To run the examples with the least amount of fuss, you'll need {{page.docker}}, {{page.dockercompose}}, and {{page.make}}. If you have those tools, things _should_ go smoothly. However,
+To run the examples with the least amount of fuss, you'll need {{page.docker}}, {{page.dockercompose}}, and (gnu)
+{{page.make}}. If you have those tools, things _should_ go smoothly. However,
 it _is_ software... so, you know... good luck. If it breaks, you've got the source code!
 
-I'll be using {{page.curl}} and {{page.jq}} to exercise the Spring application. Once you fire it up, though, it will have a Swagger UI at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) -- you can use that if you like.
+I'll be using {{page.curl}} and {{page.jq}} (via a Makefile) to exercise the Spring application. Once you fire it up,
+though, it will have a Swagger UI
+at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) -- you can use that if you
+like.
 
 For examples that show a command typed at a prompt, this character is my prompt: {{page.prompt}}
 
 ## Big Picture
 
-Broadly speaking, you'd like to cache return values of methods that are expensive to compute. You can measure "expensive" different ways (eg: CPU or memory used); but often, when
+Broadly speaking, you'd like to cache return values of methods that are expensive to compute. You can measure "
+expensive" different ways (eg: CPU or memory used); but often, when
 we say "expensive", we mean "it takes too much time".
 
-If we assume that all methods in question are "functions" in the mathematical sense -- ie: given the same inputs (to include the instance the method is operating on), they will generate the
+If we assume that all methods in question are "functions" in the mathematical sense -- ie: given the same inputs (to
+include the instance the method is operating on), they will generate the
 same output [^function]...
 
 ...then you can classify methods that "take too much time" into two groups:
+
 1. those without side effects
 2. those with side effects
 
-The problem with examples that cache results of methods without side effects is that they are really boring! For a method without side effects, there is no risk in caching its value forever.
+The problem with examples that cache results of methods without side effects is that they are really boring! For a
+method without side effects, there is no risk in caching its value forever.
 The only reason to evict things from the cache is to manage cache size -- you don't have to worry about stale values.
 
-Methods with side effects are more interesting -- 
+Methods with side effects are more interesting --
 
 ## Without Side Effects
 
-First we show that what I will call the "canonical" recursive implementation of the Fibonacci sequence is terribly slow. It duplicates an _enormous_ amount of work.
+First we show that what I will call the "canonical" recursive implementation of the Fibonacci sequence is terribly slow.
+It duplicates an _enormous_ amount of work.
 
 Start up the application by opening a terminal and running:
+
 ```shell
 ✗ make single-instance
 ```
-
 
 ```shell
 ✗ time curl -sX 'GET' 'http://localhost:8080/fibonacci/slow/35'  | jq '.'
@@ -78,7 +94,8 @@ curl -sX 'GET' 'http://localhost:8080/fibonacci/slow/35'  0.01s user 0.00s syste
 jq '.'  0.02s user 0.00s system 0% cpu 39.489 total
 ```
 
-Next, we should that using {{page.cacheable}} to mimoize a recursive function _greatly_ reduces the duplicated work done by the "canonical" implementation.
+Next, we should that using {{page.cacheable}} to mimoize a recursive function _greatly_ reduces the duplicated work done
+by the "canonical" implementation.
 
 ```shell
 ✗ time curl -sX 'GET' 'http://localhost:8080/fibonacci/fast/35'  | jq '.'
@@ -92,7 +109,8 @@ curl -sX 'GET' 'http://host:8080/fibonacci/fast/35'  0.01s user 0.00s system 14%
 jq '.'  0.03s user 0.00s system 60% cpu 0.042 total
 ```
 
-Next, we show that using {{page.cacheable}} to cache the final return value of the function makes even _less_ work for us on
+Next, we show that using {{page.cacheable}} to cache the final return value of the function makes even _less_ work for
+us on
 successive calls.
 
 ```shell
@@ -115,6 +133,7 @@ jq '.'  0.03s user 0.00s system 99% cpu 0.025 total
 ```
 
 There are some non-obvious fields on the objects our API returns. We can ask the API what they are[^jqshowoff]:
+
 ```shell
 ✗ curl -s http://localhost:8080/v3/api-docs \
 | jq '.components.schemas."FibonacciResult".properties' \
@@ -128,10 +147,11 @@ There are some non-obvious fields on the objects our API returns. We can ask the
 {"field":"cached","description":"Was this value retrieved from the cache?"}
 ```
 
-
 ### Single JVM
-The only examples of Spring declarative caching I found online were those of the most simple case: a single JVM.  This case is pretty easy to reason about, but it seems hard for me to imagine
-an example of where it would be useful in the modern world of distributed applications. 
+
+The only examples of Spring declarative caching I found online were those of the most simple case: a single JVM. This
+case is pretty easy to reason about, but it seems hard for me to imagine
+an example of where it would be useful in the modern world of distributed applications.
 
 ```mermaid!
 sequenceDiagram
@@ -158,7 +178,9 @@ sequenceDiagram
 ```
 
 ### Multiple JVMs
-Nowadays, microservices are all the rage. It's VERY common to come across a distributed application that runs in multiple JVMs. This was exactly the concern I had
+
+Nowadays, microservices are all the rage. It's VERY common to come across a distributed application that runs in
+multiple JVMs. This was exactly the concern I had
 with using {{page.cacheable}}.
 
 ```shell
@@ -248,16 +270,33 @@ curl -s http://localhost:8080/books | jq -c '.[]'
 ```
 
 ```json
-{"isbn":"0130305529","title":"On Lisp","author":"Paul Graham"}
-{"isbn":"0923891579","title":"Introduction to Meta-Mathematics","author":"Stephen Cole Kleene"}
-{"isbn":"1640781684","title":"Pathfinder - Core Rulebook","author":"Jason Bulmahn"}
+{
+  "isbn": "0130305529",
+  "title": "On Lisp",
+  "author": "Paul Graham"
+}
+{
+  "isbn": "0923891579",
+  "title": "Introduction to Meta-Mathematics",
+  "author": "Stephen Cole Kleene"
+}
+{
+  "isbn": "1640781684",
+  "title": "Pathfinder - Core Rulebook",
+  "author": "Jason Bulmahn"
+}
 ```
 
 ```shell
 curl -s http://localhost:8080/books/0130305529 | jq -c '.'
 ```
+
 ```json
-{"isbn":"0130305529","title":"On Lisp","author":"Paul Graham"}
+{
+  "isbn": "0130305529",
+  "title": "On Lisp",
+  "author": "Paul Graham"
+}
 ```
 
 ```shell
@@ -266,21 +305,24 @@ curl -s http://localhost:8080/books/0130305529 | jq -c '.'
 ```
 
 Cache wasn't updated!
+
 ```jsonc
 {"isbn":"0130305529","title":"On Lisp","author":"Paul Graham"}
 ```
 
 ```java
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 class Book {
-	@Id @NonNull
-	private String isbn;
-	@With
-	private String title;
-	private String author;
+    @Id
+    @NonNull
+    private String isbn;
+    @With
+    private String title;
+    private String author;
 }
 ```
 
@@ -509,7 +551,6 @@ block-beta
   
   cache --> db
 ```
-
 
 <!---@formatter:off--->
 [^baeldung]: Seriously, I'm not picking on Baeldung. It's one of my favorite web sites. Even though I didn't love its examples in this instance, the article I referenced served as
