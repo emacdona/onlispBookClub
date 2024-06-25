@@ -25,7 +25,7 @@ cached: "`cached`{:.language-java .highlight}"
 host: "`host`{:.language-java .highlight}"
 ---
 
-# DRAFT[^draft]: Spring Caching
+# W.I.P.[^work-in-progress]: Spring Declarative Caching
 
 ## Why this blog post?
 
@@ -33,7 +33,7 @@ I had occasion at work recently to consider using Spring's {{page.cacheable}} an
 some hints on how to use it, but wasn't satisfied with any of the results. Even my favorite source[^baeldung]
 of bite-size Java code samples had examples that I felt
 were [too](https://www.baeldung.com/spring-cache-tutorial#2-cacheevict) [simple](https://www.baeldung.com/spring-cache-tutorial#3-cacheput).
-Using "get" methods
+Using "lookup" methods
 as examples of places where you may want to put {{page.cacheevict}} and {{page.cacheput}} annotations seemed misleading
 to me.
 
@@ -142,9 +142,9 @@ Some notes on the methods and their use of Spring's declarative caching.
   * If it does cache the list as a unit (which I think is the case), how could we make it cache the results individually?
   * If the list were cached as a unit, how would we manage the cache when an individual Book was updated? Would we clear ***ALL*** cached lists of books (in case it appears in one of them)?
 * {{page.bookByIsbn}}: Given an isbn, this method returns a single Book and caches the result ({{page.cacheable}}).
-* {{page.badUpdateTitle}}: Given an isbn and a title, this method will update the title of the Book determined by the isbn. It does NOT make any updates to the cache!
-* {{page.betterUpdateTitle}}: Given an isbn and a title, this method will update the the title of the Book determined by the isbn _and_ _evict_ any instance of the book from the cache ({{page.cacheevict}}).
-* {{page.bestUpdateTitle}}: Given an isbn and a title, this method will update the title of the book determined by the isbn _and_ _update_ any instance of the book from the cache ({{page.cacheput}}).
+* {{page.badUpdateTitle}}: Given an isbn and a title, this method will update the title of the Book determined by the isbn. This is "bad" because it allows for records in the database to be updated without correpsonding records in the cache being updated.
+* {{page.betterUpdateTitle}}: Given an isbn and a title, this method will update the the title of the Book determined by the isbn _and_ _evict_ any instance of the book from the cache ({{page.cacheevict}}). This is "better" because when a database record is updated, any corresponding record in the cache is removed.
+* {{page.bestUpdateTitle}}: Given an isbn and a title, this method will update the title of the book determined by the isbn _and_ _update_ any instance of the book from the cache ({{page.cacheput}}). This is "best" because when a database record is updated, any corresponding record in the cache is also updated.
 
 A stripped down version of the Book entity follows (see the source for the complete class).
 
@@ -195,7 +195,7 @@ If it's not, the interceptor calls the Endpoint Method and adds the result to th
 
 ```mermaid!
 sequenceDiagram
-    participant B as Browser
+    participant B as Client
     box rgba(98, 175, 192, 0.5) Single JVM
     participant CI as Cache Interceptor
     participant EM as Endpoint Method
@@ -223,7 +223,87 @@ To deploy the application in this configuration, run the following command (from
 ✗ make single-instance
 ```
 
+Now let's kick the tires! Open another shell (because the one in which you ran the previous command should now be occupied).
+
+Note that if we clear the cache and then make 99 requests for the same book, 98 requests are served by the cache[^make-automation]:
+
+```shell
+✗ make clear-cache get-book
+curl -s http://localhost:8080/books/clear;
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+      1 {"host":"454fe726c47c","cached":false,"title":"On Lisp"}
+     98 {"host":"454fe726c47c","cached":true,"title":"On Lisp"}
+```
+
+Then, if we (without clearing caches) "bad" update the title and then make 99 requests for the book... all 99 requests
+are served by the cache, and all 99 have the ***wrong*** (old) title:
+
+```shell
+✗ make bad-update-title get-book 
+curl -s http://localhost:8080/books/0130305529/badUpdateTitle/"HELLO%20WORLD"%20BAD | jq -c '.'
+{"isbn":"0130305529","title":"HELLO WORLD BAD","author":"Paul Graham","cached":false,"host":"454fe726c47c"}
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+     99 {"host":"454fe726c47c","cached":true,"title":"On Lisp"}
+```
+
+The lesson to be learned here is that you are responsible for keeping the cache up to date with the "source of truth". In our
+example, the "source of truth" is our database.
+
+Next, if we (again, without clearing caches) "better" update the title and then make 99 requests for the book... 98 requests
+are served by the cache, and one is not. However all 99 have the ***correct*** (new) title:
+```shell
+✗ make better-update-title get-book 
+curl -s http://localhost:8080/books/0130305529/betterUpdateTitle/"HELLO%20WORLD"%20BETTER | jq -c '.'
+{"isbn":"0130305529","title":"HELLO WORLD BETTER","author":"Paul Graham","cached":false,"host":"454fe726c47c"}
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+      1 {"host":"454fe726c47c","cached":false,"title":"HELLO WORLD BETTER"}
+     98 {"host":"454fe726c47c","cached":true,"title":"HELLO WORLD BETTER"}
+```
+
+***This*** is a much better example of how to use {{page.cacheevict}} (in my opinion) than I was able to find online. Any time we update a record in the database, we evict
+any instances of it in the cache. This is much better than evicting the entire cache.
+
+Finally, if we (again, without clearing caches) "best" update the title and then make 99 requests for the book... all 99 requests
+are served by the cache, and all 99 have the ***correct*** (new) title:
+```shell
+✗ make best-update-title get-book 
+curl -s http://localhost:8080/books/0130305529/bestUpdateTitle/"HELLO%20WORLD"%20BEST | jq -c '.'
+{"isbn":"0130305529","title":"HELLO WORLD BEST","author":"Paul Graham","cached":false,"host":"454fe726c47c"}
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+     99 {"host":"454fe726c47c","cached":true,"title":"HELLO WORLD BEST"}
+```
+
+This example is arguably the best method for keeping a cache up to date. Any time a record is updated in the database, we add it to the cache (if it wasn't there already) or
+update it in the cache (if it was already there). This allows us to serve as many lookup requests from the cache as possible.
+
+If you want to keep playing, you can use the following command to restore the state to what it was before we started. However,
+if you plan to just move on to the examples in the next session, there is no need -- because we are going to bring down the
+entire application and deploy it in a new configuration.
+
+```shell
+✗ make restore-title-for-all-replicas clear-cache-for-all-replicas
+```
+
+
 ### Replicas with Individual Caches, Shared Database
+
+This is the deployment scenario where...
 
 ```mermaid!
 block-beta
@@ -299,7 +379,7 @@ block-beta
 
 ```mermaid!
 sequenceDiagram
-    participant B as Browser
+    participant B as Client
     box rgba(98, 175, 192, 0.5) Replica 1
         participant CI as Cache Interceptor
         participant EM as Endpoint Method
@@ -326,6 +406,91 @@ sequenceDiagram
         C-->>CI: return
         CI-->>B: return
     end
+```
+
+```shell
+✗ make clean
+```
+
+```shell
+✗ make replicas-individual-cache-shared-db
+```
+
+```shell
+✗ make clear-cache get-book
+curl -s http://localhost:8080/books/clear;
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+      1 {"host":"0ab9998805ab","cached":false,"title":"On Lisp"}
+     19 {"host":"0ab9998805ab","cached":true,"title":"On Lisp"}
+      1 {"host":"0ad497034e6e","cached":false,"title":"On Lisp"}
+     19 {"host":"0ad497034e6e","cached":true,"title":"On Lisp"}
+      1 {"host":"42b5ae496324","cached":false,"title":"On Lisp"}
+     19 {"host":"42b5ae496324","cached":true,"title":"On Lisp"}
+      1 {"host":"5ea86506da53","cached":false,"title":"On Lisp"}
+     19 {"host":"5ea86506da53","cached":true,"title":"On Lisp"}
+      1 {"host":"7cfe13ae6a5c","cached":false,"title":"On Lisp"}
+     18 {"host":"7cfe13ae6a5c","cached":true,"title":"On Lisp"}
+```
+
+```shell
+✗ make bad-update-title get-book
+curl -s http://localhost:8080/books/0130305529/badUpdateTitle/"HELLO%20WORLD"%20BAD | jq -c '.'
+{"isbn":"0130305529","title":"HELLO WORLD BAD","author":"Paul Graham","cached":false,"host":"7cfe13ae6a5c"}
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+     20 {"host":"0ab9998805ab","cached":true,"title":"On Lisp"}
+     20 {"host":"0ad497034e6e","cached":true,"title":"On Lisp"}
+     20 {"host":"42b5ae496324","cached":true,"title":"On Lisp"}
+     20 {"host":"5ea86506da53","cached":true,"title":"On Lisp"}
+     19 {"host":"7cfe13ae6a5c","cached":true,"title":"On Lisp"}
+```
+
+```shell
+✗ make better-update-title get-book
+curl -s http://localhost:8080/books/0130305529/betterUpdateTitle/"HELLO%20WORLD"%20BETTER | jq -c '.'
+{"isbn":"0130305529","title":"HELLO WORLD BETTER","author":"Paul Graham","cached":false,"host":"7cfe13ae6a5c"}
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+     20 {"host":"0ab9998805ab","cached":true,"title":"On Lisp"}
+     20 {"host":"0ad497034e6e","cached":true,"title":"On Lisp"}
+     20 {"host":"42b5ae496324","cached":true,"title":"On Lisp"}
+     20 {"host":"5ea86506da53","cached":true,"title":"On Lisp"}
+      1 {"host":"7cfe13ae6a5c","cached":false,"title":"HELLO WORLD BETTER"}
+     18 {"host":"7cfe13ae6a5c","cached":true,"title":"HELLO WORLD BETTER"}
+```
+
+```shell
+✗ make best-update-title get-book
+curl -s http://localhost:8080/books/0130305529/bestUpdateTitle/"HELLO%20WORLD"%20BEST | jq -c '.'
+{"isbn":"0130305529","title":"HELLO WORLD BEST","author":"Paul Graham","cached":false,"host":"7cfe13ae6a5c"}
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+     20 {"host":"0ab9998805ab","cached":true,"title":"On Lisp"}
+     20 {"host":"0ad497034e6e","cached":true,"title":"On Lisp"}
+     20 {"host":"42b5ae496324","cached":true,"title":"On Lisp"}
+     20 {"host":"5ea86506da53","cached":true,"title":"On Lisp"}
+     19 {"host":"7cfe13ae6a5c","cached":true,"title":"HELLO WORLD BEST"}
+```
+
+```shell
+✗ make clear-cache get-book
+```
+
+```shell
+✗ make restore-title-for-all-replicas clear-cache-for-all-replicas
 ```
 
 ### Replicas with Shared Caches, Shared Database
@@ -403,7 +568,7 @@ block-beta
 
 ```mermaid!
 sequenceDiagram
-participant B as Browser
+participant B as Client
 box rgba(98, 175, 192, 0.5) Replica 1
 participant CI as Cache Interceptor
 participant EM as Endpoint Method
@@ -433,11 +598,98 @@ CI-->>B: return
 end
 ```
 
+```shell
+✗ make clean
+```
+
+```shell
+✗ make replicas-shared-cache-shared-db
+```
+
+```shell
+✗ make clear-cache get-book
+curl -s http://localhost:8080/books/clear;
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+     20 {"host":"2e989a481029","cached":true,"title":"On Lisp"}
+     20 {"host":"6353b2b26113","cached":true,"title":"On Lisp"}
+     19 {"host":"885eb7e3679c","cached":true,"title":"On Lisp"}
+     20 {"host":"9ad678f720d2","cached":true,"title":"On Lisp"}
+      1 {"host":"fbc281a88ef7","cached":false,"title":"On Lisp"}
+     19 {"host":"fbc281a88ef7","cached":true,"title":"On Lisp"}
+```
+
+```shell
+✗ make bad-update-title get-book
+curl -s http://localhost:8080/books/0130305529/badUpdateTitle/"HELLO%20WORLD"%20BAD | jq -c '.'
+{"isbn":"0130305529","title":"HELLO WORLD BAD","author":"Paul Graham","cached":false,"host":"885eb7e3679c"}
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+     20 {"host":"2e989a481029","cached":true,"title":"On Lisp"}
+     20 {"host":"6353b2b26113","cached":true,"title":"On Lisp"}
+     19 {"host":"885eb7e3679c","cached":true,"title":"On Lisp"}
+     20 {"host":"9ad678f720d2","cached":true,"title":"On Lisp"}
+     20 {"host":"fbc281a88ef7","cached":true,"title":"On Lisp"}
+```
+
+```shell
+✗ make better-update-title get-book
+curl -s http://localhost:8080/books/0130305529/betterUpdateTitle/"HELLO%20WORLD"%20BETTER | jq -c '.'
+{"isbn":"0130305529","title":"HELLO WORLD BETTER","author":"Paul Graham","cached":false,"host":"885eb7e3679c"}
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+     20 {"host":"2e989a481029","cached":true,"title":"HELLO WORLD BETTER"}
+     20 {"host":"6353b2b26113","cached":true,"title":"HELLO WORLD BETTER"}
+     19 {"host":"885eb7e3679c","cached":true,"title":"HELLO WORLD BETTER"}
+     20 {"host":"9ad678f720d2","cached":true,"title":"HELLO WORLD BETTER"}
+      1 {"host":"fbc281a88ef7","cached":false,"title":"HELLO WORLD BETTER"}
+     19 {"host":"fbc281a88ef7","cached":true,"title":"HELLO WORLD BETTER"}
+```
+
+```shell
+✗ make best-update-title get-book
+curl -s http://localhost:8080/books/0130305529/bestUpdateTitle/"HELLO%20WORLD"%20BEST | jq -c '.'
+{"isbn":"0130305529","title":"HELLO WORLD BEST","author":"Paul Graham","cached":false,"host":"885eb7e3679c"}
+for i in {1..99};
+do
+curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
+done \
+| sort | uniq -c
+     20 {"host":"2e989a481029","cached":true,"title":"HELLO WORLD BEST"}
+     20 {"host":"6353b2b26113","cached":true,"title":"HELLO WORLD BEST"}
+     19 {"host":"885eb7e3679c","cached":true,"title":"HELLO WORLD BEST"}
+     20 {"host":"9ad678f720d2","cached":true,"title":"HELLO WORLD BEST"}
+     20 {"host":"fbc281a88ef7","cached":true,"title":"HELLO WORLD BEST"}
+```
+
+```shell
+✗ make clear-cache get-book
+```
+
+```shell
+✗ make restore-title-for-all-replicas clear-cache-for-all-replicas
+```
 <!---@formatter:off--->
 [^draft]: While this is in "draft" status, there may be significant changes. Such changes should not be expected to have correction notes attached.
 
+[^work-in-progress]: A hastily organized mess with large chunks simply unwritten. Published so I can show people the direction I am taking.
+
 [^baeldung]: Seriously, I'm not picking on Baeldung. It's one of my favorite web sites. Even though I didn't love its examples in this instance, the article I referenced served as
     one of the starting points for this very blog post.
+
+[^make-automation]: The Makefile contains targets that allow me to run commands to exercise the application more succinctly.
+    {{page.make}} also has the wonderful feature of echoing commands that it runs. This allows me to type a short command and
+    copy paste the output directly into this post -- showing you both the commands that were actually run and the output that they
+    generated.
 
 [^jqshowoff]: You could just look at the Swagger UI, which shows these descriptions. But I said I was going to use 
     {{page.curl}} and {{page.jq}}. I'm committed.
