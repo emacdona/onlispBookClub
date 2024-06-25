@@ -310,6 +310,10 @@ A misguided next step in the evolution of this application's architecture (espec
 to create multiple replicas of the app that all store their data in a single database -- ***without*** also centralizing
 the cache.
 
+For Spring novices, this is where a huge "gotcha" lies: you are always free to put a {{page.cacheable}} annotation on any component
+method. If you take no other action than that, you are using Spring's default cache implementation... which is an in memory cache.
+This was fine for our single replica example, however... it will cause trouble here.
+
 ```mermaid!
 block-beta
   %% columns auto (default)
@@ -417,13 +421,22 @@ sequenceDiagram
     end
 ```
 
+Okay, let's give this new deployment scenario a spin. First things first... in a terminal where you have a prompt (ie: not the one currently
+streaming docker logs from the previous scenario), run this:
+
 ```shell
 ✗ make clean
 ```
 
+Give it a little time, the check your shell that had the docker logs. All containers should stop, and you should eventually be presented
+with a prompt again. at that prompt, type:
+
 ```shell
 ✗ make replicas-individual-cache-shared-db
 ```
+
+Now, if we clear the cache and then make 98 requests for the same book, we'll see that each replica responds with a single un-cached
+record, and then responds to successive requests from its own cache.
 
 ```shell
 ✗ make clear-cache-for-all-replicas get-book
@@ -448,6 +461,9 @@ done \
      19 {"host":"e5910004e389","cached":true,"title":"On Lisp"}
 ```
 
+Keep in mind that all replicas now have the book we are querying for cached. If we "bad" update the title, successive
+lookups will all be served from replicas' caches. However, none of those caches will contain the proper, updated book.
+
 ```shell
 ✗ make bad-update-title get-book
 curl -s http://localhost:8080/books/0130305529/badUpdateTitle/"HELLO%20WORLD"%20BAD | jq -c '.'
@@ -463,6 +479,9 @@ done \
      20 {"host":"e4a74ccf237b","cached":true,"title":"On Lisp"}
      20 {"host":"e5910004e389","cached":true,"title":"On Lisp"}
 ```
+
+But, when we "better" update the title, only ***ONE*** stale cached value is removed (the one in the cache of the replica that serviced the update request). 
+When we fetch books after that update, only the cache from which the stale value was removed bothers to repopulate its cache.
 
 ```shell
 ✗ make better-update-title get-book
@@ -481,6 +500,9 @@ done \
      20 {"host":"e5910004e389","cached":true,"title":"On Lisp"}
 ```
 
+Finally, the only thing that our "best" update improves is that it prevents a cache-miss from a single replica. It has no effect
+on data integrit. As you can see below, we now have ***TWO*** distinct stale values distributed across our replicas' caches.
+
 ```shell
 ✗ make best-update-title get-book
 curl -s http://localhost:8080/books/0130305529/bestUpdateTitle/"HELLO%20WORLD"%20BEST | jq -c '.'
@@ -497,11 +519,17 @@ done \
      19 {"host":"e5910004e389","cached":true,"title":"On Lisp"}
 ```
 
+Okay, that was fun. Remember, if you want to keep messing around with this deployment scenario, you can run the following command 
+to "reset". Otherwise, let's move on to the next deployment scenario.
+
 ```shell
 ✗ make restore-title-for-all-replicas clear-cache-for-all-replicas
 ```
 
 ### Replicas with Shared Caches, Shared Database
+
+Okay, if it wasn't immediately obvious that the previous scenario was a bad idea, it should definitely be obvious in hindsight.
+This scenario fixes the issues of the previous scenario by also using a centralized cache.
 
 ```mermaid!
 block-beta
@@ -574,6 +602,9 @@ block-beta
   cache --> db
 ```
 
+As you can see from the following sequence diagram, in this scenario: all replicas read from and write to the same cache.
+Any update to the cache is seen by all replicas[^threading].
+
 ```mermaid!
 sequenceDiagram
 participant B as Client
@@ -606,13 +637,21 @@ CI-->>B: return
 end
 ```
 
+Okay, time for our final deployment scenario. You know the drill...
+
+In a shell with a prompt:
+
 ```shell
 ✗ make clean
 ```
 
+In the shell that had logs and now (after you wait a little bit) has a prompt again:
+
 ```shell
 ✗ make replicas-shared-cache-shared-db
 ```
+
+This time, when we fetch books, ONLY ONE request isn't serviced from the cache... despite requests being distributed across five replicas.
 
 ```shell
 ✗ make clear-cache-for-all-replicas get-book
@@ -633,6 +672,9 @@ done \
      20 {"host":"b7f5bbac15b7","cached":true,"title":"On Lisp"}
 ```
 
+"Bad" update is, of course, still broken: all requests are serviced from the cache, however no response contains the actual
+book as it exists in the database.
+
 ```shell
 ✗ make bad-update-title get-book
 curl -s http://localhost:8080/books/0130305529/badUpdateTitle/"HELLO%20WORLD"%20BAD | jq -c '.'
@@ -648,6 +690,9 @@ done \
      20 {"host":"471359f51bd4","cached":true,"title":"On Lisp"}
      19 {"host":"b7f5bbac15b7","cached":true,"title":"On Lisp"}
 ```
+
+"Better" update now evicts the stale book from the ***single*** cache. The first request after this update requires a 
+database lookup, but after that, ***all*** replicas are able to service successive requests using the cache.
 
 ```shell
 ✗ make better-update-title get-book
@@ -666,6 +711,8 @@ done \
      19 {"host":"b7f5bbac15b7","cached":true,"title":"HELLO WORLD BETTER"}
 ```
 
+And finally, "best" update updates the book without requiring any successive lookups to query the database!
+
 ```shell
 ✗ make best-update-title get-book
 curl -s http://localhost:8080/books/0130305529/bestUpdateTitle/"HELLO%20WORLD"%20BEST | jq -c '.'
@@ -681,6 +728,21 @@ done \
      20 {"host":"471359f51bd4","cached":true,"title":"HELLO WORLD BEST"}
      20 {"host":"b7f5bbac15b7","cached":true,"title":"HELLO WORLD BEST"}
 ```
+
+Again, if you want to keep playing around, you can reset the application state with this:
+
+## Summary
+
+The big takeaway here is this: Spring make easy things easy. To that end, it has a default cache implementation. If you're
+not careful, you may be inclined to mark a component method as {{page.cacheable}} -- and then get on with your life. This
+could have severe ramifications depending on how your app is deployed now or in the future.
+
+Like I hinted at earlier, I had a lot of fun writing this sample app. The actual "book database web service" was the boring part.
+Using AspectJ to decorate returned entities was really fun, and I think it made the examples much easier to read (you can
+tell from the payload which host it came from and whether or not it was cached). It was also a lot of fun using docker compose
+paired with Spring profiles to create wildly different deployment scenarios without having to change a single line of Java code.
+Seriously, have a look at the source -- there's not a lot of it. The only bit that I would say is perhaps "less than readable" is the
+AspectJ part -- there's not a lot to it, but it got complicated.
 
 ```shell
 ✗ make restore-title-for-all-replicas clear-cache-for-all-replicas
@@ -700,4 +762,7 @@ done \
 
 [^jqshowoff]: You could just look at the Swagger UI, which shows these descriptions. But I said I was going to use 
     {{page.curl}} and {{page.jq}}. I'm committed.
+
+[^threading]: This raises very interesting questions like: "How does Spring's Caching Interceptor handle cache updates from multiple threads?". That's outside of the scope of this
+    post, however -- so I'm just going to "trust Spring" on this one.
 <!---@formatter:on--->
