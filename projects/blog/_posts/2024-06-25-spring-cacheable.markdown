@@ -303,7 +303,9 @@ entire application and deploy it in a new configuration.
 
 ### Replicas with Individual Caches, Shared Database
 
-This is the deployment scenario where...
+A misguided next step in the evolution of this application's architecture (especially if you think the way I do) would be
+to create multiple replicas of the app that all store their data in a single database -- ***without*** also centralizing
+the cache.
 
 ```mermaid!
 block-beta
@@ -376,6 +378,10 @@ block-beta
   cache4 --> db
   cache5 --> db
 ```
+
+As you can see from the following sequence diagram, caches still belong to individual replicas, and are updated independently of one another.
+If a replica answers a given retrieval request, only its cache is populated with the value. If a given replica services an update request,
+only its cache is updated with the new value. Any other replica that has cached the value previously will now return stale data for lookup requests!
 
 ```mermaid!
 sequenceDiagram
