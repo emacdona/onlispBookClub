@@ -12,9 +12,20 @@ curl: "`curl`{:.language-shell .highlight}"
 jq: "`jq`{:.language-shell .highlight}"
 perl: "`perl`{:.language-shell .highlight}"
 prompt: "`✗`{:.language-shell .highlight}"
+clearCache: "`clearCache`{:.language-java .highlight .nf}"
+books: "`books`{:.language-java .highlight}"
+bookByIsbn: "`bookByIsbn`{:.language-java .highlight}"
+badUpdateTitle: "`badUpdateTitle`{:.language-java .highlight}"
+betterUpdateTitle: "`betterUpdateTitle`{:.language-java .highlight}"
+bestUpdateTitle: "`bestUpdateTitle`{:.language-java .highlight}"
+isbn: "`isbn`{:.language-java .highlight}"
+booktitle: "`title`{:.language-java .highlight}"
+author: "`author`{:.language-java .highlight}"
+cached: "`cached`{:.language-java .highlight}"
+host: "`host`{:.language-java .highlight}"
 ---
 
-# Spring Caching
+# DRAFT[^draft]: Spring Caching
 
 ## Why this blog post?
 
@@ -52,106 +63,135 @@ For examples that show a command typed at a prompt, this character is my prompt:
 
 ## Big Picture
 
-Broadly speaking, you'd like to cache return values of methods that are expensive to compute. You can measure "
-expensive" different ways (eg: CPU or memory used); but often, when
+Broadly speaking, you'd like to cache return values of methods that are expensive to compute. You can measure 
+"expensive" in different ways (eg: CPU or memory used); but often, when
 we say "expensive", we mean "it takes too much time".
 
 If we assume that all methods in question are "functions" in the mathematical sense -- ie: given the same inputs (to
-include the instance the method is operating on), they will generate the
-same output [^function]...
+include the instance the method is operating on), they always give the same output -- then caching is pretty simple. Any 
+return value of such a method can be cached indefinitely, and the only decisions you need to make with respect to your 
+cache are:
+1. How big can it get?
+2. Which eviction policy do you choose to ensure the size constraint is maintained?
 
-...then you can classify methods that "take too much time" into two groups:
+If we do ***not*** assume that the method in question are functions, then we can consider much more interesting examples.
 
-1. those without side effects
-2. those with side effects
+For instance: consider a service that, given an identifier, retrieves a record from a relational database. Assume that this
+database has multiple clients, each of which can update records. Should you expect that, given the same identifier, the service
+should return the same record now that it did six hours ago? Of course not: the record could have been updated in the 
+intervening time.
 
-The problem with examples that cache results of methods without side effects is that they are really boring! For a
-method without side effects, there is no risk in caching its value forever.
-The only reason to evict things from the cache is to manage cache size -- you don't have to worry about stale values.
+## Sample Application
 
-Methods with side effects are more interesting --
+The sample application includes a very simple service for managing a database of books. It uses Spring declarative 
+caching to minimize database lookups. It lets you:
+1. Retrieve books
+2. Change books' titles
 
-## Without Side Effects
+Following is a stripped down version of the RestController class that implements the API endpoints for our service (see the
+source code for the complete class). 
 
-First we show that what I will call the "canonical" recursive implementation of the Fibonacci sequence is terribly slow.
-It duplicates an _enormous_ amount of work.
+```java
+@RequestMapping("/books")
+public class BookRestController {
+  private final BookRepository bookRepository;
 
-Start up the application by opening a terminal and running:
+  @GetMapping("/clear")
+  @CacheEvict(cacheNames = "books", allEntries = true)
+  public void clearCache() {
+  }
 
-```shell
-✗ make single-instance
-```
+  @GetMapping
+  public Collection<Book> books() {
+    return bookRepository.findAll();
+  }
 
-```shell
-✗ time curl -sX 'GET' 'http://localhost:8080/fibonacci/slow/35'  | jq '.'
-{
-  "result": 9227465,
-  "callCount": 18454928,
-  "cached": false,
-  "host": "89f3a297fc1d"
+  @GetMapping("/{isbn}")
+  @Cacheable(cacheNames = "books")
+  public Book bookByIsbn(@PathVariable("isbn") String isbn) {
+    return bookRepository.findByIsbn(isbn);
+  }
+
+  @GetMapping("/{isbn}/badUpdateTitle/{title}")
+  public Book badUpdateTitle(@PathVariable("isbn") String isbn,
+                             @PathVariable("title") String title) {
+    return bookRepository.save(bookRepository.findByIsbn(isbn).withTitle(title));
+  }
+
+  @GetMapping("/{isbn}/betterUpdateTitle/{title}")
+  @CacheEvict(cacheNames = "books", key = "#isbn")
+  public Book betterUpdateTitle(@PathVariable("isbn") String isbn,
+                                @PathVariable("title") String title) {
+    return bookRepository.save(bookRepository.findByIsbn(isbn).withTitle(title));
+  }
+
+  @GetMapping("/{isbn}/bestUpdateTitle/{title}")
+  @CachePut(cacheNames = "books", key = "#isbn")
+  public Book bestUpdateTitle(@PathVariable("isbn") String isbn,
+                              @PathVariable("title") String title) {
+    return bookRepository.save(bookRepository.findByIsbn(isbn).withTitle(title));
+  }
 }
-curl -sX 'GET' 'http://localhost:8080/fibonacci/slow/35'  0.01s user 0.00s system 0% cpu 39.489 total
-jq '.'  0.02s user 0.00s system 0% cpu 39.489 total
 ```
 
-Next, we should that using {{page.cacheable}} to mimoize a recursive function _greatly_ reduces the duplicated work done
-by the "canonical" implementation.
+Some notes on the methods and their use of Spring's declarative caching.
 
-```shell
-✗ time curl -sX 'GET' 'http://localhost:8080/fibonacci/fast/35'  | jq '.'
-{
-  "result": 9227465,
-  "callCount": 34,
-  "cached": false,
-  "host": "89f3a297fc1d"
+* {{page.clearCache}}: This method is for testing purposes only! It uses {{page.cacheevict}} to clear ***ALL*** items from the cache. It allows us to start from a known state (empty cache) when we are testing. In a production application, however, I can't imagine a scenario when you'd want to clear the entire cache -- this is one of the reasons I didn't like examples I found on the web: this seemed to be the most popular example use of this annotation.
+* {{page.books}}: This method returns a list of all Books. It does not cache results. It's a convenience method that lets us see all Books. There are interesting questions here that I chose to completely ignore (but they are worth further research):
+  * If we were to cache the result, would it cache the list as a unit, or the items in the list individually?
+  * If it does cache the list as a unit (which I think is the case), how could we make it cache the results individually?
+  * If the list were cached as a unit, how would we manage the cache when an individual Book was updated? Would we clear ***ALL*** cached lists of books (in case it appears in one of them)?
+* {{page.bookByIsbn}}: Given an isbn, this method returns a single Book and caches the result ({{page.cacheable}}).
+* {{page.badUpdateTitle}}: Given an isbn and a title, this method will update the title of the Book determined by the isbn. It does NOT make any updates to the cache!
+* {{page.betterUpdateTitle}}: Given an isbn and a title, this method will update the the title of the Book determined by the isbn _and_ _evict_ any instance of the book from the cache ({{page.cacheevict}}).
+* {{page.bestUpdateTitle}}: Given an isbn and a title, this method will update the title of the book determined by the isbn _and_ _update_ any instance of the book from the cache ({{page.cacheput}}).
+
+A stripped down version of the Book entity follows (see the source for the complete class).
+
+```java
+public class Book {
+  private String isbn;
+  private String title;
+  private String author;
+  private Boolean cached;
+  private String host;
 }
-curl -sX 'GET' 'http://host:8080/fibonacci/fast/35'  0.01s user 0.00s system 14% cpu 0.042 total
-jq '.'  0.03s user 0.00s system 60% cpu 0.042 total
 ```
 
-Next, we show that using {{page.cacheable}} to cache the final return value of the function makes even _less_ work for
-us on
-successive calls.
+This entity captures the {{page.isbn}}, {{page.bookTitle}}, and {{page.author}} of the book -- no surprises there.
 
-```shell
-✗ curl -sX 'GET' 'http://host:8080/books'  | jq -c '.[] | {isbn, title}'
-{"isbn":"0130305529","title":"On Lisp"}
-{"isbn":"0923891579","title":"Introduction to Meta-Mathematics"}
-{"isbn":"1640781684","title":"Pathfinder - Core Rulebook"}
-```
+However, it also has two additional fields: {{page.cached}} and {{page.host}}. These two fields aren't actually stored
+in the database. They are managed by some clever AspectJ code. For a given instance of a book, they allow us to see:
+* Whether it came from a cache.
+* Which host provided it in response to our request (which is interesting when we deploy multiple instances of our application).
 
-```shell
-✗ time curl -sX 'GET' 'http://host:8080/fibonacci/fast/35'  | jq '.'
-{
-  "result": 9227465,
-  "callCount": 0,
-  "cached": true,
-  "host": "89f3a297fc1d"
-}
-curl -sX 'GET' 'http://host:8080/fibonacci/fast/35'  0.01s user 0.00s system 65% cpu 0.010 total
-jq '.'  0.03s user 0.00s system 99% cpu 0.025 total
-```
-
-There are some non-obvious fields on the objects our API returns. We can ask the API what they are[^jqshowoff]:
-
-```shell
-✗ curl -s http://localhost:8080/v3/api-docs \
-| jq '.components.schemas."FibonacciResult".properties' \
-| jq 'to_entries' \
-| jq 'reduce .[] as $i ({}; .[$i.key] += ($i.value * {"field": $i.key}))' \
-| jq '.["callCount", "host", "cached"]' \
-| jq -c '{field, description}'
-
-{"field":"callCount","description":"The number of intermediate, recursive calls made to obtain this result."}
-{"field":"host","description":"Which host serviced the request that provided this value?"}
-{"field":"cached","description":"Was this value retrieved from the cache?"}
-```
+The same sample application can be deployed multiple ways, each having an impact on caching behavior.
 
 ### Single JVM
 
-The only examples of Spring declarative caching I found online were those of the most simple case: a single JVM. This
-case is pretty easy to reason about, but it seems hard for me to imagine
-an example of where it would be useful in the modern world of distributed applications.
+The simplest of these architectures is a single instance of the application, using both an in-memory cache and an in-memory 
+database (all in the same JVM):
+
+```mermaid!
+block-beta
+  columns 4
+  client["client"]
+  space
+  block:group1:2
+    columns 6
+    space app(["app"]) space cache[("cache\n(in mem)")] space db[("db\n(H2)")] 
+    app --> cache
+    cache --> db
+  end
+  client --> app
+```
+
+In this configuration, all requests are answered by the same application instance. That instance has a single backend
+database. Its responses are saved in a single cache.
+
+The following sequence diagram shows what happens when we attempt to retrieve a book. The Cache Interceptor intercepts the
+request and first checks to see if the result is already in the cache. If it is, the interceptor returns the result.
+If it's not, the interceptor calls the Endpoint Method and adds the result to the cache before returning it to the Client.
 
 ```mermaid!
 sequenceDiagram
@@ -169,7 +209,7 @@ sequenceDiagram
         EM->>DB:SELECT
         DB-->>EM: return
         EM-->>CI: return
-        CI-->>C: PUT
+        CI->>C: PUT
         CI-->>B: return
     else cache hit
         C-->>CI: return
@@ -177,237 +217,13 @@ sequenceDiagram
         end
 ```
 
-### Multiple JVMs
-
-Nowadays, microservices are all the rage. It's VERY common to come across a distributed application that runs in
-multiple JVMs. This was exactly the concern I had
-with using {{page.cacheable}}.
+To deploy the application in this configuration, run the following command (from the project's root directory):
 
 ```shell
-✗ curl -s http://host:8080/books/clear; for i in {1..6}; do curl -s http://host:8080/books/0130305529 | jq -c
- 
-{"host":"0e7b8a14bd32","cached":false}
-{"host":"7b9a2ba6757a","cached":true}
-{"host":"44b88b21d5ad","cached":true}
-{"host":"bd96ee2ec401","cached":true}
-{"host":"e7d40c130569","cached":true}
-{"host":"0e7b8a14bd32","cached":true}
+✗ make single-instance
 ```
 
-#### Multiple JVMs: Default Behavior
-
-```mermaid!
-sequenceDiagram
-    participant B as Browser
-    box rgba(98, 175, 192, 0.5) Replica 1
-        participant CI as Cache Interceptor
-        participant EM as Endpoint Method
-        participant C as Cache
-    end
-    box rgba(98, 175, 192, 0.5) Replica 2
-        participant CI2 as Cache Interceptor
-        participant EM2 as Endpoint Method
-        participant C2 as Cache
-    end
-    box rgba(98, 175, 192, 0.5) Database Server
-        participant DB as Database
-    end
-    B->>CI: GET
-    CI->>C: GET
-    alt cache miss
-        CI->>EM: GET
-        EM->>DB:SELECT
-        DB-->>EM: return
-        EM-->>CI: return
-        CI-->>C: PUT
-        CI-->>B: return
-    else cache hit
-        C-->>CI: return
-        CI-->>B: return
-    end
-```
-
-#### Multiple JVMs: Central Cache
-
-```mermaid!
-sequenceDiagram
-participant B as Browser
-box rgba(98, 175, 192, 0.5) Replica 1
-participant CI as Cache Interceptor
-participant EM as Endpoint Method
-end
-box rgba(98, 175, 192, 0.5) Replica 2
-participant CI2 as Cache Interceptor
-participant EM2 as Endpoint Method
-end
-box rgba(98, 175, 192, 0.5) Cache Server
-participant C as Cache
-end
-box rgba(98, 175, 192, 0.5) Database Server
-participant DB as Database
-end
-B->>CI: GET
-CI->>C: GET
-alt cache miss
-CI->>EM: GET
-EM->>DB:SELECT
-DB-->>EM: return
-EM-->>CI: return
-CI-->>C: PUT
-CI-->>B: return
-else cache hit
-C-->>CI: return
-CI-->>B: return
-end
-```
-
-```shell
-./gradlew bootRun
-```
-
-```shell
-curl -s http://localhost:8080/books | jq -c '.[]'
-```
-
-```json
-{
-  "isbn": "0130305529",
-  "title": "On Lisp",
-  "author": "Paul Graham"
-}
-{
-  "isbn": "0923891579",
-  "title": "Introduction to Meta-Mathematics",
-  "author": "Stephen Cole Kleene"
-}
-{
-  "isbn": "1640781684",
-  "title": "Pathfinder - Core Rulebook",
-  "author": "Jason Bulmahn"
-}
-```
-
-```shell
-curl -s http://localhost:8080/books/0130305529 | jq -c '.'
-```
-
-```json
-{
-  "isbn": "0130305529",
-  "title": "On Lisp",
-  "author": "Paul Graham"
-}
-```
-
-```shell
-curl -s http://localhost:8080/books/0130305529/badUpdateTitle/Onto%20Lisp | jq -c '.'
-curl -s http://localhost:8080/books/0130305529 | jq -c '.'                           
-```
-
-Cache wasn't updated!
-
-```jsonc
-{"isbn":"0130305529","title":"On Lisp","author":"Paul Graham"}
-```
-
-```java
-
-@Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-class Book {
-    @Id
-    @NonNull
-    private String isbn;
-    @With
-    private String title;
-    private String author;
-}
-```
-
-```mermaid!
-block-beta
-  columns 4
-  client["client"]
-  space
-  block:group1:2
-    columns 5
-    app(["app"]) space cache[("cache")] space db[("db")] 
-    app --> cache
-    cache --> db
-  end
-  client --> app
-```
-
-```mermaid!
-block-beta
-  %% columns auto (default)
-  
-  block:clientblock:1
-    columns 1
-    space
-    space
-    client["client"]
-    space
-    space
-  end
-  
-  style clientblock fill:#fce1c5, stroke: #fce1c5
-  
-  block:lbblock:1
-    columns 1
-    space
-    space
-    lb["load\nbalancer"]:1
-    space
-    space
-  end
-  
-  style lbblock  fill:#fce1c5, stroke: #fce1c5
-  
-  block:replicas:1
-    columns 3
-  
-    block:replica1:3
-      app1(["app"]) cache1[("cache")] db1[("db")]
-      app1 --> cache1
-      cache1 --> db1
-    end
-    
-    block:replica2:3
-      app2(["app"]) cache2[("cache")] db2[("db")]
-      app2 --> cache2
-      cache2 --> db2
-    end
-    
-    block:replica3:3
-      app3(["app"]) cache3[("cache")] db3[("db")]
-      app3 --> cache3
-      cache3 --> db3
-    end
-    
-    block:replica4:3
-      app4(["app"]) cache4[("cache")] db4[("db")]
-      app4 --> cache4
-      cache4 --> db4
-    end
-    
-    block:replica5:3
-      app5(["app"]) cache5[("cache")] db5[("db")]
-      app5 --> cache5
-      cache5 --> db5
-    end
-    
-  end
-  
-  client --> lb
-  lb --> app1
-  lb --> app2
-  lb --> app3
-  lb --> app4
-  lb --> app5
-```
+### Replicas with Individual Caches, Shared Database
 
 ```mermaid!
 block-beta
@@ -439,27 +255,27 @@ block-beta
     columns 2
   
     block:replica1:2
-      app1(["app"]) cache1[("cache")]
+      app1(["app"]) cache1[("cache\n(in mem)")]
       app1 --> cache1
     end
     
     block:replica2:2
-      app2(["app"]) cache2[("cache")]
+      app2(["app"]) cache2[("cache\n(in mem)")]
       app2 --> cache2
     end
     
     block:replica3:2
-      app3(["app"]) cache3[("cache")]
+      app3(["app"]) cache3[("cache\n(in mem)")]
       app3 --> cache3
     end
     
     block:replica4:2
-      app4(["app"]) cache4[("cache")]
+      app4(["app"]) cache4[("cache\n(in mem)")]
       app4 --> cache4
     end
     
     block:replica5:2
-      app5(["app"]) cache5[("cache")]
+      app5(["app"]) cache5[("cache\n(in mem)")]
       app5 --> cache5
     end
     
@@ -472,7 +288,7 @@ block-beta
   lb --> app4
   lb --> app5
   
-  db[("db")]:1
+  db[("db\n(Postgres)")]:1
   
   cache1 --> db
   cache2 --> db
@@ -480,6 +296,39 @@ block-beta
   cache4 --> db
   cache5 --> db
 ```
+
+```mermaid!
+sequenceDiagram
+    participant B as Browser
+    box rgba(98, 175, 192, 0.5) Replica 1
+        participant CI as Cache Interceptor
+        participant EM as Endpoint Method
+        participant C as Cache
+    end
+    box rgba(98, 175, 192, 0.5) Replica 2
+        participant CI2 as Cache Interceptor
+        participant EM2 as Endpoint Method
+        participant C2 as Cache
+    end
+    box rgba(98, 175, 192, 0.5) Database Server
+        participant DB as Database
+    end
+    B->>CI: GET
+    CI->>C: GET
+    alt cache miss
+        CI->>EM: GET
+        EM->>DB:SELECT
+        DB-->>EM: return
+        EM-->>CI: return
+        CI->>C: PUT
+        CI-->>B: return
+    else cache hit
+        C-->>CI: return
+        CI-->>B: return
+    end
+```
+
+### Replicas with Shared Caches, Shared Database
 
 ```mermaid!
 block-beta
@@ -545,18 +394,51 @@ block-beta
   app4 --> cache
   app5 --> cache
   
-  cache[("cache")]:1
+  cache[("cache\n(Redis)")]:1
   
-  db[("db")]:1
+  db[("db\n(Postgres)")]:1
   
   cache --> db
 ```
 
+```mermaid!
+sequenceDiagram
+participant B as Browser
+box rgba(98, 175, 192, 0.5) Replica 1
+participant CI as Cache Interceptor
+participant EM as Endpoint Method
+end
+box rgba(98, 175, 192, 0.5) Replica 2
+participant CI2 as Cache Interceptor
+participant EM2 as Endpoint Method
+end
+box rgba(98, 175, 192, 0.5) Cache Server
+participant C as Cache
+end
+box rgba(98, 175, 192, 0.5) Database Server
+participant DB as Database
+end
+B->>CI: GET
+CI->>C: GET
+alt cache miss
+CI->>EM: GET
+EM->>DB:SELECT
+DB-->>EM: return
+EM-->>CI: return
+CI->>C: PUT
+CI-->>B: return
+else cache hit
+C-->>CI: return
+CI-->>B: return
+end
+```
+
 <!---@formatter:off--->
+[^draft]: While this is in "draft" status, there may be significant changes. Such changes should not be expected to have correction notes attached.
+
 [^baeldung]: Seriously, I'm not picking on Baeldung. It's one of my favorite web sites. Even though I didn't love its examples in this instance, the article I referenced served as
     one of the starting points for this very blog post.
 
-[^function]: What would be the point of caching a method whose return value was dependent on something _other_ than its input values? Think about it...
-
-[^jqshowoff]: You could just look at the Swagger UI, which shows these descriptions. But I said I was going to use {{page.curl}} and {{page.jq}}. I'm committed.
+[^jqshowoff]: You could just look at the Swagger UI, which shows these descriptions. But I said I was going to use 
+    {{page.curl}} and {{page.jq}}. I'm committed.
 <!---@formatter:on--->

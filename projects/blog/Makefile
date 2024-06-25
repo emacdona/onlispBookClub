@@ -1,3 +1,11 @@
 
+export BUILDKIT_PROGRESS := plain
+export COMPOSE_MENU := 0
+
+.PHONY: localdev
 localdev:
-	BUILDKIT_PROGRESS=plain COMPOSE_MENU=0 docker compose up --build
+	docker compose up --build
+
+.PHONY: clean
+clean:
+	docker compose down

@@ -47,6 +47,16 @@ h5 {
     padding-bottom: 0.5rem;
 }
 
+li {
+    list-style-position: outside;
+    margin-left: 1em;
+    padding-left: 0.5rem
+}
+
+li:not(:last-child) {
+    margin-bottom: 0.25em;
+}
+
 strong {
     font-weight: bolder;
 }
