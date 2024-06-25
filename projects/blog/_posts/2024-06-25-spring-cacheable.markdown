@@ -158,7 +158,7 @@ public class Book {
 }
 ```
 
-This entity captures the {{page.isbn}}, {{page.bookTitle}}, and {{page.author}} of the book -- no surprises there.
+This entity captures the {{page.isbn}}, {{page.booktitle}}, and {{page.author}} of the book -- no surprises there.
 
 However, it also has two additional fields: {{page.cached}} and {{page.host}}. These two fields aren't actually stored
 in the database. They are managed by some clever AspectJ code. For a given instance of a book, they allow us to see:
@@ -228,15 +228,18 @@ Now let's kick the tires! Open another shell (because the one in which you ran t
 Note that if we clear the cache and then make 98 requests for the same book, 97 requests are served by the cache[^make-automation]:
 
 ```shell
-✗ make clear-cache get-book
+✗ make clear-cache-for-all-replicas get-book
+for i in {1..5};
+do
 curl -s http://localhost:8080/books/clear;
+done
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-      1 {"host":"532d60982dba","cached":false,"title":"On Lisp"}
-     97 {"host":"532d60982dba","cached":true,"title":"On Lisp"}
+      1 {"host":"72fca0a378f9","cached":false,"title":"On Lisp"}
+     97 {"host":"72fca0a378f9","cached":true,"title":"On Lisp"}
 ```
 
 Then, if we (without clearing caches) "bad" update the title and then make 99 requests for the book... all 99 requests
@@ -245,13 +248,13 @@ are served by the cache, and all 99 have the ***wrong*** (old) title:
 ```shell
 ✗ make bad-update-title get-book 
 curl -s http://localhost:8080/books/0130305529/badUpdateTitle/"HELLO%20WORLD"%20BAD | jq -c '.'
-{"isbn":"0130305529","title":"HELLO WORLD BAD","author":"Paul Graham","cached":false,"host":"532d60982dba"}
+{"isbn":"0130305529","title":"HELLO WORLD BAD","author":"Paul Graham","cached":false,"host":"72fca0a378f9"}
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-     98 {"host":"532d60982dba","cached":true,"title":"On Lisp"}
+     98 {"host":"72fca0a378f9","cached":true,"title":"On Lisp"}
 ```
 
 The lesson to be learned here is that you are responsible for keeping the cache up to date with the "source of truth". In our
@@ -262,14 +265,14 @@ are served by the cache, and one is not. However all 98 have the ***correct*** (
 ```shell
 ✗ make better-update-title get-book 
 curl -s http://localhost:8080/books/0130305529/betterUpdateTitle/"HELLO%20WORLD"%20BETTER | jq -c '.'
-{"isbn":"0130305529","title":"HELLO WORLD BETTER","author":"Paul Graham","cached":false,"host":"532d60982dba"}
+{"isbn":"0130305529","title":"HELLO WORLD BETTER","author":"Paul Graham","cached":false,"host":"72fca0a378f9"}
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-      1 {"host":"532d60982dba","cached":false,"title":"HELLO WORLD BETTER"}
-     97 {"host":"532d60982dba","cached":true,"title":"HELLO WORLD BETTER"}
+      1 {"host":"72fca0a378f9","cached":false,"title":"HELLO WORLD BETTER"}
+     97 {"host":"72fca0a378f9","cached":true,"title":"HELLO WORLD BETTER"}
 ```
 
 ***This*** is a much better example of how to use {{page.cacheevict}} (in my opinion) than I was able to find online. Any time we update a record in the database, we evict
@@ -280,13 +283,13 @@ are served by the cache, and all 99 have the ***correct*** (new) title:
 ```shell
 ✗ make best-update-title get-book 
 curl -s http://localhost:8080/books/0130305529/bestUpdateTitle/"HELLO%20WORLD"%20BEST | jq -c '.'
-{"isbn":"0130305529","title":"HELLO WORLD BEST","author":"Paul Graham","cached":false,"host":"532d60982dba"}
+{"isbn":"0130305529","title":"HELLO WORLD BEST","author":"Paul Graham","cached":false,"host":"72fca0a378f9"}
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-     98 {"host":"532d60982dba","cached":true,"title":"HELLO WORLD BEST"}
+     98 {"host":"72fca0a378f9","cached":true,"title":"HELLO WORLD BEST"}
 ```
 
 This example is arguably the best method for keeping a cache up to date. Any time a record is updated in the database, we add it to the cache (if it wasn't there already) or
@@ -423,72 +426,75 @@ sequenceDiagram
 ```
 
 ```shell
-✗ make clear-cache get-book
+✗ make clear-cache-for-all-replicas get-book
+for i in {1..5};
+do
 curl -s http://localhost:8080/books/clear;
+done
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-      1 {"host":"3a1db2a714da","cached":false,"title":"On Lisp"}
-     19 {"host":"3a1db2a714da","cached":true,"title":"On Lisp"}
-      1 {"host":"485ee6b3361b","cached":false,"title":"On Lisp"}
-     19 {"host":"485ee6b3361b","cached":true,"title":"On Lisp"}
-      1 {"host":"5ee8e58f8c2f","cached":false,"title":"On Lisp"}
-     19 {"host":"5ee8e58f8c2f","cached":true,"title":"On Lisp"}
-      1 {"host":"a7a07ea78b94","cached":false,"title":"On Lisp"}
-     18 {"host":"a7a07ea78b94","cached":true,"title":"On Lisp"}
-      1 {"host":"a9b983a67310","cached":false,"title":"On Lisp"}
-     18 {"host":"a9b983a67310","cached":true,"title":"On Lisp"}
+      1 {"host":"1de0e07a1854","cached":false,"title":"On Lisp"}
+     18 {"host":"1de0e07a1854","cached":true,"title":"On Lisp"}
+      1 {"host":"64434b3e44f2","cached":false,"title":"On Lisp"}
+     18 {"host":"64434b3e44f2","cached":true,"title":"On Lisp"}
+      1 {"host":"a7c9cadc9353","cached":false,"title":"On Lisp"}
+     19 {"host":"a7c9cadc9353","cached":true,"title":"On Lisp"}
+      1 {"host":"e4a74ccf237b","cached":false,"title":"On Lisp"}
+     19 {"host":"e4a74ccf237b","cached":true,"title":"On Lisp"}
+      1 {"host":"e5910004e389","cached":false,"title":"On Lisp"}
+     19 {"host":"e5910004e389","cached":true,"title":"On Lisp"}
 ```
 
 ```shell
 ✗ make bad-update-title get-book
 curl -s http://localhost:8080/books/0130305529/badUpdateTitle/"HELLO%20WORLD"%20BAD | jq -c '.'
-{"isbn":"0130305529","title":"HELLO WORLD BAD","author":"Paul Graham","cached":false,"host":"a7a07ea78b94"}
+{"isbn":"0130305529","title":"HELLO WORLD BAD","author":"Paul Graham","cached":false,"host":"1de0e07a1854"}
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-     20 {"host":"3a1db2a714da","cached":true,"title":"On Lisp"}
-     19 {"host":"485ee6b3361b","cached":true,"title":"On Lisp"}
-     20 {"host":"5ee8e58f8c2f","cached":true,"title":"On Lisp"}
-     19 {"host":"a7a07ea78b94","cached":true,"title":"On Lisp"}
-     20 {"host":"a9b983a67310","cached":true,"title":"On Lisp"}
+     19 {"host":"1de0e07a1854","cached":true,"title":"On Lisp"}
+     20 {"host":"64434b3e44f2","cached":true,"title":"On Lisp"}
+     19 {"host":"a7c9cadc9353","cached":true,"title":"On Lisp"}
+     20 {"host":"e4a74ccf237b","cached":true,"title":"On Lisp"}
+     20 {"host":"e5910004e389","cached":true,"title":"On Lisp"}
 ```
 
 ```shell
 ✗ make better-update-title get-book
 curl -s http://localhost:8080/books/0130305529/betterUpdateTitle/"HELLO%20WORLD"%20BETTER | jq -c '.'
-{"isbn":"0130305529","title":"HELLO WORLD BETTER","author":"Paul Graham","cached":false,"host":"485ee6b3361b"}
+{"isbn":"0130305529","title":"HELLO WORLD BETTER","author":"Paul Graham","cached":false,"host":"a7c9cadc9353"}
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-     19 {"host":"3a1db2a714da","cached":true,"title":"On Lisp"}
-      1 {"host":"485ee6b3361b","cached":false,"title":"HELLO WORLD BETTER"}
-     18 {"host":"485ee6b3361b","cached":true,"title":"HELLO WORLD BETTER"}
-     20 {"host":"5ee8e58f8c2f","cached":true,"title":"On Lisp"}
-     20 {"host":"a7a07ea78b94","cached":true,"title":"On Lisp"}
-     20 {"host":"a9b983a67310","cached":true,"title":"On Lisp"}
+     20 {"host":"1de0e07a1854","cached":true,"title":"On Lisp"}
+     20 {"host":"64434b3e44f2","cached":true,"title":"On Lisp"}
+      1 {"host":"a7c9cadc9353","cached":false,"title":"HELLO WORLD BETTER"}
+     18 {"host":"a7c9cadc9353","cached":true,"title":"HELLO WORLD BETTER"}
+     19 {"host":"e4a74ccf237b","cached":true,"title":"On Lisp"}
+     20 {"host":"e5910004e389","cached":true,"title":"On Lisp"}
 ```
 
 ```shell
 ✗ make best-update-title get-book
 curl -s http://localhost:8080/books/0130305529/bestUpdateTitle/"HELLO%20WORLD"%20BEST | jq -c '.'
-{"isbn":"0130305529","title":"HELLO WORLD BEST","author":"Paul Graham","cached":false,"host":"3a1db2a714da"}
+{"isbn":"0130305529","title":"HELLO WORLD BEST","author":"Paul Graham","cached":false,"host":"e4a74ccf237b"}
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-     19 {"host":"3a1db2a714da","cached":true,"title":"HELLO WORLD BEST"}
-     20 {"host":"485ee6b3361b","cached":true,"title":"HELLO WORLD BETTER"}
-     19 {"host":"5ee8e58f8c2f","cached":true,"title":"On Lisp"}
-     20 {"host":"a7a07ea78b94","cached":true,"title":"On Lisp"}
-     20 {"host":"a9b983a67310","cached":true,"title":"On Lisp"}
+     20 {"host":"1de0e07a1854","cached":true,"title":"On Lisp"}
+     20 {"host":"64434b3e44f2","cached":true,"title":"On Lisp"}
+     20 {"host":"a7c9cadc9353","cached":true,"title":"HELLO WORLD BETTER"}
+     19 {"host":"e4a74ccf237b","cached":true,"title":"HELLO WORLD BEST"}
+     19 {"host":"e5910004e389","cached":true,"title":"On Lisp"}
 ```
 
 ```shell
@@ -609,68 +615,71 @@ end
 ```
 
 ```shell
-✗ make clear-cache get-book
+✗ make clear-cache-for-all-replicas get-book
+for i in {1..5};
+do
 curl -s http://localhost:8080/books/clear;
+done
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-     19 {"host":"2a675199e293","cached":true,"title":"On Lisp"}
-      1 {"host":"463a20cf88ee","cached":false,"title":"On Lisp"}
-     19 {"host":"463a20cf88ee","cached":true,"title":"On Lisp"}
-     20 {"host":"95a799ee7097","cached":true,"title":"On Lisp"}
-     20 {"host":"c3d8bc675f77","cached":true,"title":"On Lisp"}
-     19 {"host":"fba702b71638","cached":true,"title":"On Lisp"}
+     19 {"host":"2bb40d744e9c","cached":true,"title":"On Lisp"}
+      1 {"host":"380a19db4fcd","cached":false,"title":"On Lisp"}
+     19 {"host":"380a19db4fcd","cached":true,"title":"On Lisp"}
+     20 {"host":"4428dd122929","cached":true,"title":"On Lisp"}
+     19 {"host":"471359f51bd4","cached":true,"title":"On Lisp"}
+     20 {"host":"b7f5bbac15b7","cached":true,"title":"On Lisp"}
 ```
 
 ```shell
 ✗ make bad-update-title get-book
 curl -s http://localhost:8080/books/0130305529/badUpdateTitle/"HELLO%20WORLD"%20BAD | jq -c '.'
-{"isbn":"0130305529","title":"HELLO WORLD BAD","author":"Paul Graham","cached":false,"host":"fba702b71638"}
+{"isbn":"0130305529","title":"HELLO WORLD BAD","author":"Paul Graham","cached":false,"host":"2bb40d744e9c"}
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-     20 {"host":"2a675199e293","cached":true,"title":"On Lisp"}
-     20 {"host":"463a20cf88ee","cached":true,"title":"On Lisp"}
-     19 {"host":"95a799ee7097","cached":true,"title":"On Lisp"}
-     20 {"host":"c3d8bc675f77","cached":true,"title":"On Lisp"}
-     19 {"host":"fba702b71638","cached":true,"title":"On Lisp"}
+     19 {"host":"2bb40d744e9c","cached":true,"title":"On Lisp"}
+     20 {"host":"380a19db4fcd","cached":true,"title":"On Lisp"}
+     20 {"host":"4428dd122929","cached":true,"title":"On Lisp"}
+     20 {"host":"471359f51bd4","cached":true,"title":"On Lisp"}
+     19 {"host":"b7f5bbac15b7","cached":true,"title":"On Lisp"}
 ```
 
 ```shell
 ✗ make better-update-title get-book
 curl -s http://localhost:8080/books/0130305529/betterUpdateTitle/"HELLO%20WORLD"%20BETTER | jq -c '.'
-{"isbn":"0130305529","title":"HELLO WORLD BETTER","author":"Paul Graham","cached":false,"host":"95a799ee7097"}
+{"isbn":"0130305529","title":"HELLO WORLD BETTER","author":"Paul Graham","cached":false,"host":"b7f5bbac15b7"}
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-     20 {"host":"2a675199e293","cached":true,"title":"HELLO WORLD BETTER"}
-     20 {"host":"463a20cf88ee","cached":true,"title":"HELLO WORLD BETTER"}
-     19 {"host":"95a799ee7097","cached":true,"title":"HELLO WORLD BETTER"}
-     19 {"host":"c3d8bc675f77","cached":true,"title":"HELLO WORLD BETTER"}
-      1 {"host":"fba702b71638","cached":false,"title":"HELLO WORLD BETTER"}
-     19 {"host":"fba702b71638","cached":true,"title":"HELLO WORLD BETTER"}
+      1 {"host":"2bb40d744e9c","cached":false,"title":"HELLO WORLD BETTER"}
+     19 {"host":"2bb40d744e9c","cached":true,"title":"HELLO WORLD BETTER"}
+     20 {"host":"380a19db4fcd","cached":true,"title":"HELLO WORLD BETTER"}
+     19 {"host":"4428dd122929","cached":true,"title":"HELLO WORLD BETTER"}
+     20 {"host":"471359f51bd4","cached":true,"title":"HELLO WORLD BETTER"}
+     19 {"host":"b7f5bbac15b7","cached":true,"title":"HELLO WORLD BETTER"}
 ```
 
 ```shell
 ✗ make best-update-title get-book
 curl -s http://localhost:8080/books/0130305529/bestUpdateTitle/"HELLO%20WORLD"%20BEST | jq -c '.'
-{"isbn":"0130305529","title":"HELLO WORLD BEST","author":"Paul Graham","cached":false,"host":"c3d8bc675f77"}
+{"isbn":"0130305529","title":"HELLO WORLD BEST","author":"Paul Graham","cached":false,"host":"4428dd122929"}
 for i in {1..98};
 do
 curl -s http://localhost:8080/books/0130305529 | jq -c '. | {host, cached,title}';
 done \
 | sort | uniq -c
-     20 {"host":"2a675199e293","cached":true,"title":"HELLO WORLD BEST"}
-     19 {"host":"463a20cf88ee","cached":true,"title":"HELLO WORLD BEST"}
-     20 {"host":"95a799ee7097","cached":true,"title":"HELLO WORLD BEST"}
-     19 {"host":"c3d8bc675f77","cached":true,"title":"HELLO WORLD BEST"}
-     20 {"host":"fba702b71638","cached":true,"title":"HELLO WORLD BEST"}
+     20 {"host":"2bb40d744e9c","cached":true,"title":"HELLO WORLD BEST"}
+     19 {"host":"380a19db4fcd","cached":true,"title":"HELLO WORLD BEST"}
+     19 {"host":"4428dd122929","cached":true,"title":"HELLO WORLD BEST"}
+     20 {"host":"471359f51bd4","cached":true,"title":"HELLO WORLD BEST"}
+     20 {"host":"b7f5bbac15b7","cached":true,"title":"HELLO WORLD BEST"}
 ```
 
 ```shell
