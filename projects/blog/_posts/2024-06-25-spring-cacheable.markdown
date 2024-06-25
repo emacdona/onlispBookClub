@@ -731,6 +731,10 @@ done \
 
 Again, if you want to keep playing around, you can reset the application state with this:
 
+```shell
+✗ make restore-title-for-all-replicas clear-cache-for-all-replicas
+```
+
 ## Summary
 
 The big takeaway here is this: Spring make easy things easy. To that end, it has a default cache implementation. If you're
@@ -744,9 +748,6 @@ paired with Spring profiles to create wildly different deployment scenarios with
 Seriously, have a look at the source -- there's not a lot of it. The only bit that I would say is perhaps "less than readable" is the
 AspectJ part -- there's not a lot to it, but it got complicated.
 
-```shell
-✗ make restore-title-for-all-replicas clear-cache-for-all-replicas
-```
 <!---@formatter:off--->
 [^draft]: While this is in "draft" status, there may be significant changes. Such changes should not be expected to have correction notes attached.
 
