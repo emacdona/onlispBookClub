@@ -44,7 +44,7 @@ In the process, I ended up going off the rails a bit. I spent way more time sett
 run my examples than I did writing actual Java code.
 But, in a way, that's great! If you came here to read Java code, the good new is: there's not a lot of it.
 
-## Sample Code
+## Code
 
 For this blog post, I bootstrapped a Spring project using the [spring initializr](https://start.spring.io/) and
 then [put it on Github](https://github.com/emacdona/blog-spring-cacheable).
@@ -203,14 +203,14 @@ sequenceDiagram
     participant B as Client
     box rgba(98, 175, 192, 0.5) Single JVM
     participant CI as Cache Interceptor
-    participant EM as Endpoint Method
+    participant EM as BookRestController
         participant C as Cache
     participant DB as Database
     end
-    B->>CI: GET
+    B->>CI: GET (/{isbn})
     CI->>C: GET
     alt cache miss
-        CI->>EM: GET
+        CI->>EM: bookByIsbn
         EM->>DB:SELECT
         DB-->>EM: return
         EM-->>CI: return
@@ -400,29 +400,46 @@ sequenceDiagram
     participant B as Client
     box rgba(98, 175, 192, 0.5) Replica 1
         participant CI as Cache Interceptor
-        participant EM as Endpoint Method
+        participant EM as BookRestController
         participant C as Cache
     end
     box rgba(98, 175, 192, 0.5) Replica 2
         participant CI2 as Cache Interceptor
-        participant EM2 as Endpoint Method
+        participant EM2 as BookRestController
         participant C2 as Cache
     end
     box rgba(98, 175, 192, 0.5) Database Server
         participant DB as Database
     end
-    B->>CI: GET
-    CI->>C: GET
-    alt cache miss
-        CI->>EM: GET
-        EM->>DB:SELECT
-        DB-->>EM: return
-        EM-->>CI: return
-        CI->>C: PUT
-        CI-->>B: return
-    else cache hit
-        C-->>CI: return
-        CI-->>B: return
+    
+    rect rgba(98, 175, 192, 0.5)
+    note right of B: Replica 2 services lookup. Cache 2 populated.
+    B->>CI2: GET (/{isbn})
+    CI2->>EM2: bookByIsbn
+    EM2->>DB:SELECT
+    DB-->>EM2: return
+    EM2-->>CI2: return
+    CI2->>C2: PUT
+    CI2-->>B: return
+    end
+
+    rect rgba(98, 175, 192, 0.5)
+    note right of B: Replica 1 services update. Cache 1 populated.
+    B->>CI: GET ("/{isbn}/bestUpdateTitle/{title}")
+    CI->>EM: bestUpdateTitle
+    EM->>DB:UPDATE
+    DB-->>EM: return
+    EM-->>CI: return
+    CI->>C: PUT
+    CI-->>B: return
+    end
+
+    rect rgba(98, 175, 192, 0.5)
+    note right of B: Replica 2 services lookup. Cache 2 hit.
+    B->>CI2: GET (/{isbn})
+    CI2->>C2: GET
+        C2-->>CI2: return
+        CI2-->>B: return
     end
 ```
 
@@ -531,7 +548,7 @@ to "reset". Otherwise, let's move on to the next deployment scenario.
 ✗ make restore-title-for-all-replicas clear-cache-for-all-replicas
 ```
 
-### Replicas with Shared Caches, Shared Database
+### Replicas with Shared Cache, Shared Database
 
 Okay, if it wasn't immediately obvious that the previous scenario was a bad idea, it should definitely be obvious in hindsight.
 This scenario fixes the issues of the previous scenario by also using a centralized cache.
@@ -615,11 +632,11 @@ sequenceDiagram
 participant B as Client
 box rgba(98, 175, 192, 0.5) Replica 1
 participant CI as Cache Interceptor
-participant EM as Endpoint Method
+participant EM as BookRestController
 end
 box rgba(98, 175, 192, 0.5) Replica 2
 participant CI2 as Cache Interceptor
-participant EM2 as Endpoint Method
+participant EM2 as BookRestController
 end
 box rgba(98, 175, 192, 0.5) Cache Server
 participant C as Cache
@@ -627,7 +644,7 @@ end
 box rgba(98, 175, 192, 0.5) Database Server
 participant DB as Database
 end
-B->>CI: GET
+B->>CI: GET (/{isbn})
 CI->>C: GET
 alt cache miss
 CI->>EM: GET
