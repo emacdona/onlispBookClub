@@ -644,16 +644,33 @@ end
 box rgba(98, 175, 192, 0.5) Database Server
 participant DB as Database
 end
+
+rect rgba(98, 175, 192, 0.5)
+note right of B: Replica 2 services lookup. Cache populated.
 B->>CI: GET (/{isbn})
-CI->>C: GET
-alt cache miss
-CI->>EM: GET
+CI->>EM: bookByIsbn
 EM->>DB:SELECT
 DB-->>EM: return
 EM-->>CI: return
 CI->>C: PUT
 CI-->>B: return
-else cache hit
+end
+
+rect rgba(98, 175, 192, 0.5)
+note right of B: Replica 1 services update. Cache updated.
+B->>CI: GET ("/{isbn}/bestUpdateTitle/{title}")
+CI->>EM: bestUpdateTitle
+EM->>DB:UPDATE
+DB-->>EM: return
+EM-->>CI: return
+CI->>C: PUT
+CI-->>B: return
+end
+
+rect rgba(98, 175, 192, 0.5)
+note right of B: Replica 2 services lookup. Cache hit.
+B->>CI: GET (/{isbn})
+CI->>C: GET
 C-->>CI: return
 CI-->>B: return
 end
