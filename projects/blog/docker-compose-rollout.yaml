@@ -1,0 +1,14 @@
+---
+
+services:
+  blog:
+    build: .
+    volumes:
+      - ./:/app
+      - ~/.aws:/root/.aws
+    entrypoint: >
+      sh -c '
+      bundle config set --local path "vendor/bundle"
+      && bundle install
+      && ./sync.sh
+      '

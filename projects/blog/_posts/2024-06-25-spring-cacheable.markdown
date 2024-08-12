@@ -25,11 +25,11 @@ cached: "`cached`{:.language-java .highlight}"
 host: "`host`{:.language-java .highlight}"
 ---
 
-# W.I.P.[^work-in-progress]: Spring Declarative Caching
+# Spring Declarative Caching
 
 ## Why this blog post?
 
-I had occasion at work recently to consider using Spring's {{page.cacheable}} annotation. I searched the web for
+Recently at work, I had occasion to consider using Spring's {{page.cacheable}} annotation. I searched the web for
 some hints on how to use it, but wasn't satisfied with any of the results. Even my favorite source[^baeldung]
 of bite-size Java code samples had examples that I felt
 were [too](https://www.baeldung.com/spring-cache-tutorial#2-cacheevict) [simple](https://www.baeldung.com/spring-cache-tutorial#3-cacheput).
@@ -38,8 +38,7 @@ as examples of places where you may want to put {{page.cacheevict}} and {{page.c
 to me.
 
 So, at the very least, I wanted to provide more substantial examples. In particular, I wanted to show why Spring's
-default cache implementation requires careful thought in
-a distributed application environment.
+default cache implementation requires careful thought in a distributed application environment.
 
 In the process, I ended up going off the rails a bit. I spent way more time setting up an environment in which I could
 run my examples than I did writing actual Java code.
@@ -88,7 +87,7 @@ caching to minimize database lookups. It lets you:
 1. Retrieve books
 2. Change books' titles
 
-Following is a stripped down version of the RestController class that implements the API endpoints for our service (see the
+Following is a stripped down version of the RestController class that implements the API for our service (see the
 source code for the complete class). 
 
 ```java
@@ -136,15 +135,21 @@ public class BookRestController {
 
 Some notes on the methods and their use of Spring's declarative caching.
 
-* {{page.clearCache}}: This method is for testing purposes only! It uses {{page.cacheevict}} to clear ***ALL*** items from the cache. It allows us to start from a known state (empty cache) when we are testing. In a production application, however, I can't imagine a scenario when you'd want to clear the entire cache -- this is one of the reasons I didn't like examples I found on the web: this seemed to be the most popular example use of this annotation.
-* {{page.books}}: This method returns a list of all Books. It does not cache results. It's a convenience method that lets us see all Books. There are interesting questions here that I chose to completely ignore (but they are worth further research):
+* {{page.clearCache}}: This method is for testing purposes only! It uses {{page.cacheevict}} to clear ***ALL*** items from the cache. It allows us to start from a known state (empty cache) when we are testing.
+    In a production application, I struggle to imagine a scenario in which you'd want to clear the entire cache.
+    This is one of the reasons I didn't like examples I found on the web: this seemed to be the most popular example use of this annotation.
+* {{page.books}}: This method returns a list of all Books. It does not cache results. It's a convenience method that lets us see all Books.
+    There are interesting questions here that I chose to completely ignore (but they are worth further research):
   * If we were to cache the result, would it cache the list as a unit, or the items in the list individually?
   * If it does cache the list as a unit (which I think is the case), how could we make it cache the results individually?
   * If the list were cached as a unit, how would we manage the cache when an individual Book was updated? Would we clear ***ALL*** cached lists of books (in case it appears in one of them)?
 * {{page.bookByIsbn}}: Given an isbn, this method returns a single Book and caches the result ({{page.cacheable}}).
-* {{page.badUpdateTitle}}: Given an isbn and a title, this method will update the title of the Book determined by the isbn. This is "bad" because it allows for records in the database to be updated without correpsonding records in the cache being updated.
-* {{page.betterUpdateTitle}}: Given an isbn and a title, this method will update the the title of the Book determined by the isbn _and_ _evict_ any instance of the book from the cache ({{page.cacheevict}}). This is "better" because when a database record is updated, any corresponding record in the cache is removed.
-* {{page.bestUpdateTitle}}: Given an isbn and a title, this method will update the title of the book determined by the isbn _and_ _update_ any instance of the book from the cache ({{page.cacheput}}). This is "best" because when a database record is updated, any corresponding record in the cache is also updated.
+* {{page.badUpdateTitle}}: Given an isbn and a title, this method will update the title of the Book determined by the isbn. 
+   This is "bad" because it allows for records in the database to be updated without correpsonding records in the cache being updated.
+* {{page.betterUpdateTitle}}: Given an isbn and a title, this method will update the the title of the Book determined by the isbn _and_ _evict_ any instance of the book from the cache ({{page.cacheevict}}).
+   This is "better" because when a database record is updated, any corresponding record in the cache is removed.
+* {{page.bestUpdateTitle}}: Given an isbn and a title, this method will update the title of the book determined by the isbn _and_ _update_ any instance of the book from the cache ({{page.cacheput}}).
+   This is "best" because when a database record is updated, any corresponding record in the cache is also updated.
 
 A stripped down version of the Book entity follows (see the source for the complete class).
 
@@ -161,7 +166,7 @@ public class Book {
 This entity captures the {{page.isbn}}, {{page.booktitle}}, and {{page.author}} of the book -- no surprises there.
 
 However, it also has two additional fields: {{page.cached}} and {{page.host}}. These two fields aren't actually stored
-in the database. They are managed by some clever AspectJ code. For a given instance of a book, they allow us to see:
+in the database. They are managed by some clever [AspectJ](https://eclipse.dev/aspectj/doc/latest/index.html) code. For a given instance of a book, they allow us to see:
 * Whether it came from a cache.
 * Which host provided it in response to our request (which is interesting when we deploy multiple instances of our application).
 
@@ -501,7 +506,7 @@ done \
 ```
 
 Finally, the only thing that our "best" update improves is that it prevents a cache-miss from a single replica. It has no effect
-on data integrit. As you can see below, we now have ***TWO*** distinct stale values distributed across our replicas' caches.
+on data integrity. As you can see below, we now have ***TWO*** distinct stale values distributed across our replicas' caches.
 
 ```shell
 ✗ make best-update-title get-book
@@ -749,10 +754,6 @@ Seriously, have a look at the source -- there's not a lot of it. The only bit th
 AspectJ part -- there's not a lot to it, but it got complicated.
 
 <!---@formatter:off--->
-[^draft]: While this is in "draft" status, there may be significant changes. Such changes should not be expected to have correction notes attached.
-
-[^work-in-progress]: A hastily organized mess with large chunks simply unwritten. Published so I can show people the direction I am taking.
-
 [^baeldung]: Seriously, I'm not picking on Baeldung. It's one of my favorite web sites. Even though I didn't love its examples in this instance, the article I referenced served as
     one of the starting points for this very blog post.
 
