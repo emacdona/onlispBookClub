@@ -419,7 +419,7 @@ sequenceDiagram
     end
 
     rect rgba(98, 175, 192, 0.5)
-    note right of B: Replica 1 services update. Cache 1 populated.
+    note right of B: Replica 1 services update. Cache 1 updated.
     B->>CI: GET ("/{isbn}/bestUpdateTitle/{title}")
     CI->>EM: bestUpdateTitle
     EM->>DB:UPDATE
