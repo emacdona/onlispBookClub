@@ -49,14 +49,9 @@ But, in a way, that's great! If you came here to read Java code, the good new is
 For this blog post, I bootstrapped a Spring project using the [spring initializr](https://start.spring.io/) and
 then [put it on Github](https://github.com/emacdona/blog-spring-cacheable).
 
-To run the examples with the least amount of fuss, you'll need {{page.docker}}, {{page.dockercompose}}, and (gnu)
-{{page.make}}. If you have those tools, things _should_ go smoothly. However,
+To run the examples with the least amount of fuss, you'll need {{page.docker}}, {{page.dockercompose}}, (gnu)
+{{page.make}}, {{page.curl}}, and {{page.jq}}. If you have those tools, things _should_ go smoothly. However,
 it _is_ software... so, you know... good luck. If it breaks, you've got the source code!
-
-I'll be using {{page.curl}} and {{page.jq}} (via a Makefile) to exercise the Spring application. Once you fire it up,
-though, it will have a Swagger UI
-at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) -- you can use that if you
-like.
 
 For examples that show a command typed at a prompt, this character is my prompt: {{page.prompt}}
 
