@@ -170,7 +170,7 @@ The same sample application can be deployed multiple ways, each having an impact
 ### Single JVM
 
 The simplest of these architectures is a single instance of the application, using both an in-memory cache and an in-memory 
-database (all in the same JVM):
+database (all in the same JVM)[^mermaid]:
 
 ```mermaid!
 block-beta
@@ -788,6 +788,8 @@ AspectJ part -- there's not a lot to it, but it got complicated.
 
 [^fibonacci]: The examples in this blog post _only_ consider caching return values of methods that are _not_ mathematical functions. However, the sample application _does_ have
     examples of caching "mathematical" functions. See the endpoints for calculating fibonacci numbers...
+
+[^mermaid]: All diagrams in this post were created with [mermaid](https://mermaid.js.org/intro/).
 
 [^make-automation]: The Makefile contains targets that allow me to run commands to exercise the application more succinctly.
     {{page.make}} also has the wonderful feature of echoing commands that it runs. This allows me to type a short command and
