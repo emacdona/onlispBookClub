@@ -445,8 +445,8 @@ streaming docker logs from the previous scenario), run this:
 ✗ make clean
 ```
 
-Give it a little time, then check your shell that had the docker logs. All containers should stop, and you should eventually be presented
-with a prompt again. at that prompt, type:
+Give it a little time, then check your shell that had the docker logs. Eventually, all containers should stop, and you should be presented
+with a prompt again. At that prompt, type:
 
 ```shell
 ✗ make replicas-individual-cache-shared-db
