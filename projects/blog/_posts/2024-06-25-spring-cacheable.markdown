@@ -68,11 +68,11 @@ cache are:
 1. How big can it get?
 2. Which eviction policy do you choose to ensure the size constraint is maintained?
 
-If we do ***not*** assume that the method in question are functions, then we can consider much more interesting examples.
+If we do ***not*** assume that the method in question are functions[^fibonacci], then we can consider much more interesting examples.
 
 For instance: consider a service that, given an identifier, retrieves a record from a relational database. Assume that this
 database has multiple clients, each of which can update records. Should you expect that, given the same identifier, the service
-should return the same record now that it did six hours ago? Of course not: the record could have been updated in the 
+will return the same record now that it did six hours ago? Of course not: the record could have been updated in the 
 intervening time.
 
 ## Sample Application
@@ -445,7 +445,7 @@ streaming docker logs from the previous scenario), run this:
 ✗ make clean
 ```
 
-Give it a little time, the check your shell that had the docker logs. All containers should stop, and you should eventually be presented
+Give it a little time, then check your shell that had the docker logs. All containers should stop, and you should eventually be presented
 with a prompt again. at that prompt, type:
 
 ```shell
@@ -786,13 +786,13 @@ AspectJ part -- there's not a lot to it, but it got complicated.
 [^baeldung]: Seriously, I'm not picking on Baeldung. It's one of my favorite web sites. Even though I didn't love its examples in this instance, the article I referenced served as
     one of the starting points for this very blog post.
 
+[^fibonacci]: The examples in this blog post _only_ consider caching return values of methods that are _not_ mathematical functions. However, the sample application _does_ have
+    examples of caching "mathematical" functions. See the endpoints for calculating fibonacci numbers...
+
 [^make-automation]: The Makefile contains targets that allow me to run commands to exercise the application more succinctly.
     {{page.make}} also has the wonderful feature of echoing commands that it runs. This allows me to type a short command and
     copy paste the output directly into this post -- showing you both the commands that were actually run and the output that they
     generated.
-
-[^jqshowoff]: You could just look at the Swagger UI, which shows these descriptions. But I said I was going to use 
-    {{page.curl}} and {{page.jq}}. I'm committed.
 
 [^threading]: This raises very interesting questions like: "How does Spring's Caching Interceptor handle cache updates from multiple threads?". That's outside of the scope of this
     post, however -- so I'm just going to "trust Spring" on this one.
