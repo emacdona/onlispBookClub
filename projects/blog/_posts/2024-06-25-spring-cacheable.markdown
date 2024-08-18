@@ -242,8 +242,8 @@ done \
      97 {"host":"72fca0a378f9","cached":true,"title":"On Lisp"}
 ```
 
-Then, if we (without clearing caches) "bad" update the title and then make 99 requests for the book... all 99 requests
-are served by the cache, and all 99 have the ***wrong*** (old) title:
+Then, if we (without clearing caches) "bad" update the title and then make 98 requests for the book... all 98 requests
+are served by the cache, and all 98 have the ***wrong*** (old) title:
 
 ```shell
 ✗ make bad-update-title get-book 
@@ -278,8 +278,8 @@ done \
 ***This*** is a much better example of how to use {{page.cacheevict}} (in my opinion) than I was able to find online. Any time we update a record in the database, we evict
 any instances of it in the cache. This is much better than evicting the entire cache.
 
-Finally, if we (again, without clearing caches) "best" update the title and then make 99 requests for the book... all 99 requests
-are served by the cache, and all 99 have the ***correct*** (new) title:
+Finally, if we (again, without clearing caches) "best" update the title and then make 98 requests for the book... all 98 requests
+are served by the cache, and all 98 have the ***correct*** (new) title:
 ```shell
 ✗ make best-update-title get-book 
 curl -s http://localhost:8080/books/0130305529/bestUpdateTitle/"HELLO%20WORLD"%20BEST | jq -c '.'
@@ -430,7 +430,7 @@ sequenceDiagram
     end
 
     rect rgba(98, 175, 192, 0.5)
-    note right of B: Replica 2 services lookup. Cache 2 hit.
+    note right of B: Replica 2 services lookup. Cache 2 hit (stale data!).
     B->>CI2: GET (/{isbn})
     CI2->>C2: GET
         C2-->>CI2: return
