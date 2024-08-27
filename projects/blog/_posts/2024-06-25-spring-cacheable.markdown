@@ -27,6 +27,10 @@ host: "`host`{:.language-java .highlight}"
 
 # Spring Declarative Caching
 
+_This blog post was also published (with permission) [on my employer's website](https://www.solutionstreet.com/blog/2024/08/21/spring-declarative-caching/)._
+
+_Disclaimer: My views and opinions are my own and do not necessarily reflect those of my employer._
+
 ## Why this blog post?
 
 Recently at work, I had occasion to consider using Spring's {{page.cacheable}} annotation. I searched the web for
