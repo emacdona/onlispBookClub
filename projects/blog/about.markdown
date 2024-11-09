@@ -20,3 +20,5 @@ If you're wondering what the name of this website means, then there's a good cha
 
 ## Socials
 hn handle: emacdona
+
+call sign: KQ4YGT
