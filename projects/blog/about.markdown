@@ -20,5 +20,3 @@ If you're wondering what the name of this website means, then there's a good cha
 
 ## Contact Me
 [webmaster@consartist.com](mailto:webmaster@consartist.com)
-
-KQ4YGT
