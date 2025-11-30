@@ -7,8 +7,6 @@ published: false
 
 I've been messing around with F# lately. I've glanced at ML/OCaml/F# code before, but this is the first time I've really spent some time working in an ML descendant. So far, I'm really liking what I see. Today I came across something that I thought would be interesting to write a few lines about.
 
-Warning: if you've come here looking for a strong thesis, you'll be disappointed. This is just a rumination on a subtle difference in how two languages implement a library feature.
-
 ## Options
 
 If you're not familiar with what an `Option` type is, take a look at the [Wikipedia page](https://en.wikipedia.org/wiki/Option_type). I'll attempt to describe it very briefly as:
@@ -19,19 +17,21 @@ Proponents would say that Options are a better alternative to `null` when you de
 
 There is a LOT more to say about Options, but this isn't a blog post about why they exist. This is a blog post about an interesting use case that appears in a language where library creators have always been able to assume they are present.
 
-## Filtering, Mapping, Choosing with Options
+## Filtering, Transforming, and Choosing with Options
 
-The `Option` type certainly isn't unique to F#. Java, for example, has `Optional`. However, whereas Java's `Optional` is a feature that was added to a language that had already been around for a long time (it was added in Java 1.8), F#'s `option` type has been in the language since its inception. In fact, my second edition of _ML for the Working Programmer_, published in 1996, lists an option type as part of ML's standard library. In other words, F#'s ancestor had options since at least 1996 (and probably long before).
+The `Option` type isn't unique to F#. Java, for example, has `Optional`. However, whereas Java's `Optional` is a feature that was added to a language that had already been around for a long time (it was added in Java 1.8), F#'s `option` type has been in the language since its inception. In fact, my second edition of _ML for the Working Programmer_, published in 1996, lists an option type as part of ML's standard library. In other words, F#'s ancestor had options since at least 1996 (and probably long before).
 
-This means that essentially all F# code in existence was written for a platform where `option` existed from day one. This has apparently led to library functions that would never have occurred to someone who's been writing Java for over two decades (me).
+This means that all F# code in existence was written for a platform where `option` existed from day one. This has led to library functions that would never have occurred to someone who's been writing Java for over two decades (me).
 
-Any language I've ever used that has collections has had two primitive functions defined for them. These functions have many different names, depending on the language. Let's agree to call them **filter** and **transform** when we are not talking about a particular implementation.
+### Java Example
+
+All programming languages I've used have had some sort of _collection_ abstraction, and they've all had _at least_ the two following operations defined for collections: **filter** and **transform**. Sure, these operations often go by different names ("grep", "remove-if-not", "map", ...) -- but they are always there.
 
 The **filter** function takes two arguments: a collection and a unary predicate. It returns a new collection containing only the elements of the original collection for which the predicate returned `true`.
 
 The **transform** function takes two arguments: a collection and a unary function. It returns a new collection whose elements are the result of applying the function to each element in the original collection.
 
-For example, let's say that given a list of integers, you wanted to take only the even ones, divide them by three, and show the result as a floating point number.
+For example, let's say that given a list of integers, you wanted to take only the even ones, divide them by three, and show the result as a floating point number. In Java, that could be accomplished as follows:
 
 ```
 $> jshell
@@ -49,33 +49,42 @@ jshell> floats.get(0).getClass()
 $29 ==> class java.lang.Double
 ```
 
-Conceptually, the types involved are:
+Most of that is boilerplate that lets me show you the types of the expressions (to convince you I started with `int`s and ended up with `float`s). The really important part is:
 
-```
-filter:   ('a -> bool)
-map:      ('a -> 'b)
-```
-
-Here you can see that first I build a list of `Integer`s and prove they are integers by calling `getClass()` on the first one. Then I perform a pattern I've used thousands of times: I filter, then I transform (`map` in Java).
-
-Until today, this is about the only way I could even think of solving this: **Filter. Then transform.**
-
-Well, in a language that has always had an `option` type, library implementors apparently think differently.
-
-```
-// ...existing code...
+```shell
+var floats = ints.stream().filter(n -> n % 2 == 0).map(i->i/3.0).collect(Collectors.toList())
 ```
 
-Here, you can see that the first thing I do is look at the signature of the `List.choose` method:
+Note the successive calls to `filter` and `map` (a.k.a.: "transform"). The tried and true method of solving this type of problem that I've been using for over two decades.
 
-> `List.choose : ('a -> 'b option) -> 'a list -> 'b list`
+### F# Example
 
-`List.choose`, as its first argument, takes a function that maps a value of type `'a` to an `option` of type `'b`. `List.choose` then returns a function that accepts a list of type `'a` and converts it to a (possibly smaller) list of type `'b`.
+In F#, the same example uses `option`s to merge "filtering" and "transforming" into the same function! To you, dear reader, this may seem like such a little thing... but when I saw it, I was taken aback. It's always interesting to see a new way of doing something you've been doing the same way for your entire career.
 
-In other words, the authors of `List.choose` recognized that if a caller can provide a function with the signature `'a -> 'b option`, that is enough information to create a function that both filters _and_ transforms an input list in one pass.
+```shell
+$> dotnet fsi
 
-You could describe `choose` informally as:
+> List.choose;;
+val it: (('a -> 'b option) -> 'a list -> 'b list)
 
-> “Run this function on each element. If it returns `Some x`, keep `x`. If it returns `None`, drop that element.”
+> let ints = [1..10];;
+val ints: int list = [1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
 
-Because `option` has always been there, this “filter while mapping” operation feels natural enough to deserve its own combinator in the standard library. Coming from Java, where `Optional` arrived much later and doesn't quite occupy the same central role, it's the sort of function I didn't even realize I was missing until I saw it.
+> ints |> List.choose(fun i -> if i % 2 = 0 then Some(float i / 3.0) e
+val it: float list =
+  [0.6666666667; 1.333333333; 2.0; 2.666666667; 3.333333333]
+```
+
+Look at the signature of `List.choose`, the method that both "filters" and "transforms":
+
+```
+('a -> 'b option) -> 'a list -> 'b list
+```
+
+`List.choose`, as its first argument, takes a function that maps a value of type `'a` to an `option` of type `'b`. That function can do two things:
+1. Convert an instance of `'a` to an instance of `'b`
+2. Indicate inclusion or exclusion via an `option`
+
+In other words, it does the jobs of both "transform" and "filter"!
+
+Given this argument, `List.choose` then builds a function that can be applied to an input collection (`ints` in the example) to generate an output collection. An output collection that has undergone both a "filter" and a "transform".
