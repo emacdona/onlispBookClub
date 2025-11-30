@@ -1,6 +1,6 @@
 ---
 layout: post
-published: false
+published: true
 ---
 
 # F#: There was always an Option
