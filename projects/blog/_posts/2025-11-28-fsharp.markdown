@@ -1,6 +1,7 @@
 ---
 layout: post
 published: true
+title: "F#: There was always an Option"
 ---
 
 # F#: There was always an Option
