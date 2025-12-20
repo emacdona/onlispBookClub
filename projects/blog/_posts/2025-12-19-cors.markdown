@@ -1,16 +1,16 @@
 ---
 layout: post
-published: false
+published: true
 title: "CORS Lite"
 ---
 
 # CORS Lite
 
-Every time I see a CORS error, I have to rebuild my mental model of how CORS works. Maybe I don't see CORS errors often enough ... or maybe I'm just getting old. For whatever reason, I just can't retain that model.  But... every single time I try to rebuild it, I get it wrong. This blog post is for me -- something to refer myself to the next time I'm wondering what CORS is.
+Every time I see a CORS error, I have to rebuild my mental model of how CORS works. Maybe I don't see CORS errors often enough, or maybe I'm just getting old. For whatever reason, I just can't retain that model. But... every single time I try to rebuild it, I get it wrong. This blog post is for me -- something to refer back to the next time I'm wondering what CORS is.
 
 There are lots of docs you can read online if you want a reference. This is not a reference; this is the "Lite" version.
 
-## What is CORS
+## What is CORS?
 
 Actually, one of those [online references](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS) mentioned above has a perfectly fine definition:
 
@@ -18,7 +18,7 @@ Actually, one of those [online references](https://developer.mozilla.org/en-US/d
 
 ## My Error(s)
 
-My first problem is one of terminology. I always think of **server** as the url I typed into my browser. In fact, that is the **origin**. The **server** is the resource server from which the page (loaded from the **origin**) requests resources.
+My first problem is one of terminology. I always think of **server** as the URL I typed into my browser. In fact, that is the **origin**. The **server** is the resource server from which the page (loaded from the **origin**) requests resources.
 
 With that clarified, we can state my true problem using the same language as the definition:
 
@@ -30,20 +30,25 @@ This seems natural to me. Shouldn't it be the page I am visiting that determines
 
 To understand why I'm wrong, it helps to use concrete examples -- instead of the abstract "**origin** A loads resources from **server** B" types of examples.
 
-Let's say you do your banking with (**origin**) https://www.mybank.example.com. They've got a modern website, ie: a JavaScript frontend app that makes calls to a webservice backend. The frontend authenticates you, stores your credentials in a cookie, and sends that cookie with every request it makes to the backend. One of those backend services is "/transfer_to/<routing_number>/<account_number>/<amount>".
+Let's say you do your banking with (**origin**) `https://www.mybank.example.com`. They've got a modern website: a JavaScript frontend app that makes calls to a web service backend. The frontend authenticates you, stores your credentials in a cookie, and sends that cookie with every request it makes to the backend. One of those backend services is `"/transfer_to/<routing_number>/<account_number>/<amount>"`.
 
-Actually, that's not quite accurate. Since your credentials are in a cookie, the frontend app doesn't actively send them. It relies on the browser to send the cookie with every XMLHttpRequest request it makes to the backend webservices. That's an important distinction: if your browser stored a cookie for www.mybank.example.com, it will send that cookie for every request it makes to www.mybank.example.com.
+Actually, that's not quite accurate. Since your credentials are in a cookie, the frontend app doesn't actively send them. It relies on the browser to send the cookie with every XMLHttpRequest it makes to the backend web services. That's an important distinction: if your browser stored a cookie for `www.mybank.example.com`, it will send that cookie for every request it makes to `www.mybank.example.com`.
 
-So, let's say you go to your bank, log in, and use their bill payment system to send a rent check to your landlord. Having taken care of that, it's time to crack open a beer and watch a movie. So, after opening that beer, you go to your favorite source of online content, https://www.shadymovietorrenting.example.com.
+So let's say you go to your bank, log in, and use their bill payment system to send a rent check to your landlord. Having taken care of that, it's time to crack open a beer and watch a movie. So, after opening that beer, you go to your favorite source of online content, `https://www.shadymovietorrenting.example.com`.
 
-You never logged out of your bank's website, though, so the credentials in the cookie are still there, and they're still valid...
+You never logged out of your bank's website though. So the credentials in the cookie are still there, and they're still valid...
 
-And guess what? When you open https://www.shadymovietorrenting.example.com, it makes this XMLHttpRequest:
+And guess what? When you open `https://www.shadymovietorrenting.example.com`, it makes this XMLHttpRequest:
 
+```
 https://www.mybank.example.com/transfer_to/555/1234/10000
+```
 
 Your browser happily attaches the cookie to the request, your bank accepts the (valid) credentials, and you're out $10,000.
 
 ## The Correct Model
 
-The number of websites (**servers**) that you trust are much smaller than the number of websites (**origins**) that you navigate to in your web browser. For those **servers** that you do trust, CORS allows them to tell your browser which **origins** **THEY** trust.
+The number of websites (**servers**) that you trust is much smaller than the number of websites (**origins**) that you navigate to in your web browser. For those **servers** that you do trust, CORS allows them to tell your browser which **origins** they allow to access their resources.
+
+Disclaimer:
+I created the first few drafts of this post before asking an LLM to be my editor. There were em dashes and semicolons in the original -- that's just how I write. You can believe me; or not. I don't care ;-)
