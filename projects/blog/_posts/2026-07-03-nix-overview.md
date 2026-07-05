@@ -177,6 +177,7 @@ Expression ->
 
 ## Building and Installing with Nix
 
+### Derivation Creating Expressions
 To build the library and program with Nix, we create a 'default.nix' file in each project root. This file contains an expression that defines a function that returns a Derivation[^derivationreturningfunction]. That Derivation contains all the information Nix needs to build the project.
 
 Here is the `default.nix`{:.language-shell .highlight} that builds the program:
@@ -210,26 +211,192 @@ stdenv.mkDerivation {
 }
 ```
 
-Note that the Derivation returned by this function includes `libgreeting`{:.language-shell .highlight} as part of its `buildInputs`{:.language-shell .highlight}.
+Note that the Derivation returned by this function includes `libgreeting`{:.language-shell .highlight} as the only member of its `buildInputs`{:.language-shell .highlight}.
 
 Also note that `libgreeting`{:.language-shell .highlight} is passed as a parameter to the function, and its value is the result of calling the function defined in the lib's `default.nix`{:.language-shell .highlight} file with the same `greeting`{:.language-shell .highlight} parameter passed to this function.
- 
+
+The Derivation returned by this function, from Nix's point of view, is completely determined by its inputs[^inputbased]. The only input is `libgreeting`{:.language-shell .highlight}, and that input is a Derivation that results from calling the function defined in `lib/default.nix`{:.language-shell .highlight} with a single parameter.
+
+Here's `lib/default.nix`{:.language-shell .highlight}:
+
+```nix
+{ stdenv
+, greeting ? "Hello, World!"
+}:
+
+stdenv.mkDerivation {
+  pname = "libgreeting";
+  version = "1.0.0";
+
+  src = ./.;
+
+  # Pass the greeting to the Makefile via environment variable
+  GREETING = greeting;
+
+  # No configure phase needed for this simple Makefile
+  dontConfigure = true;
+
+  buildPhase = ''
+    make
+  '';
+
+  installPhase = ''
+    make install PREFIX= DESTDIR=$out
+  '';
+
+  meta = {
+    description = "A simple greeting library (greeting: ${greeting})";
+  };
+}
+```
+
+Because the Derivation returned by this function uses the value of `greeting`{:.language-shell .highlight} in its definition, that means that this function creates _different_ Derivations for different values of the `greeting`{:.language-shell .highlight} parameter passed to it. The derivation returned by the function defined in `program/default.nix`{:.language-shell .highlight} can depend on any one of these Derivations.
+
+Since a Derivation is also determined by its inputs, the function defined in `program/default.nix`{:.language-shell .highlight} returns a different Derivation for every different value of `libgreeting`{:.language-shell .highlight}.
+
+In other words, when building 'greeter', each value you choose for 'greeting' yields a different derivation of 'libgreting' to be built. libgreeting being the sole input to greeter, this causes a different derivation of 'greeter' to be built. For each value of 'greeting', you get two Outputs in the store: one for greeter, one for libgreeting.
+
+It's easier to see with an example.
+
+## Running the Build.
+
+In the source directory, there are two files, demo01.nix and demo02.nix. They differ _only_ in the "greeting" they pass to the function defined in ./program/default.nix, so I'll just show demo01.nix:
+
+```nix
+let
+  pkgs = import <nixpkgs> {};
+in
+pkgs.callPackage ./program {
+  greeting = "Hello from Demo 01!";
+}
+```
+
+Given those two files, we can run the following two commands:
+
+```bash
+nix-build demo01.nix -o demo01
+nix-build demo02.nix -o demo02
+```
+
+Those commands will (for the single expression in each file) go through the whole process starting with Expression evaluation all the way through to Output creation.
+
+The first time you run them, you'll see the whole build process followed by Nix telling you where it placed the program (greeter) in the store. If you run them again, Nix recognizes that it has already built them... and just shows you where it put them in the store:
+
+```
+$> nix-build demo01.nix -o demo01
+/nix/store/32w8g2sjafhj8iag8v2hb1q1s0mmjw56-greeter-1.0.0
+
+$> nix-build demo02.nix -o demo02
+/nix/store/hnznyz5p9ymaxx61phsis0q9kh7i1aaw-greeter-1.0.0
+```
+
+### Examining the Output
+
+Because we specified the `-o` switch to `nix-build`, it also created two symlinks in the local directory:
+
+```bash
+$> ls -l demo01 demo02
+lrwxrwxrwx 1 1024 users 57 Jul  4 19:11 demo01 -> /nix/store/32w8g2sjafhj8iag8v2hb1q1s0mmjw56-greeter-1.0.0
+lrwxrwxrwx 1 1024 users 57 Jul  4 19:11 demo02 -> /nix/store/hnznyz5p9ymaxx61phsis0q9kh7i1aaw-greeter-1.0.0
+```
+
+We can use these symlinks to run the programs:
+
+```bash
+$> ./demo01/bin/greeter
+Hello from Demo 01!
+$> ./demo02/bin/greeter
+Hello from Demo 02!
+```
+
+But what about the libraries? Well, we can ask Nix to show us the dependency graph for both executables:
+
+```bash
+$> nix-store -q --tree ./demo01 | cat
+/nix/store/32w8g2sjafhj8iag8v2hb1q1s0mmjw56-greeter-1.0.0
+├───/nix/store/vr7ds8vwbl2fz7pr221d5y0f8n9a5wda-glibc-2.40-218
+│   ├───/nix/store/2a3izq4hffdd9r9gb2w6q2ibdc86kss6-xgcc-14.3.0-libgcc
+│   ├───/nix/store/hxcmad417fd8ql9ylx96xpak7da06yiv-libidn2-2.3.8
+│   │   ├───/nix/store/3rkccxj7vi0p2a0d48c4a4z2vv2cni88-libunistring-1.4.1
+│   │   │   └───/nix/store/3rkccxj7vi0p2a0d48c4a4z2vv2cni88-libunistring-1.4.1 [...]
+│   │   └───/nix/store/hxcmad417fd8ql9ylx96xpak7da06yiv-libidn2-2.3.8 [...]
+│   └───/nix/store/vr7ds8vwbl2fz7pr221d5y0f8n9a5wda-glibc-2.40-218 [...]
+└───/nix/store/fhscgmiy6gsjmghbx4nyb9djn68fxjvg-libgreeting-1.0.0
+    └───/nix/store/vr7ds8vwbl2fz7pr221d5y0f8n9a5wda-glibc-2.40-218 [...]
+
+$> nix-store -q --tree ./demo02 | cat
+/nix/store/hnznyz5p9ymaxx61phsis0q9kh7i1aaw-greeter-1.0.0
+├───/nix/store/vr7ds8vwbl2fz7pr221d5y0f8n9a5wda-glibc-2.40-218
+│   ├───/nix/store/2a3izq4hffdd9r9gb2w6q2ibdc86kss6-xgcc-14.3.0-libgcc
+│   ├───/nix/store/hxcmad417fd8ql9ylx96xpak7da06yiv-libidn2-2.3.8
+│   │   ├───/nix/store/3rkccxj7vi0p2a0d48c4a4z2vv2cni88-libunistring-1.4.1
+│   │   │   └───/nix/store/3rkccxj7vi0p2a0d48c4a4z2vv2cni88-libunistring-1.4.1 [...]
+│   │   └───/nix/store/hxcmad417fd8ql9ylx96xpak7da06yiv-libidn2-2.3.8 [...]
+│   └───/nix/store/vr7ds8vwbl2fz7pr221d5y0f8n9a5wda-glibc-2.40-218 [...]
+└───/nix/store/sazax1y1k7ab5h5k5m2hbrky7s9dnadb-libgreeting-1.0.0
+    └───/nix/store/vr7ds8vwbl2fz7pr221d5y0f8n9a5wda-glibc-2.40-218 [...]
+```
+If you look closely, you'll see they depend on two different libgreeting libraries. Perhaps even more suprising, however, is that they _share_ the same outputs for all other dependencies they have in common. Nix manages all that for you!
+
+## How Nix Enables This
+
+Let's take another look at this diagram again:
+
+```
+Expression ->
+  evaluate(Expression) ->
+    in-memory Derivation ->
+      instantiate(in-memory Derivation) ->
+        store Derivation ->
+          realize(store Derivation) ->
+            Outputs
+```
+
+Now let's justify each step:
+
+### Expression
+
+The expressions we created (in the default.nix files) define functions with parameters of our choosing. Each of these functions build and return a Derivation.
+
+We are free to use the arguments passed into this function when it is called to construct the Derivation however we see fit. Perhaps most interesting: we can use these arguments to compute the `inputs` of the Derivation.
+
+For example, given a source code repository (which includes source code along with any scripts and metadata required to convert the source code to an executable artifact), we can create an Expression (function) whose parameters capture any and all variability in our build process. For example: branch name; version number; compiler flags; upstream dependencies; etc. 
+
+In the function body, we can specify how a Derivation (and even its inputs) are constructed given the values (arguments) we assign to these parameters.
+
+### Evaluation of Expression
+
+Evaluation of the expression simply takes the arguments we've passed to the function and uses them to compute the in-memory Derivation.
+
+### In Memory Derivation
+
+Assuming we're using input addressing[^inputbased], at this point the Store Location of every Output in the entire dependency graph of the Derivation is known (or can be determined).
+
+The store location of _this derivation_ is a function of all of its inputs. That is, this derivation is specific to the exact combination of inputs that were used to create it. The same is true for every input in this derivations entire dependency graph.
+
+### Instantiate
+
+Our in-memory Derivation is serialized to disk at its own address in the Nix Store.
+
+### Store Derivation
+
+Now that the Derivation exists in the Store, any Nix process attempting to realize this Derivation or any of its downstream Derivations (those Derivations that depend on this Derivation's Outputs) now has a template that tells it how to do so.
+
+### Realize the Derivation
+
+Okay, now we actually want to run some binaries. So we realize the Derivation, which forces it to be built. This will also recursively realize this Derivation's entire dependency graph (skipping any that have already been realized).
+
+### Output
+
+Now there is an actual (in our case) binary in the store that we can run!
 
 
+## Summary
+
+So, what have we shown here? Well, in particular, we've shown that you can build as many versions of a binary as you want, where the definition of "version" takes into account any "versions" of upstream libraries you may also be building from source (note the recursion there; that's intentional). 
 
 
-
-
-
-
-
-
-
-
-The arguments to the function will be what Nix considers the dependencies of the Derivation. If two separate invocations of the function use the exact same arguments, then from Nix's point of view, they produce the exact same Derivation[^contentbased].
-
-The values of these arguments will contribute to the hash that becomes a part of the address in the Nix Store of each Output created when the Derivation is realized.
 
 
 [^derivationreturningfunction]: This Derivation returning function is what is expected by the Nix provided "callPackage" function, which we will be using in just a bit to kick off the build process.
-[^contentbased]: This is known as "input addressing". If you want to go down a rabbit hole, contrast this with "content addressing" (which is currently being worked on for NixOS).
+[^inputbased]: This is known as "input addressing". If you want to go down a rabbit hole, contrast this with "content addressing" (which is currently being worked on for NixOS).
