@@ -1,24 +1,27 @@
 ---
 layout: post
-published: false
-title: "Learning NixOS"
+published: true
+title: "DRAFT: Learning NixOS"
 ---
 
-# Learning NixOS
+# DRAFT: Learning NixOS and its Nix Package Manager
 
-I've been daily driving Nix for over half a year now. I'm still just a beginner, but I'm slowly learning enough to be dangerous.  The more I use it, the more I am convinced that it's the "correct" way to run software.
+{:.callout}
+This post is currently in "Draft" status. That means it's subject to change without me noting said changes.
 
-It reminds me a lot of when I learned Git. At first, Git was just a collection of arcane commands posing as an alternative to subversion. But the more I used it, the more I became convinced that it was the "correct" way to version control source files.
+I've been daily driving NixOS for over half a year now. I'm still just a beginner, but I'm slowly learning enough to be dangerous.  The more I use it, the more I'm convinced that it's the "correct" way to run software.
+
+It reminds me a lot of when I learned Git. At first, Git was just a collection of arcane commands posing as an alternative to Subversion. But the more I used it, the more I became convinced that it was the "correct" way to version control source files.
 
 My "aha" moment for Git was when I realized how cheap branches and tags were, and how they allowed me to easily create checkpoints anytime I wanted. That meant that if I wanted to hack together an experimental feature just to see if it was possible -- I could create a checkpoint and then try it! If it didn't work, I could throw away the changes (or even check them into a branch if I wanted to try again later) and go back to where I started. Almost instantly. In other words: _Git made running big experiments cheap and risk free_.
 
-I'm on the cusp of the same "aha" moment with Nix. At the moment, I can confidently say that _Nix makes running big experiments risk free_, but I still have a bit to learn before I can add the "_cheap_" qualifier. I have no doubt that Nix is fully capable of making big experiments "_cheap_". My current inability to do so with Nix is only because I'm currently climbing the learning curve. It was no different with Git.
+My "aha" moment for NixOS was when I realized that I could put any piece of software on my system, including its _entire_ dependency graph, without affecting any other piece of software that's already on my system. At the moment, I can confidently say that _NixOS makes running big experiments risk free_, but I still have a bit to learn before I can add the "_cheap_" qualifier. I have no doubt that NixOS is fully capable of making big experiments "_cheap_"; my current inability to make it do so is due only to my lack of knowledge.
 
-Climbing the learning curve. To that end, I did a deep dive into Nix this weekend, trying to get an idea of how it does what it does. My learnings follow.
+I'm still climbing the NixOS learning curve. To that end, I did a deep dive into NixOS this weekend, trying to get an idea of how it does what it does. My learnings follow.
 
 ## Documentation
 
-I've read some things on the [Nix Wiki](https://wiki.nixos.org/wiki/NixOS_Wiki) and I've read quite bit of the [Nix Pills](https://nixos.org/guides/nix-pills/00-preface.html) (and followed along by running their examples).
+I've read some things on the [NixOS Wiki](https://wiki.nixos.org/wiki/NixOS_Wiki) and I've read quite bit of the [Nix Pills](https://nixos.org/guides/nix-pills/00-preface.html) (and followed along by running their examples).
 
 Both are fine resources... but they always left me wanting. It always seemed that they were too precise about things I didn't care about and too imprecise about things I did care about.
 
@@ -26,13 +29,13 @@ Regardless, spend some time on the pills. I did -- so any advice I give should b
 
 That being said, read the first three chapters of Eelco Dolstra's [PhD thesis](https://edolstra.github.io/pubs/phd-thesis.pdf). Trust me.
 
-## What Nix Can Do
+## What the Nix Package Manager Can Do
 
-Nix is extraordinarily good at managing dependencies for software. When you install a package on NixOS, you can be certain that the components that it depends on will never change.
+The Nix Package Manager is extraordinarily good at managing dependencies for software. When you install a package on NixOS, you can be certain that the components that it depends on will never change as long as it remains installed on your system.
 
-Nix will allow you to upgrade any component to a new version while leaving the current version untouched. If you don't like the new version, you can almost instantly rollback.
+The Nix Package Manager will allow you to upgrade any component to a new version while leaving the current version untouched. If you don't like the new version, you can almost instantly rollback.
 
-Nix is also extraordinarily good at letting any component depend on any version of any other component. And by version, I don't mean in the sense of '1.0.1'; I mean something far more granular. You can have one program use version '1.0.1' of a library that was compiled with optimisations turned on... and another program depend on version '1.0.1' of the same library compiled with optimizations turned off! Both '1.0.1' versions of the same library can exist on your machine, and either can be used to build any program that depends on them. As a software developer, this feature really appeals to me.
+The Nix Package Manager is also extraordinarily good at letting any component depend on any version of any other component. And by version, I don't mean in the sense of '1.0.1'; I mean something far more granular. You can have one program use version '1.0.1' of a library that was compiled with optimisations turned on... and another program depend on version '1.0.1' of the same library compiled with optimizations turned off! Both '1.0.1' versions of the same library can exist on your machine, and either can be used to build any program that depends on them. As a software developer, this feature really appeals to me.
 
 ## C Libs and Executables
 
@@ -42,13 +45,13 @@ If you've ever opened up a Makefile that ships with the C source for a program y
 
 ## My Experiment
 
-After months of using Nix as my primary Linux distro, reading about Nix, and asking Claude lots of questions... I had finally arrived at what I thought was a useful experiment that would let me learn a little about how Nix worked.
+After months of using NixOS as my primary Linux distro, reading about NixOS, and asking Claude lots of questions... I had finally arrived at what I thought was a useful experiment that would let me learn a little about how NixOS worked.
 
 * I wanted to create a simple library whose build process could be influenced by an environment variable in a way that was easily witnessed by an end user.
 * I wanted to create a simple program that linked against this library.
 * I wanted the build processes of both of these projects to follow familiar conventions.
-* I wanted to show that Nix could build both of these projects with no changes to their source or build files.
-* I wanted to show that Nix could capture the dependency of the program on the library... and furthermore that it would allow the program to specify bespoke configurations of the library build to depend upon.
+* I wanted to show that the Nix Package Manager could build both of these projects with no changes to their source or build files.
+* I wanted to show that the Nix Package Manager could capture the dependency of the program on the library... and furthermore that it would allow the program to specify bespoke configurations of the library build to depend upon.
 * Finally, I wanted to show that multiple versions of program and dependency could exist on the system without conflict.
 
 ## The Code
@@ -111,23 +114,41 @@ Likewise, the Makefile that builds the program is simpler than the one that buil
 
 The Makefiles for building the library and the program follow the conventions mentioned earlier. In particular, they install into a directory determined by the `DESTDIR`{:.language-shell .highlight} and `PREFIX`{:.language-shell .highlight} environment variables.
 
-I don't recommend it, but if you wanted, you could `make && make install`{:.language-shell .highlight} the library and then the program... and it should work as expected. The reason I don't recommend this is because it would install both in the `/usr/local`{:.language-shell .highlight} directory tree. This is a blog post about Nix... we want to have things installed in the Nix Store.
+I don't recommend it, but if you wanted, you could `make && make install`{:.language-shell .highlight} the library and then the program... and it should work as expected. The reason I don't recommend this is because it would install both in the `/usr/local`{:.language-shell .highlight} directory tree. This is a blog post about NixOS... we want to have things installed in the Nix Store.
 
-## Nix Terms and Definitions
+## NixOS Terms and Definitions
 
-Now that we have source code for a program and a library that it depends on, we can proceed to see how we can use Nix to build and install it. But before we do that, we'll need to define some term.
+Now that we have source code for a program and a library that it depends on, we can proceed to see how we can use The Nix Package Manager to build and install it. But before we do that, we'll need to define some terms.
 
-These definitions reflect my current mental model of how Nix works. I won't claim they are "correct". One of my problems with the Nix ecosystem is that it's sometimes very hard to pin down what a given word means in a given context. These definitions are my attempt to at least capture my understanding.
+These definitions reflect my current mental model of how NixOS works. I won't claim they are "correct". One of my problems with the NixOS ecosystem is that it's sometimes very hard to pin down what a given word means in a given context. These definitions are my attempt to at least capture my understanding.
+
+### "Nix"
+
+The word "Nix" itself can mean one of three different things. I've tried to take care not to use "Nix" in this document. Instead, I try to explicitly use one of the following three terms[^usebeforedefining].
+
+#### Nix Expression Language
+
+The Nix Expression Language is the programming language in which Nix Expressions are written.
+
+#### Nix Package Manager
+
+The Nix Package Manager is the suite of tools that build derivations and manage the Nix Store.
+
+The Nix Package Manager can be used to maintain a Nix Store on distros other than NixOS.
+
+#### NixOS
+
+A Linux distro whose entire configuration is in the Nix Store.
 
 ### Expression
-Independent of Nix, an ***Expression*** is a syntactical object (of a programming language) that evaluates to a value.
+Independent of the Nix Expression Language, an ***Expression*** is a syntactical object (of a programming language) that evaluates to a value.
 
 The Nix ***Expression*** Language is functional: "Everything is an ***Expression***". This model should be familiar to those who have used functional languages. 
 
 You can compose ***Expressions*** into larger ***Expressions***.
 
 ### Derivation
-Some Expressions evaluate to ***Derivations***. Though there are no such formal terms, in Nix it may be helpful to think of such Expressions as "top level Expressions" or "programs".
+Some Expressions evaluate to ***Derivations***. Though there are no such formal terms, in the Nix Expression Language it may be helpful to think of such Expressions as "top level Expressions" or "programs".
 
 The ***Derivation*** that these Expressions evaluate to is an in-memory structure. 
 
@@ -151,13 +172,13 @@ A ***Package*** is really nothing more than a name given to an Expression that e
 
 It helps to consider an example:
 
-Imagine a function named `vim`{:.language-shell .highlight} that takes an `enableGui`{:.language-shell .highlight} argument (whose default value is `false`{:.language-shell .highlight}) and returns a Derivation. Imagine that your Nix distro, in some global namespace, assigned a name to this Expression: `vim-no-gui = vim {}`{:.language-shell .highlight}
+Imagine a function named `vim`{:.language-shell .highlight} that takes an `enableGui`{:.language-shell .highlight} argument (whose default value is `false`{:.language-shell .highlight}) and returns a Derivation. Imagine that your NixOS distro, in some global namespace, assigned a name to this Expression: `vim-no-gui = vim {}`{:.language-shell .highlight}
 
 That name (`vim-no-gui`{:.language-shell .highlight}) is a ***Package***.
 
 If you wanted to create a Derivation whose realization would result in a version of `vim`{:.language-shell .highlight} that **did** have a GUI, you could just call that function with `enableGui=true`{:.language-shell .highlight}, eg: `vim {enableGui = true}`{:.language-shell .highlight}.
 
-But Nix maintainers are also free to create a ***Package*** that does the same by simply doing `vim-gui = vim {enableGui = true}`{:.language-shell .highlight}.
+But NixOS maintainers are also free to create a ***Package*** that does the same by simply doing `vim-gui = vim {enableGui = true}`{:.language-shell .highlight}.
 
 ### Term Summary / Relationships
 
@@ -175,10 +196,10 @@ Expression ->
             Outputs
 ```
 
-## Building and Installing with Nix
+## Building and Installing with the Nix Package Manager
 
 ### Derivation Creating Expressions
-To build the library and program with Nix, we create a 'default.nix' file in each project root. This file contains an expression that defines a function that returns a Derivation[^derivationreturningfunction]. That Derivation contains all the information Nix needs to build the project.
+To build the library and program with the Nix Package Manager, we create a 'default.nix' file in each project root. This file contains an expression that defines a function that returns a Derivation[^derivationreturningfunction]. That Derivation contains all the information the Nix Package Manager needs to build the project.
 
 Here is the `default.nix`{:.language-shell .highlight} that builds the program:
 ```nix
@@ -215,7 +236,7 @@ Note that the Derivation returned by this function includes `libgreeting`{:.lang
 
 Also note that `libgreeting`{:.language-shell .highlight} is passed as a parameter to the function, and its value is the result of calling the function defined in the lib's `default.nix`{:.language-shell .highlight} file with the same `greeting`{:.language-shell .highlight} parameter passed to this function.
 
-The Derivation returned by this function, from Nix's point of view, is completely determined by its inputs[^inputbased]. The key variable input is `libgreeting`{:.language-shell .highlight}, and that input is a Derivation that results from calling the function defined in `lib/default.nix`{:.language-shell .highlight} with the `greeting`{:.language-shell .highlight} parameter.
+The Derivation returned by this function, from the Nix Package Manager's point of view, is completely determined by its inputs[^inputbased]. The key variable input is `libgreeting`{:.language-shell .highlight}, and that input is a Derivation that results from calling the function defined in `lib/default.nix`{:.language-shell .highlight} with the `greeting`{:.language-shell .highlight} parameter.
 
 Here's `lib/default.nix`{:.language-shell .highlight}:
 
@@ -280,7 +301,7 @@ nix-build demo02.nix -o demo02
 
 Those commands will (for the single expression in each file) go through the whole process starting with Expression evaluation all the way through to Output creation.
 
-The first time you run them, you'll see the whole build process followed by Nix telling you where it placed the program (greeter) in the store. If you run them again, Nix recognizes that it has already built them... and just shows you where it put them in the store:
+The first time you run them, you'll see the whole build process followed by the Nix Package Manager telling you where it placed the program (greeter) in the store. If you run them again, the Nix Package Manager recognizes that it has already built them... and just shows you where it put them in the store:
 
 ```
 $> nix-build demo01.nix -o demo01
@@ -309,7 +330,7 @@ $> ./demo02/bin/greeter
 Hello from Demo 02!
 ```
 
-But what about the libraries? Well, we can ask Nix to show us the dependency graph for both executables:
+But what about the libraries? Well, we can ask the Nix Package Manager to show us the dependency graph for both executables:
 
 ```bash
 $> nix-store -q --tree ./demo01 | cat
@@ -336,9 +357,9 @@ $> nix-store -q --tree ./demo02 | cat
 └───/nix/store/sazax1y1k7ab5h5k5m2hbrky7s9dnadb-libgreeting-1.0.0
     └───/nix/store/vr7ds8vwbl2fz7pr221d5y0f8n9a5wda-glibc-2.40-218 [...]
 ```
-If you look closely, you'll see they depend on two different libgreeting libraries. Perhaps even more surprising, however, is that they _share_ the same outputs for all other dependencies they have in common. Nix manages all that for you!
+If you look closely, you'll see they depend on two different libgreeting libraries. Perhaps even more surprising, however, is that they _share_ the same outputs for all other dependencies they have in common. The Nix Package Manager manages all that for you!
 
-## How Nix Enables This
+## How the Nix Package Manager Enables This
 
 Let's take another look at this diagram again:
 
@@ -380,7 +401,7 @@ Our in-memory Derivation is serialized to disk at its own address in the Nix Sto
 
 ### Store Derivation
 
-Now that the Derivation exists in the Store, any Nix process attempting to realize this Derivation or any of its downstream Derivations (those Derivations that depend on this Derivation's Outputs) now has a template that tells it how to do so.
+Now that the Derivation exists in the Store, any Nix Package Manager process attempting to realize this Derivation or any of its downstream Derivations (those Derivations that depend on this Derivation's Outputs) now has a template that tells it how to do so.
 
 ### Realize the Derivation
 
@@ -398,5 +419,6 @@ So, what have we shown here? Well, in particular, we've shown that you can build
 
 
 
-[^derivationreturningfunction]: This Derivation returning function is what is expected by the Nix provided "callPackage" function, which we will be using in just a bit to kick off the build process.
+[^usebeforedefining]: In fact, I've already use these terms before defining them. I apologize for that, but it was hard to structure this document. 
+[^derivationreturningfunction]: This Derivation returning function is what is expected by the Nix Expression Language provided "callPackage" function, which we will be using in just a bit to kick off the build process.
 [^inputbased]: This is known as "input addressing". If you want to go down a rabbit hole, contrast this with "content addressing" (which is currently being worked on for NixOS).
