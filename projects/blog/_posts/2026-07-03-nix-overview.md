@@ -20,7 +20,7 @@ Climbing the learning curve. To that end, I did a deep dive into Nix this weeken
 
 I've read some things on the [Nix Wiki](https://wiki.nixos.org/wiki/NixOS_Wiki) and I've read quite bit of the [Nix Pills](https://nixos.org/guides/nix-pills/00-preface.html) (and followed along by running their examples).
 
-Both are fine resources... but they always left me wanting. It always seemed that they were too precise about things I didn't care about and to imprecise about things I did care about.
+Both are fine resources... but they always left me wanting. It always seemed that they were too precise about things I didn't care about and too imprecise about things I did care about.
 
 Regardless, spend some time on the pills. I did -- so any advice I give should be prefixed with "try doing the pills first".
 
@@ -111,7 +111,7 @@ Likewise, the Makefile that builds the program is simpler than the one that buil
 
 The Makefiles for building the library and the program follow the conventions mentioned earlier. In particular, they install into a directory determined by the `DESTDIR`{:.language-shell .highlight} and `PREFIX`{:.language-shell .highlight} environment variables.
 
-I don't recommend it, but if you wanted, you could `make && make install`{:.language-shell .highlight} the library and then the program... and it should work as expected. The reason I don't recommend this is because it would install both in the `/usr/local`{:.language-shell .highlight} directory tree.This is a blog post about Nix... we want to have things installed in the Nix Store.
+I don't recommend it, but if you wanted, you could `make && make install`{:.language-shell .highlight} the library and then the program... and it should work as expected. The reason I don't recommend this is because it would install both in the `/usr/local`{:.language-shell .highlight} directory tree. This is a blog post about Nix... we want to have things installed in the Nix Store.
 
 ## Nix Terms and Definitions
 
@@ -215,7 +215,7 @@ Note that the Derivation returned by this function includes `libgreeting`{:.lang
 
 Also note that `libgreeting`{:.language-shell .highlight} is passed as a parameter to the function, and its value is the result of calling the function defined in the lib's `default.nix`{:.language-shell .highlight} file with the same `greeting`{:.language-shell .highlight} parameter passed to this function.
 
-The Derivation returned by this function, from Nix's point of view, is completely determined by its inputs[^inputbased]. The only input is `libgreeting`{:.language-shell .highlight}, and that input is a Derivation that results from calling the function defined in `lib/default.nix`{:.language-shell .highlight} with a single parameter.
+The Derivation returned by this function, from Nix's point of view, is completely determined by its inputs[^inputbased]. The key variable input is `libgreeting`{:.language-shell .highlight}, and that input is a Derivation that results from calling the function defined in `lib/default.nix`{:.language-shell .highlight} with the `greeting`{:.language-shell .highlight} parameter.
 
 Here's `lib/default.nix`{:.language-shell .highlight}:
 
@@ -336,7 +336,7 @@ $> nix-store -q --tree ./demo02 | cat
 └───/nix/store/sazax1y1k7ab5h5k5m2hbrky7s9dnadb-libgreeting-1.0.0
     └───/nix/store/vr7ds8vwbl2fz7pr221d5y0f8n9a5wda-glibc-2.40-218 [...]
 ```
-If you look closely, you'll see they depend on two different libgreeting libraries. Perhaps even more suprising, however, is that they _share_ the same outputs for all other dependencies they have in common. Nix manages all that for you!
+If you look closely, you'll see they depend on two different libgreeting libraries. Perhaps even more surprising, however, is that they _share_ the same outputs for all other dependencies they have in common. Nix manages all that for you!
 
 ## How Nix Enables This
 
