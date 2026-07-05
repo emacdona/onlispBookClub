@@ -41,7 +41,13 @@ The Nix Package Manager is also extraordinarily good at letting any component de
 
 If you've been using Linux for a while, there's a good chance that you've built some program and/or library from C source code. Over the decades, the process of doing so has become remarkably similar across projects. Tools like [Autoconf](https://www.gnu.org/software/autoconf/), [Automake](https://www.gnu.org/software/automake/), and [Libtool](https://www.gnu.org/software/libtool/) have helped make this possible.
 
-If you've ever opened up a Makefile that ships with the C source for a program you've built, you probably noticed that you can change the build process by specifying environment variables. `LDFLAGS`{:.language-shell .highlight} and `CFLAGS`{:.language-shell .highlight} are two such environment variables. Given the exact same source, the values passed to these flags can result in significantly different binaries.
+If you've ever opened up a Makefile that ships with the C source for a program you've built, you probably noticed that you can change the build process by specifying environment variables.
+
+`LDFLAGS`{:.language-shell .highlight} and `CFLAGS`{:.language-shell .highlight} allow you to control compiler and linker flags. Given the exact same source, the values passed to these environment variables can result in significantly different binaries.
+
+`DESTDIR`{:.language-shell .highlight} and `PREFIX`{:.language-shell .highlight} are two environment variables that let you determine where a given piece of software is installed.
+
+In other words, you can control where your project looks for its build time dependencies and where it installs to. This is one way that the Nix Package Manager can control where software is installed and where it finds its dependencies.
 
 ## My Experiment
 
