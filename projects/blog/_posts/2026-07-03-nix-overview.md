@@ -9,7 +9,7 @@ title: "DRAFT: Learning NixOS"
 {:.callout}
 This post is currently in "Draft" status. That means it's subject to change without me noting said changes.
 
-I've been daily driving NixOS for over half a year now. I'm still just a beginner, but I'm slowly learning enough to be dangerous.  The more I use it, the more I'm convinced that it's the "correct" way to run software.
+I've been daily driving NixOS for over half a year now. I'm still just a beginner, but I'm slowly learning enough to be dangerous. The more I use it, the more I'm convinced that it's the "correct" way to run software.
 
 It reminds me a lot of when I learned Git. At first, Git was just a collection of arcane commands posing as an alternative to Subversion. But the more I used it, the more I became convinced that it was the "correct" way to version control source files.
 
@@ -21,7 +21,7 @@ I'm still climbing the NixOS learning curve. To that end, I did a deep dive into
 
 ## Documentation
 
-I've read some things on the [NixOS Wiki](https://wiki.nixos.org/wiki/NixOS_Wiki) and I've read quite bit of the [Nix Pills](https://nixos.org/guides/nix-pills/00-preface.html) (and followed along by running their examples).
+I've read some things on the [NixOS Wiki](https://wiki.nixos.org/wiki/NixOS_Wiki) and I've read quite a bit of the [Nix Pills](https://nixos.org/guides/nix-pills/00-preface.html) (and followed along by running their examples).
 
 Both are fine resources... but they always left me wanting. It always seemed that they were too precise about things I didn't care about and too imprecise about things I did care about.
 
@@ -124,7 +124,7 @@ I don't recommend it, but if you wanted, you could `make && make install`{:.lang
 
 ## NixOS Terms and Definitions[^usebeforedefining]
 
-Now that we have source code for a program and a library that it depends on, we can proceed to see how we can use The Nix Package Manager to build and install it. But before we do that, we'll need to define some terms.
+Now that we have source code for a program and a library that it depends on, we can proceed to see how we can use the Nix Package Manager to build and install it. But before we do that, we'll need to define some terms.
 
 These definitions reflect my current mental model of how NixOS works. I won't claim they are "correct". One of my problems with the NixOS ecosystem is that it's sometimes very hard to pin down what a given word means in a given context. These definitions are my attempt to at least capture my understanding.
 
@@ -149,14 +149,14 @@ A Linux distro whose entire configuration (not just the applications you install
 ### Expression
 Independent of the Nix Expression Language, an ***Expression*** is a syntactical object (of a programming language) that evaluates to a value.
 
-The Nix ***Expression*** Language is functional: "Everything is an ***Expression***". This model should be familiar to those who have used functional languages. 
+The Nix ***Expression*** Language is functional: "Everything is an ***Expression***". This model should be familiar to those who have used functional languages.
 
 You can compose ***Expressions*** into larger ***Expressions***.
 
 ### Derivation
 Some Expressions evaluate to ***Derivations***. Though there are no such formal terms, in the Nix Expression Language it may be helpful to think of such Expressions as "top level Expressions" or "programs".
 
-The ***Derivation*** that these Expressions evaluate to is an in-memory structure. 
+The ***Derivation*** that these Expressions evaluate to is an in-memory structure.
 
 When one of these "in-memory ***Derivations***" is Instantiated, a store object is created. This object is ALSO called a ***Derivation***. You can think of this "store ***Derivation***" as a build plan for a set of Outputs. It can be Realized, resulting in the creation of these Outputs.
 
@@ -170,7 +170,7 @@ A Derivation can be Realized to create multiple ***Outputs***. For example, a De
 
 ### Nix Store
 
-The Nix store is the Nix Package Manager's database. It's implemented right on the filesystem and is usually located at `/nix/store`{:.language-shell .highlight}.
+The Nix Store is the Nix Package Manager's database. It's implemented right on the filesystem and is usually located at `/nix/store`{:.language-shell .highlight}.
 
 It's a flat database: each directory or file in the `/nix/store/`{:.language-shell .highlight} directory is a single addressable component in the store -- and these directories and files are the only components of the store. Most of them are Derivations and Outputs.
 
@@ -180,7 +180,7 @@ A ***Store Path*** is the coordinate (in the Nix Store) of a given store compone
 
 ### Package
 
-A ***Package*** is really nothing more than a name given to an Expression that evaluates to a Derivation. 
+A ***Package*** is really nothing more than a name given to an Expression that evaluates to a Derivation.
 
 It helps to consider an example:
 
@@ -248,7 +248,7 @@ Note that the Derivation returned by this function includes `libgreeting`{:.lang
 
 Note that `libgreeting`{:.language-shell .highlight} is passed as a parameter to the function, and its default value is the result of calling the function defined in the lib's `default.nix`{:.language-shell .highlight} file with the same `greeting`{:.language-shell .highlight} parameter passed to this function.
 
-Although the type of the `libgreeting`{:.language-shell .highlight} is a Derivation, when it's used to construct the `buildPhase`{:.language-shell .highlight} string, the Nix Expression Language's string interpolation turns it into `libgreeting`{:.language-shell .highlight}'s default Output path in the Nix Store.
+Although the type of `libgreeting`{:.language-shell .highlight} is a Derivation, when it's used to construct the `buildPhase`{:.language-shell .highlight} string, the Nix Expression Language's string interpolation turns it into `libgreeting`{:.language-shell .highlight}'s default Output path in the Nix Store.
 
 The Derivation returned by this function, from the Nix Package Manager's point of view, is completely determined by its inputs[^inputbased]. The key variable input is `libgreeting`{:.language-shell .highlight}, and that input is a Derivation that results from calling the function defined in `lib/default.nix`{:.language-shell .highlight} with the `greeting`{:.language-shell .highlight} parameter.
 
@@ -289,11 +289,11 @@ Because the Derivation returned by this function uses the value of `greeting`{:.
 
 Since a Derivation is also determined by its inputs, the function defined in `program/default.nix`{:.language-shell .highlight} returns a different Derivation for every different value of `libgreeting`{:.language-shell .highlight}.
 
-In other words, when building `greeter`{:.language-shell .highlight}, each value you choose for `greeting`{:.language-shell .highlight} yields a different Derivation of `libgreeting`{:.language-shell .highlight} to be built. `libgreeting`{:.language-shell .highlight} being the sole input to `greeter`{:.language-shell .highlight}, this causes a different Derivation of `greeter`{:.language-shell .highlight} to be built. For each value of `greeting`{:.language-shell .highlight}, you get two Outputs in the store: one for `greeter`{:.language-shell .highlight}, one for `libgreeting`{:.language-shell .highlight}.
+In other words, when building `greeter`{:.language-shell .highlight}, each value you choose for `greeting`{:.language-shell .highlight} yields a different Derivation of `libgreeting`{:.language-shell .highlight} to be built. `libgreeting`{:.language-shell .highlight} being the key variable input to `greeter`{:.language-shell .highlight}, this causes a different Derivation of `greeter`{:.language-shell .highlight} to be built. For each value of `greeting`{:.language-shell .highlight}, you get two Outputs in the store: one for `greeter`{:.language-shell .highlight}, one for `libgreeting`{:.language-shell .highlight}.
 
 It's easier to see with an example.
 
-## Running the Build.
+## Running the Build
 
 In the source directory, there are two files, `demo01.nix`{:.language-shell .highlight} and `demo02.nix`{:.language-shell .highlight}. They differ _only_ in the `greeting`{:.language-shell .highlight} they pass to the function defined in `./program/default.nix`{:.language-shell .highlight}, so I'll just show `demo01.nix`{:.language-shell .highlight}:
 
@@ -371,11 +371,12 @@ $> nix-store -q --tree ./demo02 | cat
 └───/nix/store/sazax1y1k7ab5h5k5m2hbrky7s9dnadb-libgreeting-1.0.0
     └───/nix/store/vr7ds8vwbl2fz7pr221d5y0f8n9a5wda-glibc-2.40-218 [...]
 ```
+
 If you look closely, you'll see they depend on two different `libgreeting`{:.language-shell .highlight} libraries. Perhaps even more surprising, however, is that they _share_ the same outputs for all other dependencies they have in common. The Nix Package Manager manages all that for you!
 
 ## How the Nix Package Manager Enables This
 
-Let's take another look at this diagram again:
+Let's take another look at this diagram:
 
 ```
 Expression ->
@@ -391,7 +392,7 @@ Now let's justify each step:
 
 ### Expression
 
-The Expressions we created (in the `default.nix`{:.language-shell .highlight} files) define functions with parameters of our choosing. Each of these functions build and return a Derivation.
+The Expressions we created (in the `default.nix`{:.language-shell .highlight} files) define functions with parameters of our choosing. Each of these functions builds and returns a Derivation.
 
 We are free to use the arguments passed into this function when it is called to construct the Derivation however we see fit. Perhaps most interesting: we can use these arguments to compute the `inputs`{:.language-shell .highlight} of the Derivation.
 
@@ -434,6 +435,6 @@ So, what have we shown here? Well, in particular, we've shown that you can build
 
 [^technicallymodifying]: Okay, technically I am modifying `CFLAGS`{:.language-shell .highlight}, but only because that's how you define preprocessor macros at compile time. What I mean is that I'm not passing arguments that change how the compiler behaves; e.g.: `-O3`{:.language-shell .highlight}.
 [^usebeforedefining]: I've already used some of these terms before defining them. I apologize for that, but it was hard to structure this document. 
-[^derivationreturningfunction]: This Derivation returning function is what is expected by the Nix Expression Language provided `callPackage`{:.language-shell .highlight} function, which we will be using in just a bit to kick off the build process.
+[^derivationreturningfunction]: This Derivation-returning function is what is expected by the Nix Expression Language provided `callPackage`{:.language-shell .highlight} function, which we will be using in just a bit to kick off the build process.
 [^inputbased]: This is known as "input addressing". If you want to go down a rabbit hole, contrast this with "content addressing" (which is currently being worked on for NixOS).
 [^gcroots]: These symlinks are one instance of what is known as a Garbage Collection (GC) Root. There are different ways in which the Nix Package Manager creates GC Roots. Here, they are the output of the build process -- a convenience. More interesting are Profiles and Generations... the tools NixOS uses to manage a bespoke execution environment for every user on the system. Any Output reachable via an existing GC Root's graph will not be garbage collected when you run `nix-collect-garbage`{:.language-shell .highlight}. I wanted to talk more about GC Roots, Profiles, and Generations... but this post is too long already!
