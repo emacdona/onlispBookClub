@@ -396,7 +396,7 @@ The Expressions we created (in the `default.nix`{:.language-shell .highlight} fi
 
 We are free to use the arguments passed into this function when it is called to construct the Derivation however we see fit. Perhaps most interesting: we can use these arguments to compute the `inputs`{:.language-shell .highlight} of the Derivation.
 
-For example, given a source code repository (which includes source code along with any scripts and metadata required to convert the source code to an executable artifact), we can create an Expression (function) whose parameters capture any and all variability in our build process. For example: branch name; version number; compiler flags; upstream dependencies; etc. 
+For example, given a source code repository (which includes source code along with any scripts and metadata required to convert the source code to an executable artifact), we can create an Expression (function) whose parameters capture any and all variability in our build process. For example: branch name; version number; compiler flags; upstream dependencies; etc.
 
 In the function body, we can specify how a Derivation (and even its inputs) are constructed given the values (arguments) we assign to these parameters.
 
@@ -429,7 +429,7 @@ Now there is an actual (in our case) binary in the store that we can run!
 
 ## Summary
 
-So, what have we shown here? Well, in particular, we've shown that you can build as many versions of a binary as you want, where the definition of "version" takes into account any "versions" of upstream libraries you may also be building from source. 
+So, what have we shown here? Well, in particular, we've shown that you can build as many versions of a binary as you want, where the definition of "version" takes into account any "versions" of upstream libraries you may also be building from source.
 
 
 
