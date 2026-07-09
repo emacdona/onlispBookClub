@@ -147,7 +147,7 @@ The Nix Package Manager can be used to maintain a Nix Store on distros other tha
 A Linux distro whose entire configuration (not just the applications you install within it) is in the Nix Store.
 
 ### Expression
-Independent of the Nix Expression Language, an ***Expression*** is a syntactical object (of a programming language) that evaluates to a value.
+Independent of the Nix ***Expression Language***, an ***Expression*** is a syntactical object (of a programming language) that evaluates to a value.
 
 The Nix ***Expression*** Language is functional: "Everything is an ***Expression***". This model should be familiar to those who have used functional languages.
 
@@ -188,7 +188,7 @@ Imagine a function named `vim`{:.language-shell .highlight} that takes an `enabl
 
 That name (`vim-no-gui`{:.language-shell .highlight}) is a ***Package***.
 
-If you wanted to create a Derivation whose realization would result in a version of `vim`{:.language-shell .highlight} that **did** have a GUI, you could just call that function with `enableGui=true`{:.language-shell .highlight}, eg: `vim {enableGui = true}`{:.language-shell .highlight}.
+If you wanted to create a Derivation whose Realization would result in a version of `vim`{:.language-shell .highlight} that **did** have a GUI, you could just call that function with `enableGui=true`{:.language-shell .highlight}, eg: `vim {enableGui = true}`{:.language-shell .highlight}.
 
 But NixOS maintainers are also free to create a ***Package*** that does the same by simply assigning a name: `vim-gui = vim {enableGui = true}`{:.language-shell .highlight}.
 
@@ -416,11 +416,11 @@ Our in-memory Derivation is serialized to disk at its own address in the Nix Sto
 
 ### Store Derivation
 
-Now that the Derivation exists in the Store, any Nix Package Manager process attempting to realize this Derivation or any of its downstream Derivations (those Derivations that depend on this Derivation's Outputs) now has a template that tells it how to do so.
+Now that the Derivation exists in the Store, any Nix Package Manager process attempting to Realize this Derivation or any of its downstream Derivations (those Derivations that depend on this Derivation's Outputs) now has a template that tells it how to do so.
 
 ### Realize the Derivation
 
-Okay, now we actually want to run some binaries. So we realize the Derivation, which forces it to be built. This will also recursively realize this Derivation's entire dependency graph (skipping any that have already been Realized).
+Okay, now we actually want to run some binaries. So we Realize the Derivation, which forces it to be built. This will also recursively Realize this Derivation's entire dependency graph (skipping any that have already been Realized).
 
 ### Output
 
