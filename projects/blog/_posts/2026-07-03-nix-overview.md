@@ -116,7 +116,7 @@ int main(void) {
 
 Likewise, the Makefile that builds the program is simpler than the one that builds the library. In fact, there's nothing really worth pointing out within it. Feel free to look at it in the source repo.
 
-### Building the Library and the Program
+### Building and Installing without the Nix Package Manager
 
 The Makefiles for building the library and the program follow the conventions mentioned earlier. In particular, they install into a directory determined by the `DESTDIR`{:.language-shell .highlight} and `PREFIX`{:.language-shell .highlight} environment variables.
 
