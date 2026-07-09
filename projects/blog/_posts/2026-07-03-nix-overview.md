@@ -43,11 +43,11 @@ If you've been using Linux for a while, there's a good chance that you've built 
 
 If you've ever opened up a Makefile that ships with the C source for a program you've built, you probably noticed that you can change the build process by specifying environment variables.
 
-`LDFLAGS`{:.language-shell .highlight} and `CFLAGS`{:.language-shell .highlight} allow you to control compiler and linker flags. You can use these to specify build time options (where to look for header files; where to look for libraries). You can also use them for things like adding debug symbols or choosing the compiler optimization level -- in which case, given the exact same source, the values passed to these environment variables can result in significantly different binaries.
+`INCLUDES`{:.language-shell .highlight}, `LDFLAGS`{:.language-shell .highlight}, and `CFLAGS`{:.language-shell .highlight} allow you to control compiler and linker flags. You can use these to specify build time options (where to look for header files; where to look for libraries). You can also use them for things like adding debug symbols or choosing the compiler optimization level -- in which case, given the exact same source, the values passed to these environment variables can result in significantly different binaries.
 
 `DESTDIR`{:.language-shell .highlight} and `PREFIX`{:.language-shell .highlight} are two environment variables that let you determine where a given piece of software is installed.
 
-Using these four variables, you can control where your project looks for its build time dependencies and where it installs to. This is one way that the Nix Package Manager can control where software is installed and where it finds its dependencies.
+Using these five variables, you can control where your project looks for its build time dependencies and where it installs to. This is one way that the Nix Package Manager can control where software is installed and where it finds its dependencies.
 
 ## My Experiment
 
