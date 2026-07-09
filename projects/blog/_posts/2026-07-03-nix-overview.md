@@ -147,7 +147,7 @@ The Nix Package Manager can be used to maintain a Nix Store on distros other tha
 A Linux distro whose entire configuration (not just the applications you install within it) is in the Nix Store.
 
 ### Expression
-Independent of the Nix ***Expression Language***, an ***Expression*** is a syntactical object (of a programming language) that evaluates to a value.
+Independent of the Nix ***Expression*** Language, an ***Expression*** is a syntactical object (of a programming language) that evaluates to a value.
 
 The Nix ***Expression*** Language is functional: "Everything is an ***Expression***". This model should be familiar to those who have used functional languages.
 
