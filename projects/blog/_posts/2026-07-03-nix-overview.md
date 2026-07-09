@@ -211,7 +211,7 @@ Expression ->
 ## Building and Installing with the Nix Package Manager
 
 ### Derivation Creating Expressions
-To build the library and program with the Nix Package Manager, we create a `default.nix`{:.language-shell .highlight} file in each project's root. This file contains an expression that defines a function that returns a Derivation[^derivationreturningfunction]. That Derivation contains all the information the Nix Package Manager needs to build the project.
+To build the library and program with the Nix Package Manager, we create a `default.nix`{:.language-shell .highlight} file in each project's root. This file contains an Expression that defines a function that returns a Derivation[^derivationreturningfunction]. That Derivation contains all the information the Nix Package Manager needs to build the project.
 
 Here is the `default.nix`{:.language-shell .highlight} that builds the `greeter`{:.language-shell .highlight} program:
 ```nix
@@ -313,7 +313,7 @@ nix-build demo01.nix -o demo01
 nix-build demo02.nix -o demo02
 ```
 
-Those commands will (for the single expression in each file) go through the whole process starting with Expression evaluation all the way through to Output creation.
+Those commands will (for the single Expression in each file) go through the whole process starting with Expression evaluation all the way through to Output creation.
 
 The first time you run them, you'll see the whole build process (for library _and_ program!) followed by the Nix Package Manager telling you where it placed the program (`greeter`{:.language-shell .highlight}) in the store. If you run them again, the Nix Package Manager recognizes that it has already built them... and just shows you where it put them in the store:
 
