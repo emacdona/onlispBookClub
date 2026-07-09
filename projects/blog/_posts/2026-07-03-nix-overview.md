@@ -11,9 +11,9 @@ This post is currently in "Draft" status. That means it's subject to change with
 
 I've been daily driving NixOS for over half a year now. I'm still just a beginner, but I'm slowly learning enough to be dangerous. The more I use it, the more I'm convinced that it's the "correct" way to run software.
 
-It reminds me a lot of when I learned Git. At first, Git was just a collection of arcane commands posing as an alternative to Subversion. But the more I used it, the more I became convinced that it was the "correct" way to version control source files.
+It reminds me a lot of when I learned Git. My first impression of Git was that it was just a collection of arcane commands posing as an alternative to Subversion. But the more I used it, the more I became convinced that it was the "correct" way to version control source files.
 
-My "aha" moment for Git was when I realized how cheap branches and tags were, and how they allowed me to easily create checkpoints anytime I wanted. That meant that if I wanted to hack together an experimental feature just to see if it was possible -- I could create a checkpoint and then try it! If it didn't work, I could throw away the changes (or even check them into a branch if I wanted to try again later) and go back to where I started. Almost instantly. In other words: _Git made running big experiments cheap and risk free_.
+My "aha" moment for Git was when I realized how cheap branches and tags were, and how they allowed me to easily create checkpoints anytime I wanted. That meant that if I wanted to hack together an experimental feature just to see if it was possible -- I could create a checkpoint and then get to work! If things didn't work out, I could throw away the changes (or even check them into a branch so I could come back to them later) and go back to where I started -- instantly. In other words: _Git made running big experiments cheap and risk free_.
 
 My "aha" moment for NixOS was when I realized that I could put any piece of software on my system, including its _entire_ dependency graph, without affecting any other piece of software that's already on my system. At the moment, I can confidently say that _NixOS makes running big experiments risk free_, but I still have a bit to learn before I can add the "_cheap_" qualifier. I have no doubt that NixOS is fully capable of making big experiments "_cheap_"; my current inability to make it do so is due only to my lack of knowledge.
 
@@ -33,7 +33,7 @@ That being said, read the first three chapters of Eelco Dolstra's [PhD thesis](h
 
 The Nix Package Manager is extraordinarily good at managing dependencies for software. When you install a Package on NixOS, you can be certain that the components that it depends on will never change as long as it remains installed on your system.
 
-The Nix Package Manager will allow you to upgrade any component to a new version while leaving the current version untouched. If you don't like the new version, you can almost instantly rollback.
+The Nix Package Manager will allow you to upgrade any component to a new version while leaving the current version untouched. If you don't like the new version, you can instantly rollback.
 
 The Nix Package Manager is also extraordinarily good at letting any component depend on any version of any other component. And by version, I don't mean in the sense of '1.0.1'; I mean something far more granular. You can have one program use version '1.0.1' of a library that was compiled with optimizations turned on... and another program depend on version '1.0.1' of the same library compiled with optimizations turned off! Both '1.0.1' versions of the same library can exist on your machine, and either can be used to build any program that depends on them. Because building software is an interesting use case for me, this is the feature that I wanted to explore.
 
