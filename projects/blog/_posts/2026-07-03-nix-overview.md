@@ -158,15 +158,15 @@ Some Expressions evaluate to ***Derivations***. Though there are no such formal 
 
 The ***Derivation*** that these Expressions evaluate to is an in-memory structure. 
 
-When one of these "in-memory ***Derivations***" is "Instantiated", a store object is created. This object is ALSO called a ***Derivation***. You can think of this "store ***Derivation***" as a build plan for a set of Outputs. It can be "Realized", resulting in the creation of these Outputs.
+When one of these "in-memory ***Derivations***" is Instantiated, a store object is created. This object is ALSO called a ***Derivation***. You can think of this "store ***Derivation***" as a build plan for a set of Outputs. It can be Realized, resulting in the creation of these Outputs.
 
 The key insight here is:
 
-The store ***Derivation*** is completely determined by the inputs to the Expression whose evaluation yielded the in-memory ***Derivation*** (whose "Instantiation" resulted in the store ***Derivation's*** creation). For the store ***Derivation***, all "variability" has been removed. It is a fully specified "build plan" for a set of Outputs.
+The store ***Derivation*** is completely determined by the inputs to the Expression whose evaluation yielded the in-memory ***Derivation*** (whose Instantiation resulted in the store ***Derivation's*** creation). For the store ***Derivation***, all "variability" has been removed. It is a fully specified "build plan" for a set of Outputs.
 
 ### Outputs
 
-A Derivation can be "Realized" to create multiple ***Outputs***. For example, a Derivation could have separate ***Outputs*** for its runtime and its documentation. All such ***Outputs*** (once "Realized") live in the Nix Store.
+A Derivation can be Realized to create multiple ***Outputs***. For example, a Derivation could have separate ***Outputs*** for its runtime and its documentation. All such ***Outputs*** (once Realized) live in the Nix Store.
 
 ### Nix Store
 
@@ -196,7 +196,7 @@ But NixOS maintainers are also free to create a ***Package*** that does the same
 
 Putting it all together...
 
-Some Expressions, when evaluated, yield in-memory Derivations. These in-memory Derivations can be "Instantiated" to become store Derivations. These store Derivations can be "Realized" as Outputs in the Nix Store.
+Some Expressions, when evaluated, yield in-memory Derivations. These in-memory Derivations can be Instantiated to become store Derivations. These store Derivations can be Realized as Outputs in the Nix Store.
 
 ```
 Expression ->
@@ -419,7 +419,7 @@ Now that the Derivation exists in the Store, any Nix Package Manager process att
 
 ### Realize the Derivation
 
-Okay, now we actually want to run some binaries. So we realize the Derivation, which forces it to be built. This will also recursively realize this Derivation's entire dependency graph (skipping any that have already been "Realized").
+Okay, now we actually want to run some binaries. So we realize the Derivation, which forces it to be built. This will also recursively realize this Derivation's entire dependency graph (skipping any that have already been Realized).
 
 ### Output
 
