@@ -14,12 +14,12 @@ But you'll have to wait for those blog posts. Today, I want to talk about a very
 
 ## Mathematicians
 
-I have a batchelors degree in math, but I want to be clear: I do not claim to be a mathematician. I just mention it because I do have at least some experience operating in an environment where mathematicians are moulded.
+I have a bachelors degree in math, but I want to be clear: I do not claim to be a mathematician. I just mention it because I do have at least some experience operating in an environment where mathematicians are moulded.
 
-In particular[1], I've read lots of pages of lots of math texbooks, and had plenty of disucssions about abstract mathematical models. 
+In particular[1], I've read lots of pages of lots of math textbooks, and had plenty of discussions about abstract mathematical models. 
 
 
-Nix Store: A flat datbase of Store Objects.
+Nix Store: A flat database of Store Objects.
 Store Object: A hierarchical database of Filesystem Objects.
 
 Both of which happen to live on a filesystem, one (both) of which happens to use specially crafted filesystem paths as its (their) addresses

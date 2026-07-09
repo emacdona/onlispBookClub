@@ -327,7 +327,7 @@ $> nix-build demo02.nix -o demo02
 
 ### Examining the Output
 
-Because we specified the `-o`{:.language-shell .highlight} switch to `nix-build`{:.language-shell .highlight}, it also created two symlinks in the local directory:
+Because we specified the `-o`{:.language-shell .highlight} switch to `nix-build`{:.language-shell .highlight}, it also created two symlinks[^gcroots] in the local directory:
 
 ```bash
 $> ls -l demo01 demo02
@@ -436,3 +436,4 @@ So, what have we shown here? Well, in particular, we've shown that you can build
 [^usebeforedefining]: I've already used some of these terms before defining them. I apologize for that, but it was hard to structure this document. 
 [^derivationreturningfunction]: This Derivation returning function is what is expected by the Nix Expression Language provided `callPackage`{:.language-shell .highlight} function, which we will be using in just a bit to kick off the build process.
 [^inputbased]: This is known as "input addressing". If you want to go down a rabbit hole, contrast this with "content addressing" (which is currently being worked on for NixOS).
+[^gcroots]: These symlinks are one instance of what is known as a Garbage Collection (GC) Root. There are different ways in which the Nix Package Manager creates GC Roots. Here, they are the output of the build process -- a convenience. More interesting are Profiles and Generations... the tools NixOS uses to manage a bespoke execution environment for every user on the system. Any Output reachable via an existing GC Root's graph will not be garbage collected when you run `nix-collect-garbage`{:.language-shell .highlight}. I wanted to talk more about GC Roots, Profiles, and Generations... but this post is too long already!
