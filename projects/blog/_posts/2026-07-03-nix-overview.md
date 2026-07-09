@@ -66,7 +66,7 @@ I'll include some code in this post (I tried to keep the examples small), but al
 
 ### The Library
 
-As mentioned above, I wanted to have a library whose behavior could be changed at build time (via an environment variable) in such a way that was easily witnessed by a user. In other words, I won't be modifying `LDFLAGS`{:.language-shell .highlight} or `CFLAGS`{:.language-shell .highlight}[^technicallymodifying] -- because such changes are not easily witnessed.
+As mentioned above, I wanted to have a library whose behavior could be changed at build time (via an environment variable) in such a way that was easily witnessed by a user. In other words, I won't be modifying `INCLUDES`{:.language-shell .highlight}, `LDFLAGS`{:.language-shell .highlight}, or `CFLAGS`{:.language-shell .highlight}[^technicallymodifying] -- because such changes are not easily witnessed.
 
 Instead, my library will use a preprocessor macro to determine the string its single method returns:
 
