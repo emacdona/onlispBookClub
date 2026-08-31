@@ -25,7 +25,7 @@ I've read some things on the [NixOS Wiki](https://wiki.nixos.org/wiki/NixOS_Wiki
 
 Both are fine resources... but they always left me wanting. It always seemed that they were too precise about things I didn't care about and too imprecise about things I did care about.
 
-Regardless, spend some time on the pills. I did -- so any advice I give should be prefixed with "try doing the pills first".
+Regardless, spend some time on the pills. I did -- so any advice I give with respect to learning NixOS should be prefixed with "try doing the pills first".
 
 That being said, read the first three chapters of Eelco Dolstra's [PhD thesis](https://edolstra.github.io/pubs/phd-thesis.pdf). Trust me.
 
@@ -47,22 +47,22 @@ If you've ever opened up a Makefile that ships with the C source for a program y
 
 `DESTDIR`{:.language-shell .highlight} and `PREFIX`{:.language-shell .highlight} are two environment variables that let you determine where a given piece of software is installed.
 
-Using these five variables, you can control where your project looks for its build time dependencies and where it installs to. This is one way that the Nix Package Manager can control where software is installed and where it finds its dependencies.
+Using these five variables, you can control where your project looks for its build time dependencies and where it installs to. Nix can also use them to ensure that software is installed in the Nix Store and that it looks for its dependencies in the Nix Store.
 
 ## My Experiment
 
-After months of using NixOS as my primary Linux distro, reading about NixOS, and asking Claude lots of questions... I had finally arrived at what I thought was a useful experiment that would let me learn a little about how NixOS worked.
+After months of using NixOS as my primary Linux distro, reading about NixOS, and asking Claude lots of questions... I had finally arrived at what I thought would be a useful experiment to learn a little about how NixOS works.
 
 * I wanted to create a simple library whose build process could be influenced by an environment variable in a way that was easily witnessed by an end user.
 * I wanted to create a simple program that linked against this library.
 * I wanted the build processes of both of these projects to follow familiar conventions.
-* I wanted to show that the Nix Package Manager could build both of these projects with no changes to their source or build files.
+* I wanted to show that the Nix Package Manager could build both of these projects with no changes to their source code or build scripts (Makefiles).
 * I wanted to show that the Nix Package Manager could capture the dependency of the program on the library... and furthermore that it would allow the program to specify bespoke configurations of the library build to depend upon.
 * Finally, I wanted to show that multiple versions of program and library could exist on the system without conflict.
 
 ## The Code
 
-I'll include some code in this post (I tried to keep the examples small), but all of the code can also be found [here](https://github.com/emacdona/nixdemo). With the caveat, of course, that the code in the repo may evolve.
+I'll include some code in this post (I tried to keep the examples small), but all of the code can also be found [here](https://github.com/emacdona/nixdemo).
 
 ### The Library
 
@@ -83,7 +83,7 @@ const char* get_greeting(void) {
 }
 ```
 
-The Makefile that builds my library will allow the value of this macro to be overridden via an environment variable:
+The Makefile that builds my library will allow the value of this macro to be overridden via an environment variable -- at _build_ time:
 
 ```make
 # ... code removed, see repo for entire file ...
@@ -99,6 +99,8 @@ CFLAGS += -DGREETING_MESSAGE='"$(GREETING)"'
 
 # ... code removed, see repo for entire file ...
 ```
+
+In other words, different values for the environment variable result in different binaries. The Nix Package Manager will allow all of these binaries to co-exist, and it will allow for downstream components to choose which binary their build depends on.
 
 ### The Program
 
@@ -166,7 +168,7 @@ The store ***Derivation*** is completely determined by the inputs to the Express
 
 ### Outputs
 
-A Derivation can be Realized to create multiple ***Outputs***. For example, a Derivation could have separate ***Outputs*** for its runtime and its documentation. All such ***Outputs*** (once Realized) live in the Nix Store.
+A store Derivation can be Realized to create multiple ***Outputs***. For example, a Derivation could have separate ***Outputs*** for its runtime and its documentation. All such ***Outputs*** (once Realized) live in the Nix Store.
 
 ### Nix Store
 
@@ -182,7 +184,7 @@ A ***Store Path*** is the coordinate (in the Nix Store) of a given store compone
 
 A ***Package*** is really nothing more than a name given to an Expression that evaluates to a Derivation.
 
-It helps to consider an example:
+It's easier to explain with an example:
 
 Imagine a function named `vim`{:.language-shell .highlight} that takes an `enableGui`{:.language-shell .highlight} argument (whose default value is `false`{:.language-shell .highlight}) and returns a Derivation. Imagine that your NixOS distro, in some global namespace, assigned a name to this Expression: `vim-no-gui = vim {}`{:.language-shell .highlight}
 
@@ -211,7 +213,7 @@ Expression ->
 ## Building and Installing with the Nix Package Manager
 
 ### Derivation Creating Expressions
-To build the library and program with the Nix Package Manager, we create a `default.nix`{:.language-shell .highlight} file in each project's root. This file contains an Expression that defines a function that returns a Derivation[^derivationreturningfunction]. That Derivation contains all the information the Nix Package Manager needs to build the project.
+To build our experiment's library and program with the Nix Package Manager, we create a `default.nix`{:.language-shell .highlight} file in each project's root. This file contains an Expression that defines a function that returns a Derivation[^derivationreturningfunction]. That Derivation contains all the information the Nix Package Manager needs to build the project.
 
 Here is the `default.nix`{:.language-shell .highlight} that builds the `greeter`{:.language-shell .highlight} program:
 ```nix
@@ -248,9 +250,11 @@ Note that the Derivation returned by this function includes `libgreeting`{:.lang
 
 Note that `libgreeting`{:.language-shell .highlight} is passed as a parameter to the function, and its default value is the result of calling the function defined in the lib's `default.nix`{:.language-shell .highlight} file with the same `greeting`{:.language-shell .highlight} parameter passed to this function.
 
-Although the type of `libgreeting`{:.language-shell .highlight} is a Derivation, when it's used to construct the `buildPhase`{:.language-shell .highlight} string, the Nix Expression Language's string interpolation turns it into `libgreeting`{:.language-shell .highlight}'s default Output path in the Nix Store. We use this fact to construct a value for the `INCLUDES`{:.language-shell .highlight} and `LDFLAGS`{:.language-shell .highlight} variables that will be passed to `make`{:.language-shell .highlight} when the Nix Package Manager runs it. This is how the Nix Package Manager informs `greeter`{:.language-shell .highlight}'s build process of where it put its dependencies.
+Although the type of `libgreeting`{:.language-shell .highlight} is a Derivation, when it's used to construct the `buildPhase`{:.language-shell .highlight} string, the Nix Expression Language's string interpolation turns it into `libgreeting`{:.language-shell .highlight}'s default Output path in the Nix Store. We use this fact to construct a value for the `INCLUDES`{:.language-shell .highlight} and `LDFLAGS`{:.language-shell .highlight} variables that will be passed to `make`{:.language-shell .highlight} when the Nix Package Manager runs it. This is how the Nix Package Manager informs `greeter`{:.language-shell .highlight}'s build process of where it put (or will put) its dependencies.
 
-The Derivation returned by this function, from the Nix Package Manager's point of view, is completely determined by its inputs[^inputbased]. The key variable input is `libgreeting`{:.language-shell .highlight}, and that input is a Derivation that results from calling the function defined in `lib/default.nix`{:.language-shell .highlight} with the `greeting`{:.language-shell .highlight} parameter.
+The Derivation returned by this function, from the Nix Package Manager's point of view, is completely determined by its `buildInputs`{:.language-shell .highlight}[^inputbased]. 
+<!-- left off here -->
+The key variable input is `libgreeting`{:.language-shell .highlight}, and that input is a Derivation that results from calling the function defined in `lib/default.nix`{:.language-shell .highlight} with the `greeting`{:.language-shell .highlight} parameter.
 
 Here's the `default.nix`{:.language-shell .highlight} that builds the `libgreeting`{:.language-shell .highlight} library:
 
